@@ -38,6 +38,8 @@ namespace l1t {
 
 
     ~EtSum();
+    void setHwPt(int pt);
+    static int numPtBits;
 
     void setType(EtSumType type);
 

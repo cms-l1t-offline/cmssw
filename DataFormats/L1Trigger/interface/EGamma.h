@@ -32,6 +32,8 @@ namespace l1t {
 	    int iso=0);
 
     ~EGamma();
+    void setHwPt(int pt);
+    static int numPtBits;
 
 
   private:

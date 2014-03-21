@@ -25,9 +25,10 @@ process.source = cms.Source("PoolSource",
     #fileNames = cms.untracked.vstring("/store/relval/CMSSW_7_0_0_pre4/RelValTTbar/GEN-SIM-DIGI-RAW-HLTDEBUG/PRE_ST62_V8-v1/00000/22610530-FC24-E311-AF35-003048FFD7C2.root")
     #fileNames = cms.untracked.vstring("file:22610530-FC24-E311-AF35-003048FFD7C2.root")
     #fileNames = cms.untracked.vstring("file:test.root")
-    fileNames = cms.untracked.vstring("file:/mnt/hadoop/cms/store/user/icali/HIHighPt/HIHIHighPt_RAW_Skim_HLT_HIFullTrack14/4d786c9deacb28bba8fe5ed87e99b9e4/SD_HIFullTrack14_975_1_SZU.root")
+    #fileNames = cms.untracked.vstring("file:/mnt/hadoop/cms/store/user/icali/HIHighPt/HIHIHighPt_RAW_Skim_HLT_HIFullTrack14/4d786c9deacb28bba8fe5ed87e99b9e4/SD_HIFullTrack14_975_1_SZU.root")
     #fileNames = cms.untracked.vstring("file:/mnt/hadoop/cms/store/user/icali/HIMinBiasUPC/HIMinBiasUPC_Skim_HLT_HIMinBiasHfOrBSC_v2/35880fcf9fb9fd84b27cd1405e09ffd1/SD_MinBiasHI_977_1_tba.root")
     #fileNames = cms.untracked.vstring("file:/mnt/hadoop/cms/store/user/icali/HIHighPt/HIHIHighPt_RAW_Skim_HLT_HIFullTrack14/4d786c9deacb28bba8fe5ed87e99b9e4/SD_HIFullTrack14_213_1_S5L.root")
+    fileNames = cms.untracked.vstring("file:/mnt/hadoop/cms/store/user/belt/HIMinBiasUPC/HIMinBias2011_GR_R_53_LV6_CMSSW_5_3_16_lumi1/b2348a520dfed9de660746b8b860598e/MinBiasData_step3_RAW2DIGI_RECO_100_1_CeI.root")
     )
 
 
@@ -36,16 +37,15 @@ process.output = cms.OutputModule(
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = cms.untracked.vstring('keep *',
-                                           'drop FEDRawDataCollection_rawDataRepacker_*_*',
-                                           'drop FEDRawDataCollection_virginRawDataRepacker_*_*'),
+                                           #'drop FEDRawDataCollection_rawDataRepacker_*_*',
+                                           #'drop FEDRawDataCollection_virginRawDataRepacker_*_*'
+                                       ),
     fileName = cms.untracked.string('L1Emulator_HI_newLayer2.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('')
     )
                                            )
-process.options = cms.untracked.PSet()
-
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgradePLS1', '')
@@ -65,7 +65,11 @@ process.Layer2HW = cms.EDProducer(
     regionETCutForHT = cms.uint32(7),
     regionETCutForMET = cms.uint32(0),
     minGctEtaForSums = cms.int32(4),
-    maxGctEtaForSums = cms.int32(17)
+    maxGctEtaForSums = cms.int32(17),
+    numJetPtBits = cms.uint32(14),
+    numEGammaPtBits = cms.uint32(6),
+    numEtSumPtBits = cms.uint32(16),
+    numTauPtBits = cms.uint32(11)
     )
 
 process.Layer2Phys = cms.EDProducer("l1t::PhysicalEtAdder",
