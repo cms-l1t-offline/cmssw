@@ -46,7 +46,7 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgradePLS1', '')
 
 #currently runs on gctDigis present in file already
-#see L1TriggerEmulatorHI_newLayer2.py for example of 
+#see L1TriggerEmulatorHI_newLayer2.py for example of
 #how to run on simRctDigis
 process.rctLayer2Format = cms.EDProducer(
     "l1t::L1TCaloRCTToUpgradeConverter",
@@ -61,7 +61,11 @@ process.Layer2HW = cms.EDProducer(
     regionETCutForHT = cms.uint32(7),
     regionETCutForMET = cms.uint32(0),
     minGctEtaForSums = cms.int32(4),
-    maxGctEtaForSums = cms.int32(17)
+    maxGctEtaForSums = cms.int32(17),
+    numJetPtBits = cms.uint32(14),
+    numEGammaPtBits = cms.uint32(6),
+    numEtSumPtBits = cms.uint32(16),
+    numTauPtBits = cms.uint32(11)
     )
 
 process.Layer2Phys = cms.EDProducer("l1t::PhysicalEtAdder",

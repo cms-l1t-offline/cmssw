@@ -104,7 +104,13 @@ namespace l1t {
     // register what you consume and keep token for later access:
     regionToken = consumes<BXVector<l1t::CaloRegion>>(iConfig.getParameter<InputTag>("CaloRegions"));
     candsToken = consumes<BXVector<l1t::CaloEmCand>>(iConfig.getParameter<InputTag>("CaloEmCands"));
+
+    // grab things from the python, all of this will be moved to CaloParams eventually
     int ifwv=iConfig.getParameter<unsigned>("FirmwareVersion");  // LenA  make configurable for now
+    l1t::Jet::numPtBits = iConfig.getParameter<unsigned>("numJetPtBits");
+    l1t::EGamma::numPtBits = iConfig.getParameter<unsigned>("numEGammaPtBits");
+    l1t::EtSum::numPtBits = iConfig.getParameter<unsigned>("numEtSumPtBits");
+    l1t::Tau::numPtBits = iConfig.getParameter<unsigned>("numTauPtBits");
 
     unsigned regionETCutForHT(iConfig.getParameter<unsigned int>("regionETCutForHT"));
     unsigned regionETCutForMET(iConfig.getParameter<unsigned int>("regionETCutForMET"));
@@ -261,8 +267,8 @@ void Stage1Layer2Producer::beginRun(Run const&iR, EventSetup const&iE){
   iE.get< L1JetEtScaleRcd >().get( jetScale ) ;
 
 
-  m_dbpars->setEmScale(emScale->linearLsb());  
-  m_dbpars->setJetScale(jetScale->linearLsb());  
+  m_dbpars->setEmScale(emScale->linearLsb());
+  m_dbpars->setJetScale(jetScale->linearLsb());
 
   //unsigned long long id = iE.get<CaloParamsRcd>().cacheIdentifier();
 

@@ -24,6 +24,8 @@ namespace l1t {
        int eta=0,
        int phi=0,
        int qual=0);
+  void setHwPt(int pt);
+  static int numPtBits;
 
 
   ~Jet();

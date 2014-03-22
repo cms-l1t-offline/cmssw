@@ -29,6 +29,8 @@ namespace l1t {
 
 
     ~Tau();
+    void setHwPt(int pt);
+    static int numPtBits;
 
   private:
 
