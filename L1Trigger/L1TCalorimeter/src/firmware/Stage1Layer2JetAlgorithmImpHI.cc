@@ -22,8 +22,8 @@ using namespace l1t;
 
 Stage1Layer2JetAlgorithmImpHI::Stage1Layer2JetAlgorithmImpHI(CaloParams* params) : params_(params)
 {
-  double jetScale=params_->jetScale();
-  jetSeedThreshold= floor( params_->jetSeedThreshold()/jetScale + 0.5);
+  //double jetScale=params_->jetScale();
+  //jetSeedThreshold= floor( params_->jetSeedThreshold()/jetScale + 0.5);
 }
 //: regionLSB_(0.5) {}
 
@@ -35,7 +35,7 @@ void Stage1Layer2JetAlgorithmImpHI::processEvent(const std::vector<l1t::CaloRegi
 
   std::vector<l1t::CaloRegion> *subRegions = new std::vector<l1t::CaloRegion>();
   HICaloRingSubtraction(regions, subRegions);
-  slidingWindowJetFinder(jetSeedThreshold, subRegions, jets);
+  slidingWindowJetFinder(0, subRegions, jets);
 
   delete subRegions;
 }

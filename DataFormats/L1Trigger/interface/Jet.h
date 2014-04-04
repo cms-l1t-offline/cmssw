@@ -18,13 +18,16 @@ namespace l1t {
        int pt=0,
        int eta=0,
        int phi=0,
-       int qual=0);
+       int qual=0,
+       bool forward=false);
   Jet( const PolarLorentzVector& p4,
        int pt=0,
        int eta=0,
        int phi=0,
-       int qual=0);
+       int qual=0,
+       bool forward=false);
 
+  bool forward() const;
 
   ~Jet();
 
@@ -32,6 +35,7 @@ namespace l1t {
 
   // additional hardware quantities common to L1 global jet
   // there are currently none
+  bool forward_;
 
   };
 

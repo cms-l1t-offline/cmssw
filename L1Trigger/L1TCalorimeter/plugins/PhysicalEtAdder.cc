@@ -122,11 +122,12 @@ l1t::PhysicalEtAdder::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       const double pt = itJet->hwPt() * emScale->linearLsb();
       const double eta = getPhysicalEta(itJet->hwEta());
       const double phi = getPhysicalPhi(itJet->hwPhi());
+      const bool forward = itJet->forward();
       math::PtEtaPhiMLorentzVector *p4 = new math::PtEtaPhiMLorentzVector(pt, eta, phi, 0);
 
       l1t::Jet *jet = new l1t::Jet(*p4, itJet->hwPt(),
 				   itJet->hwEta(), itJet->hwPhi(),
-				   itJet->hwQual());
+				   itJet->hwQual(), forward);
       new_jets->push_back(bx, *jet);
 
     }

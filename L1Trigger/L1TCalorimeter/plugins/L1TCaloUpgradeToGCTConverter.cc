@@ -158,7 +158,7 @@ l1t::L1TCaloUpgradeToGCTConverter::produce(Event& e, const EventSetup& es)
     int cenCount = 0; //max 4
     for(l1t::JetBxCollection::const_iterator itJet = Jet->begin(itBX);
 	itJet != Jet->end(itBX); ++itJet){
-      bool forward=(itJet->hwEta() <= 4 || itJet->hwEta() >= 17);
+      bool forward= itJet->forward();
       //int hackPt = itJet->hwPt()/8; //hack convert from LSB 0.5GeV for regions to LSB 4GeV jets
       double hackPt = static_cast<double>(itJet->hwPt()) * jetScale->linearLsb();
       hackPt = jetScale->rank(hackPt);
