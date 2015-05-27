@@ -35,13 +35,14 @@ void Stage1Layer2JetAlgorithmImpSimpleHW::processEvent(const std::vector<l1t::Ca
   std::vector<l1t::Jet> *calibratedRankedJets = new std::vector<l1t::Jet>();
   std::vector<l1t::Jet> *sortedJets = new std::vector<l1t::Jet>();
 
-  //simpleHWSubtraction(regions, subRegions);
+  double towerLsb = params_->towerLsbSum();
+  int jetSeedThreshold = floor( params_->jetSeedThreshold()/towerLsb + 0.5);
 
   std::string regionPUSType = "PUM0"; //params_->regionPUSType();
   std::vector<double> regionPUSParams = params_->regionPUSParams();
   RegionCorrection(regions, subRegions, regionPUSParams, regionPUSType);
 
-  slidingWindowJetFinder(0, subRegions, preGtEtaJets);
+  slidingWindowJetFinder(jetSeedThreshold, subRegions, preGtEtaJets);
 
   calibrateAndRankJets(params_, preGtEtaJets, calibratedRankedJets);
 
@@ -51,7 +52,7 @@ void Stage1Layer2JetAlgorithmImpSimpleHW::processEvent(const std::vector<l1t::Ca
   JetToGtEtaScales(params_, preGtEtaJets, debugJets);
   //JetToGtPtScales(params_, preGtJets, jets);
 
-  const bool verbose = true;
+  const bool verbose = false;
   const bool hex = false;
   if(verbose)
   {

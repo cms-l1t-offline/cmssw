@@ -10,8 +10,10 @@
 #include "FWCore/Utilities/interface/CPUTimer.h"
 #include "FWCore/Utilities/interface/EDMException.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
 #include "Utilities/StorageFactory/interface/StatisticsSenderService.h"
 
+#include "XrdStatistics.h"
 #include "Utilities/XrdAdaptor/src/XrdRequestManager.h"
 #include "Utilities/XrdAdaptor/src/XrdHostHandler.hh"
 
@@ -692,7 +694,6 @@ RequestManager::requestFailure(std::shared_ptr<XrdAdaptor::ClientRequest> c_ptr,
                << "', flags=0x" << std::hex << m_flags
                << ", permissions=0" << std::oct << m_perms << std::dec
                << ", old source=" << source_ptr->PrettyID()
-               << ", current server=" << m_open_handler->current_source()
                << ") => timeout when waiting for file open";
             ex.addContext("In XrdAdaptor::RequestManager::requestFailure()");
             addConnections(ex);
@@ -846,6 +847,7 @@ static IOSize validateList(const std::vector<IOPosBuffer> req)
         assert(it.size() <= XRD_CL_MAX_CHUNK);
         assert(it.offset() < 0x1ffffffffff);
     }
+    assert(req.size() <= 1024);
     return total;
 }
 
@@ -858,24 +860,45 @@ XrdAdaptor::RequestManager::splitClientRequest(const std::vector<IOPosBuffer> &i
     req2.reserve(iolist.size()/2+1);
     size_t front=0;
 
-    float q1 = static_cast<float>(m_activeSources[0]->getQuality());
-    float q2 = static_cast<float>(m_activeSources[1]->getQuality());
+        // The quality of both is increased by 5 to prevent strange effects if quality is 0 for one source.
+    float q1 = static_cast<float>(m_activeSources[0]->getQuality())+5;
+    float q2 = static_cast<float>(m_activeSources[1]->getQuality())+5;
     IOSize chunk1, chunk2;
     chunk1 = static_cast<float>(XRD_CL_MAX_CHUNK)*(q2*q2/(q1*q1+q2*q2));
     chunk2 = static_cast<float>(XRD_CL_MAX_CHUNK)*(q1*q1/(q1*q1+q2*q2));
 
+    IOSize size_orig = 0;
+    for (const auto & it : iolist) size_orig += it.size();
+
     while (tmp_iolist.size()-front > 0)
     {
-        consumeChunkFront(front, tmp_iolist, req1, chunk1);
-        consumeChunkBack(front, tmp_iolist, req2, chunk2);
+        if ((req1.size() >= 1000) && (req2.size() >= 1000))
+        {   // The XrdFile::readv implementation should guarantee that no more than approximately 1024 chunks
+            // are passed to the request manager.  However, because we have a max chunk size, we increase
+            // the total number slightly.  Theoretically, it's possible an individual readv of total size >2GB where
+            // each individual chunk is >1MB could result in this firing.  However, within the context of CMSSW,
+            // this cannot happen (ROOT uses readv for TTreeCache; TTreeCache size is 20MB).
+            edm::Exception ex(edm::errors::FileReadError);
+            ex << "XrdAdaptor::RequestManager::splitClientRequest(name='" << m_name
+               << "', flags=0x" << std::hex << m_flags
+               << ", permissions=0" << std::oct << m_perms << std::dec
+               << ") => Unable to split request between active servers.  This is an unexpected internal error and should be reported to CMSSW developers.";
+            ex.addContext("In XrdAdaptor::RequestManager::requestFailure()");
+            addConnections(ex);
+            std::stringstream ss; ss << "Original request size " << iolist.size() << "(" << size_orig << " bytes)";
+            ex.addAdditionalInfo(ss.str());
+            std::stringstream ss2; ss2 << "Quality source 1 " << q1-5 << ", quality source 2: " << q2-5;
+            ex.addAdditionalInfo(ss2.str());
+            throw ex;
+        }
+        if (req1.size() < 1000) {consumeChunkFront(front, tmp_iolist, req1, chunk1);}
+        if (req2.size() < 1000) {consumeChunkBack(front, tmp_iolist, req2, chunk2);}
     }
     std::sort(req1.begin(), req1.end(), [](const IOPosBuffer & left, const IOPosBuffer & right){return left.offset() < right.offset();});
     std::sort(req2.begin(), req2.end(), [](const IOPosBuffer & left, const IOPosBuffer & right){return left.offset() < right.offset();});
 
     IOSize size1 = validateList(req1);
     IOSize size2 = validateList(req2);
-    IOSize size_orig = 0;
-    for (const auto & it : iolist) size_orig += it.size();
 
     assert(size_orig == size1 + size2);
 
@@ -913,6 +936,9 @@ XrdAdaptor::RequestManager::OpenHandler::HandleResponseWithHosts(XrdCl::XRootDSt
   {
     return;
   }
+  //if we need to delete the File object we must do it outside
+  // of the lock to avoid a potential deadlock
+  std::unique_ptr<XrdCl::File> releaseFile;
   {
     std::lock_guard<std::recursive_mutex> sentry(m_mutex);
 
@@ -930,7 +956,7 @@ XrdAdaptor::RequestManager::OpenHandler::HandleResponseWithHosts(XrdCl::XRootDSt
     }
     else
     {
-        m_file.reset();
+        releaseFile = std::move(m_file);
         edm::Exception ex(edm::errors::FileOpenError);
         ex << "XrdCl::File::Open(name='" << manager->m_name
            << "', flags=0x" << std::hex << manager->m_flags
@@ -964,7 +990,6 @@ XrdAdaptor::RequestManager::OpenHandler::current_source()
 std::shared_future<std::shared_ptr<Source> >
 XrdAdaptor::RequestManager::OpenHandler::open()
 {
-    std::lock_guard<std::recursive_mutex> sentry(m_mutex);
     auto manager_ptr = m_manager.lock();
     if (!manager_ptr)
     {
@@ -987,10 +1012,20 @@ XrdAdaptor::RequestManager::OpenHandler::open()
       throw ex;
     }
 
+      // NOTE NOTE: we look at this variable *without* the lock.  This means the method
+      // is not thread-safe; the caller is responsible to verify it is not called from
+      // multiple threads simultaneously.
+      //
+      // This is done because ::open may be called from a Xrootd callback; if we
+      // tried to hold m_mutex here, this object's callback may also be active, hold m_mutex,
+      // and make a call into xrootd (when it invokes m_file.reset()).  Hence, our callback
+      // holds our mutex and attempts to grab an Xrootd mutex; RequestManager::requestFailure holds
+      // an Xrootd mutex and tries to hold m_mutex.  This is a classic deadlock.
     if (m_file.get())
     {
         return m_shared_future;
     }
+    std::lock_guard<std::recursive_mutex> sentry(m_mutex);
     std::promise<std::shared_ptr<Source> > new_promise;
     m_promise.swap(new_promise);
     m_shared_future = m_promise.get_future().share();

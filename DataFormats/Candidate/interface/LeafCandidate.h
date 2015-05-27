@@ -9,9 +9,6 @@
  *
  */
 #include "DataFormats/Candidate/interface/Candidate.h"
-
-#include "DataFormats/Candidate/interface/iterator_imp_specific.h"
-
 #include "ParticleState.h"
 
 namespace reco {
@@ -67,14 +64,6 @@ namespace reco {
 
     /// destructor
     virtual ~LeafCandidate();
-    /// first daughter const_iterator
-    virtual const_iterator begin() const;
-    /// last daughter const_iterator
-    virtual const_iterator end() const;
-    /// first daughter iterator
-    virtual iterator begin();
-    /// last daughter iterator
-    virtual iterator end();
     /// number of daughters
     virtual size_t numberOfDaughters() const;
     /// return daughter at a given position (throws an exception)
@@ -257,19 +246,6 @@ namespace reco {
       else return reco::numberOf<T, Tag>( * this );
     }
 
-    template<typename S>
-      struct daughter_iterator GCC11_FINAL  {
-        typedef boost::filter_iterator<S, const_iterator> type;
-      };
-
-    template<typename S>
-      typename daughter_iterator<S>::type beginFilter( const S & s ) const {
-      return boost::make_filter_iterator(s, begin(), end());
-    }
-    template<typename S>
-      typename daughter_iterator<S>::type endFilter( const S & s ) const {
-      return boost::make_filter_iterator(s, end(), end());
-    }
 
 
     virtual bool isElectron() const;
@@ -293,11 +269,6 @@ namespace reco {
     friend class ShallowCloneCandidate;
     friend class ShallowClonePtrCandidate;
 
-  private:
-    // const iterator implementation
-    typedef candidate::const_iterator_imp_specific<daughters> const_iterator_imp_specific;
-    // iterator implementation
-    typedef candidate::iterator_imp_specific<daughters> iterator_imp_specific;
   };
 
 }

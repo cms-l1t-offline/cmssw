@@ -63,6 +63,11 @@ HLTHiggsSubAnalysis::HLTHiggsSubAnalysis(const edm::ParameterSet & pset,
     edm::ParameterSet anpset = pset.getParameter<edm::ParameterSet>(analysisname);
     // Collections labels (but genparticles already initialized) 
     // initializing _recLabels data member)
+    if( anpset.exists("parametersTurnOn") )
+    {
+        _parametersTurnOn = anpset.getParameter<std::vector<double> >("parametersTurnOn");
+        _pset.addParameter("parametersTurnOn",_parametersTurnOn); 
+    }
     this->bookobjects( anpset, iC );
     // Generic objects: Initialization of cuts
     for(std::map<unsigned int,std::string>::const_iterator it = _recLabels.begin();
@@ -135,7 +140,8 @@ HLTHiggsSubAnalysis::HLTHiggsSubAnalysis(const edm::ParameterSet & pset,
             }
         }
     }
-    NptPlots = ( _useNminOneCuts ? _minCandidates : 2 );
+//    NptPlots = ( _useNminOneCuts ? _minCandidates : 2 );
+    NptPlots = _minCandidates;
 }
 
 HLTHiggsSubAnalysis::~HLTHiggsSubAnalysis()
@@ -741,6 +747,7 @@ const std::vector<unsigned int> HLTHiggsSubAnalysis::getObjectsType(const std::s
             if( (objtriggernames[i] == EVTColContainer::PFJET && TString(hltPath).Contains("CSV") ) ||   // fix for ZnnHbb PFJET            
                 (objtriggernames[i] == EVTColContainer::PFMET && TString(hltPath).Contains("MHT")) )        // fix for ZnnHbb PFMET
                 objsType.insert(objtriggernames[i]);
+            else if (objtriggernames[i] == EVTColContainer::PHOTON && TString(hltPath).Contains("Diphoton") ) objsType.insert(objtriggernames[i]);    //case of the New Diphoton paths
            continue;
         }
         if( objtriggernames[i] == EVTColContainer::CALOMET && (TString(hltPath).Contains("PFMET") || TString(hltPath).Contains("MHT") ) ) continue; // fix for PFMET

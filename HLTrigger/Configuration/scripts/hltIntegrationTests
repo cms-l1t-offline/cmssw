@@ -252,8 +252,12 @@ process.source.skipEvents = cms.untracked.uint32( $SKIP )
 fi
 
 # set the number of threads and streams for the whole hlt job
-echo "process.options.numberOfThreads = cms.untracked.uint32( $THREADS )" >> hlt.py
-echo "process.options.numberOfStreams = cms.untracked.uint32( $STREAMS )" >> hlt.py
+cat >> hlt.py << @EOF
+# configure multithreading, and allocate 10 MB of stack space per thread
+process.options.numberOfThreads = cms.untracked.uint32( $THREADS )
+process.options.numberOfStreams = cms.untracked.uint32( $STREAMS )
+process.options.sizeOfStackForThreadsInKB = cms.untracked.uint32( 10*1024 )
+@EOF
 
 # dump the menu name, and its release template
 log "HLT menu: $(head -n1 hlt.py | cut -c 3-)"
@@ -284,7 +288,7 @@ done
 # if a separate setup is requested, create the setup_cff.py file and patch all dumps to use it
 if [ "$SETUP" ]; then
   log "Extracting setup_cff dump"
-  edmConfigFromDB --cff --configName "$SETUP" --nopaths --services -FUShmDQMOutputService,-PrescaleService > setup_cff.py
+  hltConfigFromDB --cff --configName "$SETUP" --nopaths --services -FUShmDQMOutputService,-PrescaleService > setup_cff.py
   sed -i -e's/process = cms.Process(.*)/&\nprocess.load("setup_cff")/' hlt.py $(for TRIGGER in $TRIGGERS; do echo "$TRIGGER".py; done)
 fi
 

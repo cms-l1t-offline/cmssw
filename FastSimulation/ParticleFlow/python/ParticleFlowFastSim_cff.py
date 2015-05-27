@@ -9,8 +9,6 @@ from RecoParticleFlow.PFProducer.particleFlowBlock_cff import *
 from RecoParticleFlow.PFProducer.particleFlow_cff import *
 from RecoParticleFlow.PFProducer.pfElectronTranslator_cff import *
 from RecoParticleFlow.PFProducer.pfPhotonTranslator_cff import *
-from RecoParticleFlow.PFTracking.trackerDrivenElectronSeeds_cff import *
-from RecoParticleFlow.PFTracking.mergedElectronSeeds_cfi import *
 #from FastSimulation.ParticleFlow.FSparticleFlow_cfi import *
 from RecoParticleFlow.PFClusterProducer.towerMakerPF_cfi import *
 # The following is replaced by the MVA-based 
@@ -54,10 +52,6 @@ particleFlowRecHitHF.producers[0].qualityTests =cms.VPSet(
 #particleFlow.usePFDecays = cms.bool(True)
 
 ### With the new mixing scheme, the label of the Trajectory collection for the primary event is different:
-from FastSimulation.Configuration.CommonInputs_cff import *
-if(CaloMode==3 and MixingMode=='DigiRecoMixing'):
-    trackerDrivenElectronSeeds.TkColList = cms.VInputTag(cms.InputTag("generalTracksBeforeMixing"))
-
 
 famosParticleFlowSequence = cms.Sequence(
     caloTowersRec+

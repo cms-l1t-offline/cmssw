@@ -6,7 +6,7 @@
 
 #include "CalibCalorimetry/HcalAlgos/interface/HcalLogicalMapGenerator.h"
 #include "CondFormats/HcalObjects/interface/HcalLogicalMap.h"
-#include "RecoLocalCalo/HcalRecAlgos/interface/HcalCaloFlagLabels.h"
+#include "DataFormats/METReco/interface/HcalCaloFlagLabels.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "Geometry/HcalTowerAlgo/src/HcalHardcodeGeometryData.h" // for eta bounds
@@ -701,6 +701,7 @@ void HcalRecHitMonitor::analyze(edm::Event const&e, edm::EventSetup const&s)
   getLogicalMap(s);
   if (debug_>0)  std::cout <<"HcalRecHitMonitor::analyze; debug = "<<debug_<<std::endl;
 
+  HcalBaseDQMonitor::analyze(e,s);
   if (!IsAllowedCalibType()) return;
   if (LumiInOrder(e.luminosityBlock())==false) return;
 
@@ -732,7 +733,7 @@ void HcalRecHitMonitor::analyze(edm::Event const&e, edm::EventSetup const&s)
   h_LumiPlot_BX_allevents->Fill(e.bunchCrossing());
   processEvent(*hbhe_rechit, *ho_rechit, *hf_rechit, e.bunchCrossing(), e);
 
-  HcalBaseDQMonitor::analyze(e,s);
+//  HcalBaseDQMonitor::analyze(e,s);
 } // void HcalRecHitMonitor::analyze()
 
 

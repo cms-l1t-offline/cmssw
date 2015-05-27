@@ -8,7 +8,7 @@ SUSY_HLT_Ele_HT_BTag_SingleLepton = cms.EDAnalyzer('SUSY_HLT_SingleLepton',
                                                    pfJetCollection = cms.InputTag('ak4PFJets'),
                                                    jetTagCollection = cms.InputTag('pfCombinedSecondaryVertexBJetTags'),
 
-                                                   vertexCollection = cms.InputTag('goodOfflinePrimaryVertices'),
+                                                   vertexCollection = cms.InputTag('offlinePrimaryVertices'),
                                                    conversionCollection = cms.InputTag('conversions'),
                                                    beamSpot = cms.InputTag('offlineBeamSpot'),
 
@@ -16,7 +16,7 @@ SUSY_HLT_Ele_HT_BTag_SingleLepton = cms.EDAnalyzer('SUSY_HLT_SingleLepton',
                                                    hltHt = cms.InputTag('hltPFHT','','HLT'),
                                                    hltMet = cms.InputTag(''),
                                                    hltJets = cms.InputTag('hltSelector4CentralJetsL1FastJet','','HLT'),
-                                                   hltJetTags = cms.InputTag('hltL3CombinedSecondaryVertexBJetTags','','HLT'),
+                                                   hltJetTags = cms.InputTag('hltCombinedSecondaryVertexBJetTagsCalo','','HLT'),
 
                                                    triggerResults = cms.InputTag('TriggerResults','','HLT'),
                                                    trigSummary = cms.InputTag('hltTriggerSummaryAOD','','HLT'),
@@ -24,7 +24,7 @@ SUSY_HLT_Ele_HT_BTag_SingleLepton = cms.EDAnalyzer('SUSY_HLT_SingleLepton',
                                                    hltProcess = cms.string('HLT'),
 
                                                    triggerPath = cms.string('HLT_Ele15_IsoVVVL_BTagtop8CSV07_PFHT400'),
-                                                   triggerPathAuxiliary = cms.string('HLT_Ele32_eta2p1_WP85_Gsf_v'),
+                                                   triggerPathAuxiliary = cms.string('HLT_Ele32_eta2p1_WP75_Gsf_v'),
                                                    triggerPathLeptonAuxiliary = cms.string('HLT_PFHT350_PFMET120_NoiseCleaned_v'),
 
                                                    csvlCut = cms.untracked.double(0.244),

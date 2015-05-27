@@ -273,7 +273,7 @@ void DQMStore::IBooker::cd(const std::string &dir) {
 
 void DQMStore::IBooker::setCurrentFolder(const std::string &fullpath) {
   owner_->setCurrentFolder(fullpath);
-}
+} 
 
 void DQMStore::IBooker::goUp(void) {
   owner_->goUp();
@@ -281,10 +281,14 @@ void DQMStore::IBooker::goUp(void) {
 
 const std::string & DQMStore::IBooker::pwd(void) {
   return owner_->pwd();
-}
+} 
 
 void DQMStore::IBooker::tag(MonitorElement *me, unsigned int tag) {
   owner_->tag(me, tag);
+}
+
+void DQMStore::IBooker::tagContents(const std::string &path, unsigned int myTag) {
+  owner_->tagContents(path, myTag);
 }
 
 //IGetter methods
@@ -595,7 +599,7 @@ DQMStore::print_trace (const std::string &dir, const std::string &name)
   // concurrency problems because the print_trace method is always called behind
   // a lock (see bookTransaction).
   if (!stream_)
-    stream_ = new ofstream("histogramBookingBT.log");
+    stream_ = new std::ofstream("histogramBookingBT.log");
   
   void *array[10];
   size_t size;

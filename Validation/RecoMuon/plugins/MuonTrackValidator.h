@@ -8,6 +8,7 @@
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "Validation/RecoMuon/plugins/MuonTrackValidatorBase.h"
+#include "SimDataFormats/Associations/interface/TrackToTrackingParticleAssociator.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
@@ -59,6 +60,8 @@ class MuonTrackValidator : public DQMEDAnalyzer, protected MuonTrackValidatorBas
     simToRecoCollection_Token = consumes<reco::SimToRecoCollection>(associatormap);
     recoToSimCollection_Token = consumes<reco::RecoToSimCollection>(associatormap);
 
+    _simHitTpMapTag = mayConsume<SimHitTPAssociationProducer::SimHitTPAssociationList>(pset.getParameter<edm::InputTag>("simHitTpMapTag"));
+
     MABH = false;
     if (!UseAssociators) {
       // flag MuonAssociatorByHits
@@ -67,6 +70,10 @@ class MuonTrackValidator : public DQMEDAnalyzer, protected MuonTrackValidatorBas
       associators.clear();
       associators.push_back(associatormap.label());
       edm::LogVerbatim("MuonTrackValidator") << "--> associators reset to: " <<associators[0];
+    } else {
+      for (auto const& associator :associators) {
+        consumes<reco::TrackToTrackingParticleAssociator>(edm::InputTag(associator));
+      }
     }
     
     // inform on which SimHits will be counted
@@ -150,6 +157,8 @@ private:
   edm::InputTag associatormap;
   edm::EDGetTokenT<reco::SimToRecoCollection> simToRecoCollection_Token;
   edm::EDGetTokenT<reco::RecoToSimCollection> recoToSimCollection_Token;
+  edm::EDGetTokenT<SimHitTPAssociationProducer::SimHitTPAssociationList> _simHitTpMapTag;
+
   bool UseAssociators;
   double minPhi, maxPhi;
   int nintPhi;

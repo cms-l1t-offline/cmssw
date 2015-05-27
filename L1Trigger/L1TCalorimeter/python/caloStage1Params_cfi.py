@@ -24,7 +24,8 @@ caloStage1Params.egPUSType    = cms.string("None")
 caloStage1Params.egPUSParams  = cms.vdouble()
 
 ## EG Isolation LUT
-caloStage1Params.egIsoLUTFile   = cms.FileInPath("L1Trigger/L1TCalorimeter/data/egIsoLUT_stage1.txt")
+## caloStage1Params.egIsoLUTFile   = cms.FileInPath("L1Trigger/L1TCalorimeter/data/egIsoLUT_stage1.txt")
+caloStage1Params.egIsoLUTFile      = cms.FileInPath("L1Trigger/L1TCalorimeter/data/egIsoLUT_stage1_isolEB0.30_isolEE0.50_combined.txt")
 #caloStage1Params.egIsoLUTFileBarrel   = cms.FileInPath("L1Trigger/L1TCalorimeter/data/egIsoLUT_stage1_isol0.30.txt")
 #caloStage1Params.egIsoLUTFileEndcaps  = cms.FileInPath("L1Trigger/L1TCalorimeter/data/egIsoLUT_stage1_isol0.50.txt")
 
@@ -47,7 +48,7 @@ caloStage1Params.jetSeedThreshold      = cms.double(10.)
 caloStage1Params.jetNeighbourThreshold = cms.double(0.)
 caloStage1Params.jetCalibrationType    = cms.string("Stage1JEC")
 caloStage1Params.jetCalibrationParams  = jetSF_8TeV_data
-caloStage1Params.jetCalibrationLUTFile = cms.FileInPath("L1Trigger/L1TCalorimeter/data/jetCalibrationLUT_stage1.txt")
+caloStage1Params.jetCalibrationLUTFile = cms.FileInPath("L1Trigger/L1TCalorimeter/data/jetCalibrationLUT_stage1_prelim.txt")
 
 # sums
 caloStage1Params.etSumLsb                = cms.double(0.5)
@@ -56,5 +57,5 @@ caloStage1Params.etSumEtaMax             = cms.vint32(17, 17) #ET, HT
 caloStage1Params.etSumEtThreshold        = cms.vdouble(0., 7.) #ET, HT
 
 # HI
-caloStage1Params.centralityLUTFile = cms.FileInPath("L1Trigger/L1TCalorimeter/data/centralityLUT_stage1.txt")
+caloStage1Params.centralityLUTFile = cms.FileInPath("L1Trigger/L1TCalorimeter/data/centralityLUT_5020TeV_stage1.txt")
 caloStage1Params.q2LUTFile = cms.FileInPath("L1Trigger/L1TCalorimeter/data/q2LUT_stage1.txt")

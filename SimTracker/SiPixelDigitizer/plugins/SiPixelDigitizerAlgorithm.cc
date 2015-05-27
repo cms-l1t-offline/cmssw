@@ -234,8 +234,8 @@ SiPixelDigitizerAlgorithm::SiPixelDigitizerAlgorithm(const edm::ParameterSet& co
   
   // delta cutoff in MeV, has to be same as in OSCAR(0.030/cmsim=1.0 MeV
   //tMax(0.030), // In MeV.
-  //tMax(conf.getUntrackedParameter<double>("DeltaProductionCut",0.030)),
-  tMax(conf.getParameter<double>("DeltaProductionCut")),
+  //tMax(conf.getUntrackedParameter<double>("deltaProductionCut",0.030)),
+  tMax(conf.getParameter<double>("deltaProductionCut")),
 
   fluctuate(fluctuateCharge ? new SiG4UniversalFluctuation() : 0),
   theNoiser(addNoise ? new GaussianTailNoiseGenerator() : 0),
@@ -544,7 +544,6 @@ void SiPixelDigitizerAlgorithm::calculateInstlumiFactor(PileupMixingContent* puI
   //Instlumi scalefactor calculating for dynamic inefficiency
   
   if (puInfo) {
-    
     const std::vector<int> bunchCrossing = puInfo->getMix_bunchCrossing();
     const std::vector<float> TrueInteractionList = puInfo->getMix_TrueInteractions();      
     const int bunchSpacing = puInfo->getMix_bunchSpacing();

@@ -32,16 +32,17 @@
   <class name="reco::JTATagInfoRefVector"/>
   <class name="edm::Wrapper<reco::JTATagInfoCollection>"/>
 
-  <class name="reco::btag::TrackData" ClassVersion="11">
+  <class name="reco::btag::TrackData" ClassVersion="12">
+   <version ClassVersion="12" checksum="889773348"/>
    <version ClassVersion="11" checksum="427805128"/>
    <version ClassVersion="10" checksum="3899080432"/>
   </class>
   <ioread sourceClass="reco::SecondaryVertexTagInfo::TrackData" version="[1-]" targetClass="reco::btag::TrackData"/>
   <class name="reco::btag::IndexedTrackData"/>
-  <class name="std::vector<reco::btag::IndexedTrackData>"/> 
+  <class name="std::vector<reco::btag::IndexedTrackData>"/>
 
   <class name="reco::TemplatedSecondaryVertexTagInfo<reco::TrackIPTagInfo,reco::Vertex>::VertexData"/>
-  <class name="std::vector<reco::SecondaryVertexTagInfo::VertexData>"/> 
+  <class name="std::vector<reco::SecondaryVertexTagInfo::VertexData>"/>
   <class name="reco::SecondaryVertexTagInfo"/>
   <class name="reco::SecondaryVertexTagInfoCollection"/>
   <class name="reco::SecondaryVertexTagInfoRef"/>
@@ -51,7 +52,7 @@
   <class name="edm::Wrapper<reco::SecondaryVertexTagInfoCollection>"/>
 
   <class name="reco::TemplatedSecondaryVertexTagInfo<reco::CandIPTagInfo,reco::VertexCompositePtrCandidate>::VertexData"/>
-  <class name="std::vector<reco::CandSecondaryVertexTagInfo::VertexData>"/> 
+  <class name="std::vector<reco::CandSecondaryVertexTagInfo::VertexData>"/>
   <class name="reco::CandSecondaryVertexTagInfo"/>
   <class name="reco::CandSecondaryVertexTagInfoCollection"/>
   <class name="reco::CandSecondaryVertexTagInfoRef"/>
@@ -71,7 +72,7 @@
   <class name="reco::CombinedTauTagInfoRefVector"/>
   <class name="edm::Wrapper<reco::CombinedTauTagInfoCollection>"/>
 
-  
+
   <class name="reco::EMIsolatedTauTagInfo" ClassVersion="11">
    <version ClassVersion="11" checksum="1524968186"/>
    <version ClassVersion="10" checksum="1895814186"/>
@@ -94,9 +95,10 @@
   <class name="reco::IsolatedTauTagInfoRefVector"/>
   <class name="edm::Wrapper<reco::IsolatedTauTagInfoCollection>"/>
 
-  
-  <class name="reco::SoftLeptonProperties" ClassVersion="10">
+
+  <class name="reco::SoftLeptonProperties" ClassVersion="11">
    <version ClassVersion="10" checksum="3825121604"/>
+   <version ClassVersion="11" checksum="3267387532"/>
   </class>
 
   <class name="std::pair<edm::RefToBase<reco::Track>, reco::SoftLeptonProperties>"/>
@@ -119,6 +121,23 @@
   <class name="reco::CandSoftLeptonTagInfoRefVector"/>
   <class name="edm::Wrapper<reco::CandSoftLeptonTagInfoCollection>"/>
 
+
+  <class name="reco::CATopJetProperties" ClassVersion="10">
+   <version ClassVersion="10" checksum="4096516518"/>
+  </class>
+  <class name="std::pair<edm::RefToBase<reco::Jet>, reco::CATopJetProperties>"/>
+
+  <class name="reco::CATopJetTagInfo" ClassVersion="11">
+   <version ClassVersion="10" checksum="3059833435"/>
+   <version ClassVersion="11" checksum="241737491"/>
+  </class>
+  <class name="reco::CATopJetTagInfoCollection"/>
+  <class name="reco::CATopJetTagInfoRef"/>
+  <class name="reco::CATopJetTagInfoRefProd"/>
+  <class name="reco::CATopJetTagInfoRefVector"/>
+  <class name="edm::Wrapper<reco::CATopJetTagInfoCollection>"/>
+
+
   <class name="std::pair< reco::btau::TaggingVariableName, float >"/>
   <class name="std::vector<std::pair<reco::btau::TaggingVariableName,float> >"/>
   <class name="reco::TaggingVariableList" ClassVersion="10">
@@ -133,19 +152,15 @@
 
   <!-- Dictionary for the association in SVTagInfoProxy-->
   <class name="edm::Wrapper<edm::helpers::KeyVal<edm::RefProd<std::vector<reco::SecondaryVertexTagInfo> >, edm::RefProd<std::vector<reco::Vertex> > > >" persistent="false"/>
-  <!-- persistent="false" qualifier for non-wrappers is deprecated. Will be removed when no longer needed.-->
-  <class name="edm::helpers::KeyVal<edm::RefProd<std::vector<reco::SecondaryVertexTagInfo> >, edm::RefProd<std::vector<reco::Vertex> > >" persistent="false"/>
+  <class name="edm::helpers::KeyVal<edm::RefProd<std::vector<reco::SecondaryVertexTagInfo> >, edm::RefProd<std::vector<reco::Vertex> > >"/>
   <class name="edm::Wrapper<edm::AssociationMap<edm::OneToMany<std::vector<reco::SecondaryVertexTagInfo>, std::vector<reco::Vertex>, unsigned int > > >" persistent="false"/>
-  <!-- persistent="false" qualifier for non-wrappers is deprecated. Will be removed when no longer needed.-->
-  <class name="edm::AssociationMap<edm::OneToMany<std::vector<reco::SecondaryVertexTagInfo>, std::vector<reco::Vertex>, unsigned int > >" persistent="false">
+  <class name="edm::AssociationMap<edm::OneToMany<std::vector<reco::SecondaryVertexTagInfo>, std::vector<reco::Vertex>, unsigned int > >">
     <field name="transientMap_" transient="true" />
   </class>
   <class name="edm::Wrapper<edm::helpers::KeyVal<edm::RefProd<std::vector<reco::CandSecondaryVertexTagInfo> >, edm::RefProd<std::vector<reco::VertexCompositePtrCandidate> > > >" persistent="false"/>
-  <!-- persistent="false" qualifier for non-wrappers is deprecated. Will be removed when no longer needed.-->
-  <class name="edm::helpers::KeyVal<edm::RefProd<std::vector<reco::CandSecondaryVertexTagInfo> >, edm::RefProd<std::vector<reco::VertexCompositePtrCandidate> > >" persistent="false"/>
+  <class name="edm::helpers::KeyVal<edm::RefProd<std::vector<reco::CandSecondaryVertexTagInfo> >, edm::RefProd<std::vector<reco::VertexCompositePtrCandidate> > >"/>
   <class name="edm::Wrapper<edm::AssociationMap<edm::OneToMany<std::vector<reco::CandSecondaryVertexTagInfo>, std::vector<reco::VertexCompositePtrCandidate>, unsigned int > > >" persistent="false"/>
-  <!-- persistent="false" qualifier for non-wrappers is deprecated. Will be removed when no longer needed.-->
-  <class name="edm::AssociationMap<edm::OneToMany<std::vector<reco::CandSecondaryVertexTagInfo>, std::vector<reco::VertexCompositePtrCandidate>, unsigned int > >" persistent="false">
+  <class name="edm::AssociationMap<edm::OneToMany<std::vector<reco::CandSecondaryVertexTagInfo>, std::vector<reco::VertexCompositePtrCandidate>, unsigned int > >">
     <field name="transientMap_" transient="true" />
   </class>
 
@@ -318,14 +333,16 @@
   <class name="edm::reftobase::RefHolder<reco::TauMassTagInfoFwdRef>" />
   <class name="edm::reftobase::Holder<reco::BaseTagInfo, reco::TrackProbabilityTagInfoFwdRef>" />
   <class name="edm::reftobase::RefHolder<reco::TrackProbabilityTagInfoFwdRef>" />
+  <class name="edm::reftobase::Holder<reco::BaseTagInfo, reco::CATopJetTagInfoRef>" />
+  <class name="edm::reftobase::RefHolder<reco::CATopJetTagInfoRef>" />
 
 
   <class name="edm::Ptr<reco::BaseTagInfo>" />
   <class name="std::vector<edm::Ptr<reco::BaseTagInfo> >" />
   <class name="edm::FwdPtr<reco::BaseTagInfo>" />
   <class name="std::vector<edm::FwdPtr<reco::BaseTagInfo> >" />
-  <class name="edm::ValueMap<edm::Ptr<reco::BaseTagInfo> >" /> 
-  <class name="edm::Wrapper<edm::ValueMap<edm::Ptr<reco::BaseTagInfo> > >" /> 
+  <class name="edm::ValueMap<edm::Ptr<reco::BaseTagInfo> >" />
+  <class name="edm::Wrapper<edm::ValueMap<edm::Ptr<reco::BaseTagInfo> > >" />
   <class name="std::vector<reco::BaseTagInfo *>" />
   <class name="edm::OwnVector<reco::BaseTagInfo, edm::ClonePolicy<reco::BaseTagInfo> >" />
  <exclusion>

@@ -26,6 +26,7 @@ from HLTriggerOffline.SUSYBSM.SUSYBSM_HLT_HT_MuEle_cff import *
 from HLTriggerOffline.SUSYBSM.SUSYBSM_HLT_Muon_BJet_cff import *
 from HLTriggerOffline.SUSYBSM.SUSYBSM_HLT_Electron_BJet_cff import *
 from HLTriggerOffline.SUSYBSM.SUSYBSM_alphaT_cff import *
+from HLTriggerOffline.SUSYBSM.SUSYBSM_DiJet_MET_cff import *
 
 
 HLTSusyExoValSeq = cms.Sequence(SUSY_HLT_HT_MET +
@@ -50,6 +51,8 @@ HLTSusyExoValSeq = cms.Sequence(SUSY_HLT_HT_MET +
                                 SUSY_HLT_Razor_Main + 
                                 SUSY_HLT_Razor_QuadJet +
                                 SUSY_HLT_Razor_DM + 
+                                SUSY_HLT_Razor_Main_7e33 + 
+                                SUSY_HLT_Razor_QuadJet_7e33 +
                                 SUSY_HLT_CaloHT200 +
                                 SUSY_HLT_CaloHT250 +
                                 SUSY_HLT_CaloHT300 +
@@ -65,7 +68,8 @@ HLTSusyExoValSeq = cms.Sequence(SUSY_HLT_HT_MET +
                                 SUSY_HLT_HT250_alphaT0p55 +
                                 SUSY_HLT_HT300_alphaT0p53 +
                                 SUSY_HLT_HT350_alphaT0p52 +
-                                SUSY_HLT_HT400_alphaT0p51 
+                                SUSY_HLT_HT400_alphaT0p51 + 
+                                SUSY_HLT_DiJet_MET
                                 )
 
 
@@ -91,6 +95,8 @@ HLTSusyExoValSeq_FastSim = cms.Sequence(SUSY_HLT_HT_MET_FASTSIM +
                                         SUSY_HLT_Razor_Main_FASTSIM + 
                                         SUSY_HLT_Razor_QuadJet_FASTSIM +
                                         SUSY_HLT_Razor_DM_FASTSIM + 
+                                        SUSY_HLT_Razor_Main_7e33_FASTSIM + 
+                                        SUSY_HLT_Razor_QuadJet_7e33_FASTSIM +
                                         SUSY_HLT_CaloHT200_FASTSIM +
                                         SUSY_HLT_CaloHT250_FASTSIM +
                                         SUSY_HLT_CaloHT300_FASTSIM +

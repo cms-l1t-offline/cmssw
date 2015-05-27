@@ -1,9 +1,12 @@
 import FWCore.ParameterSet.Config as cms
 
+# This is used to modify parameters for Run 2 (see bottom of file)
+from Configuration.StandardSequences.Eras import eras
+
 #Global fast calorimetry parameters
 from FastSimulation.Calorimetry.HcalResponse_cfi import *
 from FastSimulation.Calorimetry.HSParameters_cfi import *
-from FastSimulation.Configuration.CommonInputs_cff import *
+#from FastSimulation.Configuration.CommonInputs_cff import *
 FamosCalorimetryBlock = cms.PSet(
     Calorimetry = cms.PSet(
         HSParameterBlock,
@@ -257,7 +260,8 @@ FamosCalorimetryBlock = cms.PSet(
             ),
             HFShowerLibrary    = cms.PSet(
               useShowerLibrary = cms.untracked.bool(False),
-              FileName = cms.FileInPath('SimG4CMS/Calo/data/HFShowerLibrary_npmt_noatt_eta4_16en_v2.root'),
+              useCorrectionSL  = cms.untracked.bool(True),
+              FileName = cms.FileInPath('SimG4CMS/Calo/data/HFShowerLibrary_npmt_noatt_eta4_16en_v3.root'),
               ProbMax          = cms.double(1.0),
               BackProbability  = cms.double(0.2),
               CFibre           = cms.double(0.5),
@@ -285,12 +289,10 @@ FamosCalorimetryBlock = cms.PSet(
     )
 )
 
-if(CaloMode == 1 ):
-    FamosCalorimetryBlock.Calorimetry.ECAL.Digitizer = True
-    
-if(CaloMode == 2 ):
-    FamosCalorimetryBlock.Calorimetry.HCAL.Digitizer = True
+FamosCalorimetryBlock.Calorimetry.ECAL.Digitizer = True
+FamosCalorimetryBlock.Calorimetry.HCAL.Digitizer = True
 
-if(CaloMode == 3 ):
-    FamosCalorimetryBlock.Calorimetry.ECAL.Digitizer = True
-    FamosCalorimetryBlock.Calorimetry.HCAL.Digitizer = True
+#
+# Modify for running in Run 2
+#
+eras.run2_common.toModify( FamosCalorimetryBlock.Calorimetry.HFShowerLibrary, useShowerLibrary=True )
