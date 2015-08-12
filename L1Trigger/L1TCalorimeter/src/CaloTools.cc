@@ -98,8 +98,9 @@ int l1t::CaloTools::calHwEtSum(int iEta,int iPhi,const std::vector<l1t::CaloTowe
       int towerIPhi = l1t::CaloStage2Nav::offsetIPhi(iPhi,phiNr);
       if(abs(towerIEta)<=iEtaAbsMax){
 	const l1t::CaloTower& tower = getTower(towers,towerIEta,towerIPhi);
-	if(etMode&ECAL) hwEtSum+=tower.hwEtEm();
-	if(etMode&HCAL) hwEtSum+=tower.hwEtHad();
+	if(etMode==ECAL) hwEtSum+=tower.hwEtEm();
+	else if(etMode==HCAL) hwEtSum+=tower.hwEtHad();
+	else if(etMode==CALO) hwEtSum+=tower.hwPt();
       }	
     }
   }
@@ -112,14 +113,16 @@ size_t l1t::CaloTools::calNrTowers(int iEtaMin,int iEtaMax,int iPhiMin,int iPhiM
   size_t nrTowers=0;
   l1t::CaloStage2Nav nav(iEtaMin,iPhiMin);
   while(nav.currIEta()<=iEtaMax){
-    while(nav.currIPhi()<=iPhiMax){
-      nav.north();
+    bool finishPhi = false;
+    while(!finishPhi){
       const l1t::CaloTower& tower = l1t::CaloTools::getTower(towers,nav.currIEta(),nav.currIPhi());
       int towerHwEt =0;
-      if(etMode&ECAL) towerHwEt+=tower.hwEtEm();
-      if(etMode&HCAL) towerHwEt+=tower.hwEtHad();
-      if(etMode&CALO) towerHwEt+=tower.hwPt();
+      if(etMode==ECAL) towerHwEt+=tower.hwEtEm();
+      else if(etMode==HCAL) towerHwEt+=tower.hwEtHad();
+      else if(etMode==CALO) towerHwEt+=tower.hwPt();
       if(towerHwEt>=minHwEt && towerHwEt<=maxHwEt) nrTowers++;
+      finishPhi = (nav.currIPhi() == iPhiMax);
+	  nav.north();
     }
     nav.east();
     nav.resetIPhi();

@@ -57,6 +57,7 @@ void l1t::Stage2TowerCompressAlgorithmFirmwareImp1::processEvent(const std::vect
       qual |= ((etHad==0 && etEm>0) || etEm>=etHad ? 0x2 : 0x0 );  // E/H flag
       qual |= (tow->hwQual() & 0xc); // get feature bits from existing tower
       
+
       l1t::CaloTower newTow;
       newTow.setHwEtEm(etEm);
       newTow.setHwEtHad(etHad);

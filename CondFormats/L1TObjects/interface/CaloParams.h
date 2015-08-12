@@ -82,6 +82,12 @@ namespace l1t {
       // turn encoding on/off
       bool doEncoding_;
 
+      TowerParams() : lsbH_(0), lsbE_(0), lsbSum_(0),
+		      nBitsH_(0), nBitsE_(0), nBitsSum_(0), nBitsRatio_(0),
+		      maskH_(0), maskE_(0), maskSum_(0), maskRatio_(0), 
+		      doEncoding_(false)
+      { /* no-op */}
+
       COND_SERIALIZABLE;
     };
 
@@ -121,6 +127,11 @@ namespace l1t {
 
       // veto region is seed tower +/- <=egIsoVetoNrTowersPhi
       unsigned isoVetoNrTowersPhi_;
+
+      EgParams() : lsb_(0), seedThreshold_(0), neighbourThreshold_(0), hcalThreshold_(0), maxHcalEt_(0), maxPtHOverE_(0), 
+		   minPtJetIsolation_(0), maxPtJetIsolation_(0), minPtHOverEIsolation_(0), maxPtHOverEIsolation_(0), 
+		   isoAreaNrTowersEta_(0), isoAreaNrTowersPhi_(0), isoVetoNrTowersPhi_(0)
+      { /* no-op */ }
 
       COND_SERIALIZABLE;
     };
@@ -162,6 +173,12 @@ namespace l1t {
       // veto region is seed tower +/- <=tauIsoVetoNrTowersPhi
       unsigned isoVetoNrTowersPhi_;
 
+      TauParams() : lsb_(0), seedThreshold_(0), neighbourThreshold_(0), maxPtTauVeto_(0), 
+		    minPtJetIsolationB_(0), maxJetIsolationB_(0), maxJetIsolationA_(0),
+		    isoEtaMin_(0), isoEtaMax_(0), 
+		    isoAreaNrTowersEta_(0), isoAreaNrTowersPhi_(0), isoVetoNrTowersPhi_(0)
+      { /* no-op */ }
+
       COND_SERIALIZABLE;
     };
 
@@ -176,6 +193,8 @@ namespace l1t {
       // Et threshold on neighbouring towers/regions
       double neighbourThreshold_;
 
+      JetParams() : lsb_(0), seedThreshold_(0), neighbourThreshold_(0) { /* no-op */ }
+
       COND_SERIALIZABLE;
     };
 
@@ -185,8 +204,9 @@ namespace l1t {
 	   egTrimming=1, egMaxHOverE=2, egCompressShapes=3, egShapeId=4, egCalibration=5, egPUS=6, egIsolation=7,
 	   tauCalibration=8, tauPUS=9, tauIsolation=10,
 	   jetPUS=11, jetCalibration=12,
-	   hiCentrality=13, hiQ2=14,
-	   NUM_CALOPARAMNODES=15
+	   hiCentrality=13, hiQ2=14, 
+	   tauEtToHFRingEt=15,
+	   NUM_CALOPARAMNODES=16
     };
 
     CaloParams() { version_=Version; pnode_.resize(NUM_CALOPARAMNODES); }
@@ -235,7 +255,11 @@ namespace l1t {
     double egMaxPtHOverE() const {return egp_.maxPtHOverE_;}
     l1t::LUT* egMaxHOverELUT() { return &pnode_[egMaxHOverE].LUT_; }
     l1t::LUT* egCompressShapesLUT() { return &pnode_[egCompressShapes].LUT_; }
+
+    std::string egShapeIdType() const { return pnode_[egShapeId].type_; }
+    unsigned egShapeIdVersion() const { return pnode_[egShapeId].version_; }
     l1t::LUT* egShapeIdLUT() { return &pnode_[egShapeId].LUT_; }
+
     int egMinPtJetIsolation() const { return egp_.minPtJetIsolation_; }
     int egMaxPtJetIsolation() const { return egp_.maxPtJetIsolation_; }
     int egMinPtHOverEIsolation() const { return egp_.minPtHOverEIsolation_; }
@@ -248,10 +272,9 @@ namespace l1t {
     const std::vector<double> & egPUSParams() const { return pnode_[egPUS].dparams_; }
     double egPUSParam(int ipar) const { return pnode_[egPUS].dparams_.at(ipar); }
 
-
-
     l1t::LUT* egIsolationLUT() { return &pnode_[egIsolation].LUT_; }
     std::string egCalibrationType() const { return pnode_[egCalibration].type_; }
+    unsigned egCalibrationVersion() const { return pnode_[egCalibration].version_; }
     std::vector<double> egCalibrationParams() { return pnode_[egCalibration].dparams_; }
     l1t::LUT* egCalibrationLUT() { return &pnode_[egCalibration].LUT_; }
 
@@ -264,6 +287,8 @@ namespace l1t {
     void setEgMaxPtHOverE(double thresh) { egp_.maxPtHOverE_ = thresh;}
     void setEgMaxHOverELUT(const l1t::LUT & lut) { pnode_[egMaxHOverE].LUT_ = lut; }
     void setEgCompressShapesLUT(const l1t::LUT & lut) { pnode_[egCompressShapes].LUT_ = lut; }
+    void setEgShapeIdType(std::string type) { pnode_[egShapeId].type_ = type; }
+    void setEgShapeIdVersion(unsigned version) { pnode_[egShapeId].version_ = version; }
     void setEgShapeIdLUT(const l1t::LUT & lut) { pnode_[egShapeId].LUT_ = lut; }
     void setEgMinPtJetIsolation(int cutValue) { egp_.minPtJetIsolation_ = cutValue; }
     void setEgMaxPtJetIsolation(int cutValue) { egp_.maxPtJetIsolation_ = cutValue; }
@@ -277,6 +302,7 @@ namespace l1t {
     void setEgPUSParams(const std::vector<double> & params) { pnode_[egPUS].dparams_ = params; }
     void setEgIsolationLUT(const l1t::LUT & lut) { pnode_[egIsolation].LUT_ = lut; }
     void setEgCalibrationType(std::string type) { pnode_[egCalibration].type_ = type; }
+    void setEgCalibrationVersion(unsigned version) { pnode_[egCalibration].version_ = version; }
     void setEgCalibrationParams(std::vector<double> params) { pnode_[egCalibration].dparams_ = params; }
     void setEgCalibrationLUT(const l1t::LUT & lut) { pnode_[egCalibration].LUT_ = lut; }
 
@@ -299,6 +325,8 @@ namespace l1t {
     std::string tauCalibrationType() const { return pnode_[tauCalibration].type_; }
     std::vector<double> tauCalibrationParams() { return pnode_[tauCalibration].dparams_; }
     l1t::LUT* tauCalibrationLUT() { return &pnode_[tauCalibration].LUT_; }
+
+    l1t::LUT* tauEtToHFRingEtLUT() { return &pnode_[tauEtToHFRingEt].LUT_; }
 
     unsigned tauIsoAreaNrTowersEta()const{return taup_.isoAreaNrTowersEta_;}
     unsigned tauIsoAreaNrTowersPhi()const{return taup_.isoAreaNrTowersPhi_;}
@@ -325,6 +353,8 @@ namespace l1t {
     void setTauCalibrationParams(std::vector<double> params) { pnode_[tauCalibration].dparams_ = params; }
     void setTauCalibrationLUT(const l1t::LUT & lut) { pnode_[tauCalibration].LUT_ = lut; }
     void setTauPUSParams(const std::vector<double> & params) { pnode_[tauPUS].dparams_ = params; }
+
+    void setTauEtToHFRingEtLUT(const l1t::LUT & lut) { pnode_[tauEtToHFRingEt].LUT_ = lut; }
 
     // jets
     double jetLsb() const { return jetp_.lsb_; }
@@ -367,7 +397,6 @@ namespace l1t {
     // print parameters to stream:
     void print(std::ostream&) const;
     friend std::ostream& operator<<(std::ostream& o, const CaloParams & p) { p.print(o); return o; }
-
 
   private:
     unsigned version_;
