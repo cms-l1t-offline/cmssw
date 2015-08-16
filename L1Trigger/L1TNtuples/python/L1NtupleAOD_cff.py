@@ -9,6 +9,6 @@ L1NtupleAOD = cms.Sequence(
   l1ExtraTreeProducer
   +l1MenuTreeProducer
   +l1JetRecoTreeProducer
-  #+l1MuonRecoTreeProducer
+  +l1MuonRecoTreeProducer
 )
 

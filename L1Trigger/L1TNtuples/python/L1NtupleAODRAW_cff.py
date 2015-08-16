@@ -12,6 +12,6 @@ L1NtupleAODRAW = cms.Sequence(
   +l1MenuTreeProducer
   +l1MenuTreeProducer
   +l1JetRecoTreeProducer
-  #+l1MuonRecoTreeProducer                                                     
+  +l1MuonRecoTreeProducer                                                     
 )
 

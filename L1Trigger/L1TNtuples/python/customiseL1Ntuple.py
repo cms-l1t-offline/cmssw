@@ -17,6 +17,10 @@ def L1NtupleAOD(process):
                                        fileName = cms.string('L1NtupleAOD.root')
     )
 
+    process.load('Configuration.StandardSequences.Reconstruction_cff')
+    process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
+    process.load('Configuration/StandardSequences/MagneticField_AutoFromDBCurrent_cff')
+
     process.load('L1Trigger.L1TNtuples.L1NtupleAOD_cff')
     process.l1ntupleaod = cms.Path(
         process.L1NtupleAOD
@@ -53,9 +57,13 @@ def L1NtupleAODRAW(process):
     process.TFileService = cms.Service("TFileService",
                                        fileName = cms.string('L1NtupleAODRAW.root')
     )
+    
+    process.load('Configuration.StandardSequences.Reconstruction_cff')
+    process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
+    process.load('Configuration/StandardSequences/MagneticField_AutoFromDBCurrent_cff')
 
     process.load('L1Trigger.L1TNtuples.L1NtupleAODRAW_cff')
-    process.l1ntupleaod = cms.Path(
+    process.l1ntupleaodraw = cms.Path(
         process.L1NtupleAODRAW
     )
 
