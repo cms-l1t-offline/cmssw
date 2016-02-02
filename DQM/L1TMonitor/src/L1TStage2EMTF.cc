@@ -23,13 +23,13 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
     stage2EMTFnTracks->setBinLabel(bin, std::to_string(label), 1);
   }
 
-  stage2EMTFTrackPt = ibooker.book1D("TrackPt", "EMTF Track p_{T}", 100, -200, 200);
+  stage2EMTFTrackPt = ibooker.book1D("TrackPt", "EMTF Track p_{T}", 260, 0, 260);
   stage2EMTFTrackPt->setAxisTitle("Track p_{T} [GeV]", 1);
 
-  stage2EMTFTrackEta = ibooker.book1D("TrackEta", "EMTF Track #eta", 100, -200, 200);
+  stage2EMTFTrackEta = ibooker.book1D("TrackEta", "EMTF Track #eta", 50, -2.5, 2.5);
   stage2EMTFTrackEta->setAxisTitle("Track #eta", 1);
 
-  stage2EMTFTrackPhi = ibooker.book1D("TrackPhi", "EMTF Track #phi", 100, -200, 200);
+  stage2EMTFTrackPhi = ibooker.book1D("TrackPhi", "EMTF Track #phi", 50, 0, 2*M_PI);
   stage2EMTFTrackPhi->setAxisTitle("Track #phi", 1);
 
   stage2EMTFTrackBX = ibooker.book2D("TrackBX", "EMTF Track Bunch Crossings", 12, 0, 12, 7, -3, 3);
@@ -50,7 +50,7 @@ void L1TStage2EMTF::bookHistograms(DQMStore::IBooker& ibooker, const edm::Run&, 
     }
   }
 
-  stage2EMTFTrackOccupancy = ibooker.book2D("TrackOccupancy", "EMTF Track Occupancy", 100, -200, 200, 100, -200, 200);
+  stage2EMTFTrackOccupancy = ibooker.book2D("TrackOccupancy", "EMTF Track Occupancy", 50, -2.5, 2.5, 50, 0, 2*M_PI);
   stage2EMTFTrackOccupancy->setAxisTitle("#eta", 1);
   stage2EMTFTrackOccupancy->setAxisTitle("#phi", 2);
 }
@@ -68,16 +68,31 @@ void L1TStage2EMTF::analyze(const edm::Event& e, const edm::EventSetup& c) {
     for (l1t::RegionalMuonCandBxCollection::const_iterator track = Tracks->begin(itBX); track != Tracks->end(itBX); ++track) {
         
       l1t::tftype tfType = track->trackFinderType();
+      // FIX: Sector numbering scheme differs between the official and 
+      // cms-l1t-offline versions of CMSSW_8_0_X. This affects the phi
+      // calculation later on as well.
+      int sector = track->processor();
 
       if (tfType == l1t::emtf_pos) {
-        stage2EMTFTrackBX->Fill(track->processor(), itBX);
+        stage2EMTFTrackBX->Fill(sector, itBX);
       } else if (tfType == l1t::emtf_neg) {
-        stage2EMTFTrackBX->Fill(track->processor() + 6, itBX);
+        stage2EMTFTrackBX->Fill(sector + 6, itBX);
       }
 
-      stage2EMTFTrackPt->Fill(track->hwPt());
-      stage2EMTFTrackEta->Fill(track->hwEta());
-      stage2EMTFTrackPhi->Fill(track->hwPhi());
+      int hwPt = track->hwPt();
+      float Pt = hwPt * 0.5;
+      stage2EMTFTrackPt->Fill(Pt);
+
+      int hwEta = track->hwEta();
+      float Eta = hwEta * 0.010875;
+      stage2EMTFTrackEta->Fill(Eta);
+
+      int hwPhi = track->hwPhi();
+      float localPhi = ((hwPhi * 0.625) + 2.0) / 0.0166666;
+      float globalPhi = (localPhi*0.0166666 + sector*60 + 13.0) * (M_PI/180);
+      stage2EMTFTrackPhi->Fill(globalPhi);
+
+      stage2EMTFTrackOccupancy->Fill(Eta, globalPhi);
         
       nTracks++;
     }
