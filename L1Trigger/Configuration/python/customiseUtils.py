@@ -10,9 +10,16 @@ import os
 #
 ##############################################################################
 
-# Unpack Stage-2 GT and GMT
+# Turn off unpack of Stage-2 GT and GMT
 def L1TTurnOffUnpackStage2GtAndGmt(process):
     cutlist=['gtStage2Digis','gmtStage2Digis']
+    for b in cutlist:
+        process.L1TRawToDigi.remove(getattr(process,b))
+    return process
+
+# Turn off unpack of Stage-2 GT, GMT and Calo
+def L1TTurnOffUnpackStage2GtGmtAndCalo(process):
+    cutlist=['gtStage2Digis','gmtStage2Digis','caloStage2Digis']
     for b in cutlist:
         process.L1TRawToDigi.remove(getattr(process,b))
     return process

@@ -15,7 +15,6 @@ def L1TReEmulFromRAW(process):
     process.simCscTriggerPrimitiveDigis.CSCWireDigiProducer       = cms.InputTag( 'muonCSCDigis', 'MuonCSCWireDigi' )  
 
     if eras.stage2L1Trigger.isChosen():
-        process.simCaloStage2Layer1Digis.hcalToken = cms.InputTag('simHcalTriggerPrimitiveDigis')
         process.simTwinMuxDigis.RPC_Source         = cms.InputTag('muonRPCDigis')
         # When available, this will switch to TwinMux input Digis:
         process.simTwinMuxDigis.DTDigi_Source      = cms.InputTag("dttfDigis")
@@ -24,6 +23,7 @@ def L1TReEmulFromRAW(process):
         process.simBmtfDigis.DTDigi_Source         = cms.InputTag("simTwinMuxDigis")
         process.simBmtfDigis.DTDigi_Theta_Source   = cms.InputTag("dttfDigis")
         process.simCaloStage2Layer1Digis.ecalToken = cms.InputTag("ecalDigis:EcalTriggerPrimitives")
+
         process.L1TReEmulPath = cms.Path(process.L1TReEmul)    
         process.schedule.append(process.L1TReEmulPath)
         print "L1TReEmul sequence:  "
