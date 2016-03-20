@@ -32,6 +32,21 @@ def L1TTurnOffUnpackStage2GtGmtAndCalo(process):
         process.L1TRawToDigi.remove(getattr(process,b))
     return process
 
+# TurnOff Pack Stage-2 
+def L1TTurnOffPackL1T(process):
+    cutlist=['L1TDigiToRaw']
+    for b in cutlist:
+        process.DigiToRaw.remove(getattr(process,b))
+    return process
+
+# TurnOff Unpack Stage-2 
+def L1TTurnOffUnpackL1T(process):
+    cutlist=['L1TRawToDigi']
+    for b in cutlist:
+        process.RawToDigi.remove(getattr(process,b))
+    return process
+
+
 def L1TStage1DigisSummary(process):
     print "L1T INFO:  will dump a summary of unpacked Stage1 content to screen."
     process.load('L1Trigger.L1TCommon.l1tSummaryStage1Digis_cfi')
@@ -76,7 +91,8 @@ def L1TGlobalDigisSummary(process):
 def L1TGlobalMenuXML(process):
     process.load('L1Trigger.L1TGlobal.StableParameters_cff')
     process.load('L1Trigger.L1TGlobal.TriggerMenu_cff')
-    process.TriggerMenu.L1TriggerMenuFile = cms.string('L1Menu_Collisions2015_25nsStage1_v7_uGT.xml')    
+    process.TriggerMenu.L1TriggerMenuFile = cms.string('L1Menu_Collisions2015_25nsStage1_v7_uGT.xml')
+    #process.TriggerMenu.L1TriggerMenuFile = cms.string('L1Menu_Collisions2016_dev_v2.xml')    
     return process
 
 def L1TGlobalSimDigisSummary(process):
