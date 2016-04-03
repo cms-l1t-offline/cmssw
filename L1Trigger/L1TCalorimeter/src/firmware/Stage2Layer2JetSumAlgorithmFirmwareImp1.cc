@@ -58,8 +58,8 @@ void l1t::Stage2Layer2JetSumAlgorithmFirmwareImp1::processEvent(const std::vecto
 	
 	if (thisJet.hwPt()>mhtJetThresholdHw_ && 
 	    abs(thisJet.hwEta())<=mhtEtaMax_) {
-	  ringHx += (int32_t) ( thisJet.hwPt() * std::trunc ( 511. * cos ( 2 * M_PI * (72 - (iphi-1)) / 72.0 ) )) >> 9;
-	  ringHy += (int32_t) ( thisJet.hwPt() * std::trunc ( 511. * sin ( 2 * M_PI * (iphi-1) / 72.0 ) )) >> 9;
+	  ringHx += (int32_t) ( thisJet.hwPt() * std::trunc ( 1023. * cos ( 2 * M_PI * (72 - (iphi-1)) / 72.0 ) ));
+	  ringHy += (int32_t) ( thisJet.hwPt() * std::trunc ( 1023. * sin ( 2 * M_PI * (iphi-1) / 72.0 ) ));
 	}
 	
 	if (thisJet.hwPt()>httJetThresholdHw_ && 
@@ -73,6 +73,9 @@ void l1t::Stage2Layer2JetSumAlgorithmFirmwareImp1::processEvent(const std::vecto
       ht += ringHt;
       
     }
+
+    hx >>= 10;
+    hy >>= 10;
 
     math::XYZTLorentzVector p4;
     
