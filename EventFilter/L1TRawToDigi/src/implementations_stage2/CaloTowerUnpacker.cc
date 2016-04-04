@@ -69,11 +69,13 @@ namespace stage2 {
            tower1.setHwQual((raw_data >> 12) & 0xF);
            tower1.setHwEtRatio((raw_data >>9) & 0x7);
            tower1.setHwPhi(link_phi+1); // iPhi starts at 1
-	 
+
+	   // iEta starts at 1, but we skip ieta 29 (iframe 28)
+           const unsigned frameShift = (iframe >= 28) ? 2 : 1;
            if (link % 2==0) { // Even number links carry Eta+
-             tower1.setHwEta(iframe+1); // iEta starts at 1
+             tower1.setHwEta(iframe+frameShift);
            } else { // Odd number links carry Eta-
-             tower1.setHwEta(-1*(iframe+1));
+             tower1.setHwEta(-1*(iframe+frameShift));
            }
 	 
            LogDebug("L1T") << "Tower 1: Eta " << tower1.hwEta() 
@@ -96,10 +98,11 @@ namespace stage2 {
            tower2.setHwEtRatio((raw_data >> 25) & 0x7);
            tower2.setHwPhi(link_phi+2);
 
+           const unsigned frameShift = (iframe >= 28) ? 2 : 1;
            if (link % 2==0) {
-             tower2.setHwEta(iframe+1);
+             tower2.setHwEta(iframe+frameShift);
            } else {
-             tower2.setHwEta(-1*(iframe+1));
+             tower2.setHwEta(-1*(iframe+frameShift));
            }
 	 
            LogDebug("L1T") << "Tower 2: Eta " << tower2.hwEta()
