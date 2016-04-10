@@ -41,14 +41,15 @@ public:
         sortRank=18,
         FWVERSION=19,
         INPUTS_TO_DISABLE=20,
-        NUM_GMTPARAMNODES=21
+        MASKED_INPUTS=21,
+        NUM_GMTPARAMNODES=22
   };
 
   // string parameters indices
   enum spIdx {fname=0};
 
   // unsigned parameters indices
-  enum upIdx {ptFactor=0, qualFactor=1, FWVERSION_IDX=0, CALOINPUTS_TO_DISABLE=0, BMTFINPUTS_TO_DISABLE=1, OMTFINPUTS_TO_DISABLE=2, EMTFINPUTS_TO_DISABLE=3};
+  enum upIdx {ptFactor=0, qualFactor=1, FWVERSION_IDX=0, CALOINPUTS=0, BMTFINPUTS=1, OMTFINPUTS=2, EMTFINPUTS=3};
 
   // double parameters indices
   enum dpIdx {maxdr=0, maxdrEtaFine=1};
@@ -65,14 +66,40 @@ public:
   void setFwVersion(unsigned fwVersion);
 
   // Input disables
-  std::bitset<72> inputsToDisable() const;
-  void setInputsToDisable(const std::bitset<72> &inputsToDisable); 
-  void setCaloInputsToDisable(const std::bitset<28> &disables);
-  void setEmtfpInputsToDisable(const std::bitset<6> &disables) { setEOmtfInputsToDisable(0, EMTFINPUTS_TO_DISABLE, disables); };
-  void setOmtfpInputsToDisable(const std::bitset<6> &disables) { setEOmtfInputsToDisable(0, OMTFINPUTS_TO_DISABLE, disables); };
-  void setBmtfInputsToDisable(const std::bitset<12> &disables);
-  void setOmtfnInputsToDisable(const std::bitset<6> &disables) { setEOmtfInputsToDisable(6, OMTFINPUTS_TO_DISABLE, disables); };
-  void setEmtfnInputsToDisable(const std::bitset<6> &disables) { setEOmtfInputsToDisable(6, EMTFINPUTS_TO_DISABLE, disables); };
+  std::bitset<72> inputsToDisable() const { return inputFlags(INPUTS_TO_DISABLE); };
+  std::bitset<28> caloInputsToDisable() const { return caloInputFlags(INPUTS_TO_DISABLE); };
+  std::bitset<12> bmtfInputsToDisable() const { return tfInputFlags(INPUTS_TO_DISABLE, BMTFINPUTS); };
+  std::bitset<12> omtfInputsToDisable() const { return tfInputFlags(INPUTS_TO_DISABLE, OMTFINPUTS); };
+  std::bitset<12> emtfInputsToDisable() const { return tfInputFlags(INPUTS_TO_DISABLE, EMTFINPUTS); };
+  std::bitset<6> omtfpInputsToDisable() const { return eomtfInputFlags(INPUTS_TO_DISABLE, 0, OMTFINPUTS); };
+  std::bitset<6> omtfnInputsToDisable() const { return eomtfInputFlags(INPUTS_TO_DISABLE, 6, OMTFINPUTS); };
+  std::bitset<6> emtfpInputsToDisable() const { return eomtfInputFlags(INPUTS_TO_DISABLE, 0, EMTFINPUTS); };
+  std::bitset<6> emtfnInputsToDisable() const { return eomtfInputFlags(INPUTS_TO_DISABLE, 6, EMTFINPUTS); };
+  void setInputsToDisable(const std::bitset<72> &inputsToDisable) { setInputFlags(INPUTS_TO_DISABLE, inputsToDisable); }; 
+  void setCaloInputsToDisable(const std::bitset<28> &disables) { setCaloInputFlags(INPUTS_TO_DISABLE, disables); };
+  void setBmtfInputsToDisable(const std::bitset<12> &disables) { setTfInputFlags(INPUTS_TO_DISABLE, BMTFINPUTS, disables); };
+  void setOmtfpInputsToDisable(const std::bitset<6> &disables) { setEOmtfInputFlags(INPUTS_TO_DISABLE, 0, OMTFINPUTS, disables); };
+  void setOmtfnInputsToDisable(const std::bitset<6> &disables) { setEOmtfInputFlags(INPUTS_TO_DISABLE, 6, OMTFINPUTS, disables); };
+  void setEmtfpInputsToDisable(const std::bitset<6> &disables) { setEOmtfInputFlags(INPUTS_TO_DISABLE, 0, EMTFINPUTS, disables); };
+  void setEmtfnInputsToDisable(const std::bitset<6> &disables) { setEOmtfInputFlags(INPUTS_TO_DISABLE, 6, EMTFINPUTS, disables); };
+
+  // masked inputs
+  std::bitset<72> maskedInputs() const { return inputFlags(MASKED_INPUTS); };
+  std::bitset<28> maskedCaloInputs() const { return caloInputFlags(MASKED_INPUTS); };
+  std::bitset<12> maskedBmtfInputs() const { return tfInputFlags(MASKED_INPUTS, BMTFINPUTS); };
+  std::bitset<12> maskedOmtfInputs() const { return tfInputFlags(MASKED_INPUTS, OMTFINPUTS); };
+  std::bitset<12> maskedEmtfInputs() const { return tfInputFlags(MASKED_INPUTS, EMTFINPUTS); };
+  std::bitset<6> maskedOmtfpInputs() const { return eomtfInputFlags(MASKED_INPUTS, 0, OMTFINPUTS); };
+  std::bitset<6> maskedOmtfnInputs() const { return eomtfInputFlags(MASKED_INPUTS, 6, OMTFINPUTS); };
+  std::bitset<6> maskedEmtfpInputs() const { return eomtfInputFlags(MASKED_INPUTS, 0, EMTFINPUTS); };
+  std::bitset<6> maskedEmtfnInputs() const { return eomtfInputFlags(MASKED_INPUTS, 6, EMTFINPUTS); };
+  void setMaskedInputs(const std::bitset<72> &masked) { setInputFlags(MASKED_INPUTS, masked); }; 
+  void setMaskedCaloInputs(const std::bitset<28> &masked) { setCaloInputFlags(MASKED_INPUTS, masked); };
+  void setMaskedBmtfInputs(const std::bitset<12> &masked) { setTfInputFlags(MASKED_INPUTS, BMTFINPUTS, masked); };
+  void setMaskedOmtfpInputs(const std::bitset<6> &masked) { setEOmtfInputFlags(MASKED_INPUTS, 0, OMTFINPUTS, masked); };
+  void setMaskedOmtfnInputs(const std::bitset<6> &masked) { setEOmtfInputFlags(MASKED_INPUTS, 6, OMTFINPUTS, masked); };
+  void setMaskedEmtfpInputs(const std::bitset<6> &masked) { setEOmtfInputFlags(MASKED_INPUTS, 0, EMTFINPUTS, masked); };
+  void setMaskedEmtfnInputs(const std::bitset<6> &masked) { setEOmtfInputFlags(MASKED_INPUTS, 6, EMTFINPUTS, masked); };
 
   // LUTs
   l1t::LUT* absIsoCheckMemLUT()        { return &pnodes_[absIsoCheckMem].LUT_; }
@@ -185,8 +212,15 @@ public:
 
 private:
 
-  std::bitset<6> eomtfInputsToDisable(const int &startLink);
-  void setEOmtfInputsToDisable(const size_t &startIdx, const int &tfIdx, const std::bitset<6> &disables);
+  // Input disables
+  std::bitset<72> inputFlags(const int &nodeIdx) const;
+  std::bitset<28> caloInputFlags(const int &nodeIdx) const;
+  std::bitset<12> tfInputFlags(const int &nodeIdx, const int &tfIdx) const;
+  std::bitset<6> eomtfInputFlags(const int &nodeIdx, const size_t &startIdx, const int &tfIdx) const;
+  void setInputFlags(const int &nodeIdx, const std::bitset<72> &flags); 
+  void setCaloInputFlags(const int &nodeIdx, const std::bitset<28> &flags);
+  void setTfInputFlags(const int &nodeIdx, const int &tfIdx, const std::bitset<12> &flags);
+  void setEOmtfInputFlags(const int &nodeIdx, const size_t &startIdx, const int &tfIdx, const std::bitset<6> &flags);
 
 };
 #endif

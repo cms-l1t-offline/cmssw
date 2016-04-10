@@ -101,6 +101,15 @@ using namespace l1t;
         int m_bxMin;
         int m_bxMax;
         std::bitset<72> m_inputsToDisable;
+        std::bitset<28> m_caloInputsToDisable;
+        std::bitset<12> m_bmtfInputsToDisable;
+        std::bitset<12> m_omtfInputsToDisable;
+        std::bitset<12> m_emtfInputsToDisable;
+        std::bitset<72> m_maskedInputs;
+        std::bitset<28> m_maskedCaloInputs;
+        std::bitset<12> m_maskedBmtfInputs;
+        std::bitset<12> m_maskedOmtfInputs;
+        std::bitset<12> m_maskedEmtfInputs;
         std::unique_ptr<L1TMuonGlobalParamsHelper> microGMTParamsHelper;
         edm::InputTag m_barrelTfInputTag;
         edm::InputTag m_overlapTfInputTag;
@@ -197,8 +206,34 @@ L1TMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // find out the BX range from the inputs
   // the smallest BX window defines the output BX window
   if (m_autoBxRange) {
-    m_bxMin = std::max({bmtfMuons->getFirstBX(), emtfMuons->getFirstBX(), omtfMuons->getFirstBX(), trigTowers->getFirstBX()});
-    m_bxMax = std::min({bmtfMuons->getLastBX(), emtfMuons->getLastBX(), omtfMuons->getLastBX(), trigTowers->getLastBX()});
+    int bxMin = -1000;
+    int bxMax = 1000;
+    if (!(m_caloInputsToDisable.all() || m_maskedCaloInputs.all())) {
+      bxMin = std::max(bxMin, trigTowers->getFirstBX());
+      bxMax = std::min(bxMax, trigTowers->getLastBX());
+    }
+    if (!(m_bmtfInputsToDisable.all() || m_maskedBmtfInputs.all())) {
+      bxMin = std::max(bxMin, bmtfMuons->getFirstBX());
+      bxMax = std::min(bxMax, bmtfMuons->getLastBX());
+    }
+    if (!(m_omtfInputsToDisable.all() || m_maskedOmtfInputs.all())) {
+      bxMin = std::max(bxMin, omtfMuons->getFirstBX());
+      bxMax = std::min(bxMax, omtfMuons->getLastBX());
+    }
+    if (!(m_emtfInputsToDisable.all() || m_maskedEmtfInputs.all())) {
+      bxMin = std::max(bxMin, emtfMuons->getFirstBX());
+      bxMax = std::min(bxMax, emtfMuons->getLastBX());
+    }
+    if (bxMin > -1000) {
+      m_bxMin = bxMin;
+    } else {
+      m_bxMin = 0;
+    }
+    if (bxMax < 1000) {
+      m_bxMax = bxMax;
+    } else {
+      m_bxMax = 0;
+    }
   }
 
   // set BX range for outputs
@@ -407,7 +442,7 @@ L1TMuonProducer::splitAndConvertMuons(const edm::Handle<MicroGMTConfiguration::I
   int currentLink = 0;
   for (size_t i = 0; i < in->size(bx); ++i, ++muIdx) {
     int link = in->at(bx, i).link();
-    if (m_inputsToDisable.test(link)) continue; // only process if input link is enabled
+    if (m_inputsToDisable.test(link) || m_maskedInputs.test(link)) continue; // only process if input link is enabled and not masked
     if (currentLink != link) {
       muIdx = 0;
       currentLink = link;
@@ -444,7 +479,7 @@ L1TMuonProducer::convertMuons(const edm::Handle<MicroGMTConfiguration::InputColl
   int currentLink = 0;
   for (size_t i = 0; i < in->size(bx); ++i, ++muIdx) {
     int link = in->at(bx, i).link();
-    if (m_inputsToDisable.test(link)) continue; // only process if input link is enabled
+    if (m_inputsToDisable.test(link) || m_maskedInputs.test(link)) continue; // only process if input link is enabled and not masked
     if (currentLink != link) {
       muIdx = 0;
       currentLink = link;
@@ -487,6 +522,16 @@ L1TMuonProducer::beginRun(edm::Run const& run, edm::EventSetup const& iSetup)
   //microGMTParamsHelper->print(std::cout);
   m_inputsToDisable  = microGMTParamsHelper->inputsToDisable();
   edm::LogVerbatim("L1TMuonProducer") << "uGMT inputsToDisable: " << m_inputsToDisable << "\n                      EMTF-|OMTF-|   BMTF    |OMTF+|EMTF+|            CALO           |  res  0";
+  m_caloInputsToDisable  = microGMTParamsHelper->caloInputsToDisable();
+  m_bmtfInputsToDisable  = microGMTParamsHelper->bmtfInputsToDisable();
+  m_omtfInputsToDisable  = microGMTParamsHelper->omtfInputsToDisable();
+  m_emtfInputsToDisable  = microGMTParamsHelper->emtfInputsToDisable();
+  m_maskedInputs  = microGMTParamsHelper->maskedInputs();
+  edm::LogVerbatim("L1TMuonProducer") << "uGMT maskedInputs:    " << m_maskedInputs << "\n                      EMTF-|OMTF-|   BMTF    |OMTF+|EMTF+|            CALO           |  res  0";
+  m_maskedCaloInputs  = microGMTParamsHelper->maskedCaloInputs();
+  m_maskedBmtfInputs  = microGMTParamsHelper->maskedBmtfInputs();
+  m_maskedOmtfInputs  = microGMTParamsHelper->maskedOmtfInputs();
+  m_maskedEmtfInputs  = microGMTParamsHelper->maskedEmtfInputs();
   m_rankPtQualityLUT = l1t::MicroGMTRankPtQualLUTFactory::create(microGMTParamsHelper->sortRankLUTPath(), microGMTParamsHelper->fwVersion(), microGMTParamsHelper->sortRankLUTPtFactor(), microGMTParamsHelper->sortRankLUTQualFactor());
   m_isolationUnit.initialise(microGMTParamsHelper.get());
   m_cancelOutUnit.initialise(microGMTParamsHelper.get());

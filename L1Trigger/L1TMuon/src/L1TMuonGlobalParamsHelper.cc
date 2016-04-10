@@ -8,30 +8,62 @@ L1TMuonGlobalParamsHelper::L1TMuonGlobalParamsHelper(const L1TMuonGlobalParams p
 }
 
 
-std::bitset<72> L1TMuonGlobalParamsHelper::inputsToDisable() const
+std::bitset<72> L1TMuonGlobalParamsHelper::inputFlags(const int &nodeIdx) const
 {
-  std::bitset<72> inputsToDisable;
-  if (pnodes_[INPUTS_TO_DISABLE].uparams_.size() < 4) {
-    return inputsToDisable;
+  std::bitset<72> inputFlags;
+  if (pnodes_[nodeIdx].uparams_.size() != 4) {
+    return inputFlags;
   }
 
   for (size_t i = 0; i < 28; ++i) {
-    inputsToDisable[CALOLINK1 + i] = ((pnodes_[INPUTS_TO_DISABLE].uparams_[CALOINPUTS_TO_DISABLE] >> i) & 0x1);
+    inputFlags[CALOLINK1 + i] = ((pnodes_[nodeIdx].uparams_[CALOINPUTS] >> i) & 0x1);
     if (i < CALOLINK1) {
       // disable unused inputs
-      inputsToDisable[i] = 0x1;
+      inputFlags[i] = 0x1;
     }
     if (i < 12) {
-      inputsToDisable[BMTFLINK1 + i] = ((pnodes_[INPUTS_TO_DISABLE].uparams_[BMTFINPUTS_TO_DISABLE] >> i) & 0x1);
+      inputFlags[BMTFLINK1 + i] = ((pnodes_[nodeIdx].uparams_[BMTFINPUTS] >> i) & 0x1);
       if (i < 6) {
-        inputsToDisable[EMTFPLINK1 + i] = ((pnodes_[INPUTS_TO_DISABLE].uparams_[EMTFINPUTS_TO_DISABLE] >> i) & 0x1);
-        inputsToDisable[OMTFPLINK1 + i] = ((pnodes_[INPUTS_TO_DISABLE].uparams_[OMTFINPUTS_TO_DISABLE] >> i) & 0x1);
-        inputsToDisable[OMTFNLINK1 + i] = ((pnodes_[INPUTS_TO_DISABLE].uparams_[OMTFINPUTS_TO_DISABLE] >> (i + 6)) & 0x1);
-        inputsToDisable[EMTFNLINK1 + i] = ((pnodes_[INPUTS_TO_DISABLE].uparams_[EMTFINPUTS_TO_DISABLE] >> (i + 6)) & 0x1);
+        inputFlags[EMTFPLINK1 + i] = ((pnodes_[nodeIdx].uparams_[EMTFINPUTS] >> i) & 0x1);
+        inputFlags[OMTFPLINK1 + i] = ((pnodes_[nodeIdx].uparams_[OMTFINPUTS] >> i) & 0x1);
+        inputFlags[OMTFNLINK1 + i] = ((pnodes_[nodeIdx].uparams_[OMTFINPUTS] >> (i + 6)) & 0x1);
+        inputFlags[EMTFNLINK1 + i] = ((pnodes_[nodeIdx].uparams_[EMTFINPUTS] >> (i + 6)) & 0x1);
       }
     }
   }
-  return inputsToDisable;
+  return inputFlags;
+}
+
+
+std::bitset<28> L1TMuonGlobalParamsHelper::caloInputFlags(const int &nodeIdx) const
+{
+  if (pnodes_[nodeIdx].uparams_.size() == 4) {
+    return std::bitset<28>(pnodes_[nodeIdx].uparams_[CALOINPUTS]);
+  } else {
+    return std::bitset<28>();
+  }
+}
+
+
+std::bitset<12> L1TMuonGlobalParamsHelper::tfInputFlags(const int &nodeIdx, const int &tfIdx) const
+{
+  if (pnodes_[nodeIdx].uparams_.size() == 4) {
+    return std::bitset<12>(pnodes_[nodeIdx].uparams_[tfIdx]);
+  } else {
+    return std::bitset<12>();
+  }
+}
+
+
+std::bitset<6> L1TMuonGlobalParamsHelper::eomtfInputFlags(const int &nodeIdx, const size_t &startIdx, const int &tfIdx) const
+{
+  std::bitset<6> inputFlags;
+  if (pnodes_[nodeIdx].uparams_.size() == 4) {
+    for (size_t i = 0; i < 6; ++i) {
+      inputFlags[i] = ((pnodes_[nodeIdx].uparams_[tfIdx] >> (i + startIdx)) & 0x1);
+    }
+  }
+  return inputFlags;
 }
 
 
@@ -42,47 +74,47 @@ void L1TMuonGlobalParamsHelper::setFwVersion(unsigned fwVersion)
 }
 
 
-void L1TMuonGlobalParamsHelper::setInputsToDisable(const std::bitset<72> &inputsToDisable)
+void L1TMuonGlobalParamsHelper::setInputFlags(const int &nodeIdx, const std::bitset<72> &inputFlags)
 {
-  pnodes_[INPUTS_TO_DISABLE].uparams_.resize(4);
+  pnodes_[nodeIdx].uparams_.resize(4);
   for (size_t i = 0; i < 28; ++i) {
-    pnodes_[INPUTS_TO_DISABLE].uparams_[CALOINPUTS_TO_DISABLE] += (inputsToDisable.test(CALOLINK1 + i) << i);
+    pnodes_[nodeIdx].uparams_[CALOINPUTS] += (inputFlags.test(CALOLINK1 + i) << i);
     if (i < 12) {
-      pnodes_[INPUTS_TO_DISABLE].uparams_[BMTFINPUTS_TO_DISABLE] += (inputsToDisable.test(BMTFLINK1 + i) << i);
+      pnodes_[nodeIdx].uparams_[BMTFINPUTS] += (inputFlags.test(BMTFLINK1 + i) << i);
       if (i < 6) {
-        pnodes_[INPUTS_TO_DISABLE].uparams_[OMTFINPUTS_TO_DISABLE] += (inputsToDisable.test(OMTFPLINK1 + i) << i);
-        pnodes_[INPUTS_TO_DISABLE].uparams_[OMTFINPUTS_TO_DISABLE] += (inputsToDisable.test(OMTFNLINK1 + i) << (i + 6));
-        pnodes_[INPUTS_TO_DISABLE].uparams_[EMTFINPUTS_TO_DISABLE] += (inputsToDisable.test(EMTFPLINK1 + i) << i);
-        pnodes_[INPUTS_TO_DISABLE].uparams_[EMTFINPUTS_TO_DISABLE] += (inputsToDisable.test(EMTFNLINK1 + i) << (i + 6));
+        pnodes_[nodeIdx].uparams_[OMTFINPUTS] += (inputFlags.test(OMTFPLINK1 + i) << i);
+        pnodes_[nodeIdx].uparams_[OMTFINPUTS] += (inputFlags.test(OMTFNLINK1 + i) << (i + 6));
+        pnodes_[nodeIdx].uparams_[EMTFINPUTS] += (inputFlags.test(EMTFPLINK1 + i) << i);
+        pnodes_[nodeIdx].uparams_[EMTFINPUTS] += (inputFlags.test(EMTFNLINK1 + i) << (i + 6));
       }
     }
   }
 }
 
 
-void L1TMuonGlobalParamsHelper::setCaloInputsToDisable(const std::bitset<28> &inputsToDisable)
+void L1TMuonGlobalParamsHelper::setCaloInputFlags(const int &nodeIdx, const std::bitset<28> &inputFlags)
 {
-  pnodes_[INPUTS_TO_DISABLE].uparams_.resize(4);
+  pnodes_[nodeIdx].uparams_.resize(4);
   for (size_t i = 0; i < 28; ++i) {
-    pnodes_[INPUTS_TO_DISABLE].uparams_[CALOINPUTS_TO_DISABLE] += (inputsToDisable.test(i) << i);
+    pnodes_[nodeIdx].uparams_[CALOINPUTS] += (inputFlags.test(i) << i);
   }
 }
 
 
-void L1TMuonGlobalParamsHelper::setEOmtfInputsToDisable(const size_t &startIdx, const int &tfIdx, const std::bitset<6> &inputsToDisable)
+void L1TMuonGlobalParamsHelper::setTfInputFlags(const int &nodeIdx, const int &tfIdx, const std::bitset<12> &inputFlags)
 {
-  pnodes_[INPUTS_TO_DISABLE].uparams_.resize(4);
-  for (size_t i = 0; i < 6; ++i) {
-    pnodes_[INPUTS_TO_DISABLE].uparams_[tfIdx] += (inputsToDisable.test(i) << (i + startIdx));
-  }
-}
-
-
-void L1TMuonGlobalParamsHelper::setBmtfInputsToDisable(const std::bitset<12> &inputsToDisable)
-{
-  pnodes_[INPUTS_TO_DISABLE].uparams_.resize(4);
+  pnodes_[nodeIdx].uparams_.resize(4);
   for (size_t i = 0; i < 12; ++i) {
-    pnodes_[INPUTS_TO_DISABLE].uparams_[BMTFINPUTS_TO_DISABLE] += (inputsToDisable.test(i) << i);
+    pnodes_[nodeIdx].uparams_[tfIdx] += (inputFlags.test(i) << i);
+  }
+}
+
+
+void L1TMuonGlobalParamsHelper::setEOmtfInputFlags(const int &nodeIdx, const size_t &startIdx, const int &tfIdx, const std::bitset<6> &inputFlags)
+{
+  pnodes_[nodeIdx].uparams_.resize(4);
+  for (size_t i = 0; i < 6; ++i) {
+    pnodes_[nodeIdx].uparams_[tfIdx] += (inputFlags.test(i) << (i + startIdx));
   }
 }
 
@@ -94,6 +126,9 @@ void L1TMuonGlobalParamsHelper::print(std::ostream& out) const {
   out << "Firmware version: " << this->fwVersion() << std::endl;
 
   out << "InputsToDisable: " << this->inputsToDisable() << std::endl;
+  out << "                 EMTF-|OMTF-|   BMTF    |OMTF+|EMTF+|            CALO           |  res  0" << std::endl;
+
+  out << "Masked Inputs:   " << this->maskedInputs() << std::endl;
   out << "                 EMTF-|OMTF-|   BMTF    |OMTF+|EMTF+|            CALO           |  res  0" << std::endl;
 
   out << "LUT paths (LUTs are generated analytically if path is empty)" << std::endl;

@@ -89,7 +89,7 @@ bool UCTTower::processHFTower() {
     // Divide by four
     calibratedET /= 4;
   }
-  towerData = calibratedET + (hcalFB << miscShift);
+  towerData = calibratedET + (hcalFB << miscShift) + zeroFlagMask;
   return true;
 }
 

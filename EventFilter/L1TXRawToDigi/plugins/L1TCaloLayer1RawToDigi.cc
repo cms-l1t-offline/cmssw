@@ -237,7 +237,8 @@ void L1TCaloLayer1RawToDigi::makeECalTPGs(uint32_t lPhi, UCTCTP7RawData& ctp7Dat
 	   ctp7Data.isLinkDown(cType, negativeEta, iEta, iPhi)) towerDatum |= 0x8000;
 	EcalTriggerPrimitiveSample sample(towerDatum); 
 	int zSide = cEta / ((int) iEta);
-	EcalSubdetector ecalTriggerTower = EcalSubdetector::EcalTriggerTower;
+        // As far as I can tell, the ECal unpacker only uses barrel and endcap IDs, never EcalTriggerTower
+	const EcalSubdetector ecalTriggerTower = (iEta > 17 ) ? EcalSubdetector::EcalEndcap : EcalSubdetector::EcalBarrel;
 	EcalTrigTowerDetId id(zSide, ecalTriggerTower, iEta, cPhi);
 	EcalTriggerPrimitiveDigi tpg(id);
 	tpg.setSize(1);

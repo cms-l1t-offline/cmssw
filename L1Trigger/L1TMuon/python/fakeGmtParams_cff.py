@@ -15,14 +15,19 @@ gmtParamsSource = cms.ESSource(
 gmtParams = cms.ESProducer('L1TMuonGlobalParamsESProducer',
     fwVersion = cms.uint32(1),
 
-    bxMin = cms.int32(-2),
-    bxMax = cms.int32(2),
-
     # uGMT inputs to disable
+    # disabled inputs are not used in the algo but are still in the readout
     caloInputsDisable = cms.bool(False),
     bmtfInputsToDisable = cms.vuint32(0,0,0,0,0,0,0,0,0,0,0,0), # BMTF 0-11
     omtfInputsToDisable = cms.vuint32(0,0,0,0,0,0,0,0,0,0,0,0), # OMTF+0-5, OMTF-0-5
     emtfInputsToDisable = cms.vuint32(0,0,0,0,0,0,0,0,0,0,0,0), # EMTF+0-5, EMTF-0-5
+
+    # masked inputs
+    # masked inputs are not used in the algo and are not in the readout
+    caloInputsMasked = cms.bool(False),
+    maskedBmtfInputs = cms.vuint32(0,0,0,0,0,0,0,0,0,0,0,0), # BMTF 0-11
+    maskedOmtfInputs = cms.vuint32(0,0,0,0,0,0,0,0,0,0,0,0), # OMTF+0-5, OMTF-0-5
+    maskedEmtfInputs = cms.vuint32(0,0,0,0,0,0,0,0,0,0,0,0), # EMTF+0-5, EMTF-0-5
 
     AbsIsoCheckMemLUTPath        = cms.string(os.path.join(lut_dir, 'AbsIsoCheckMem.txt')),
     RelIsoCheckMemLUTPath        = cms.string(os.path.join(lut_dir, 'RelIsoCheckMem.txt')),

@@ -71,6 +71,7 @@ L1TMuonGlobalParamsESProducer::L1TMuonGlobalParamsESProducer(const edm::Paramete
    unsigned fwVersion = iConfig.getParameter<unsigned>("fwVersion");
    m_params_helper.setFwVersion(fwVersion);
 
+   // uGMT disabled inputs
    bool disableCaloInputs = iConfig.getParameter<bool>("caloInputsDisable");
    if (disableCaloInputs) {
       m_params_helper.setCaloInputsToDisable(std::bitset<28>(0xFFFFFFF));
@@ -111,7 +112,48 @@ L1TMuonGlobalParamsESProducer::L1TMuonGlobalParamsESProducer(const edm::Paramete
    m_params_helper.setEmtfpInputsToDisable(emtfpDisables);
    m_params_helper.setEmtfnInputsToDisable(emtfnDisables);
 
+   // masked inputs
+   bool caloInputsMasked = iConfig.getParameter<bool>("caloInputsMasked");
+   if (caloInputsMasked) {
+      m_params_helper.setMaskedCaloInputs(std::bitset<28>(0xFFFFFFF));
+   } else {
+      m_params_helper.setMaskedCaloInputs(std::bitset<28>());
+   }
 
+   std::vector<unsigned> maskedBmtfInputs = iConfig.getParameter<std::vector<unsigned> >("maskedBmtfInputs");
+   std::bitset<12> bmtfMasked;
+   for (size_t i = 0; i < maskedBmtfInputs.size(); ++i) {
+     bmtfMasked.set(i, maskedBmtfInputs[i] > 0);
+   }
+   m_params_helper.setMaskedBmtfInputs(bmtfMasked);
+
+   std::vector<unsigned> maskedOmtfInputs = iConfig.getParameter<std::vector<unsigned> >("maskedOmtfInputs");
+   std::bitset<6> omtfpMasked;
+   std::bitset<6> omtfnMasked;
+   for (size_t i = 0; i < maskedOmtfInputs.size(); ++i) {
+     if (i < 6) {
+       omtfpMasked.set(i, maskedOmtfInputs[i] > 0);
+     } else {
+       omtfnMasked.set(i-6, maskedOmtfInputs[i] > 0);
+     }
+   }
+   m_params_helper.setMaskedOmtfpInputs(omtfpMasked);
+   m_params_helper.setMaskedOmtfnInputs(omtfnMasked);
+
+   std::vector<unsigned> maskedEmtfInputs = iConfig.getParameter<std::vector<unsigned> >("maskedEmtfInputs");
+   std::bitset<6> emtfpMasked;
+   std::bitset<6> emtfnMasked;
+   for (size_t i = 0; i < maskedEmtfInputs.size(); ++i) {
+     if (i < 6) {
+       emtfpMasked.set(i, maskedEmtfInputs[i] > 0);
+     } else {
+       emtfnMasked.set(i-6, maskedEmtfInputs[i] > 0);
+     }
+   }
+   m_params_helper.setMaskedEmtfpInputs(emtfpMasked);
+   m_params_helper.setMaskedEmtfnInputs(emtfnMasked);
+
+   // LUTs
    m_params_helper.setFwdPosSingleMatchQualLUTMaxDR(iConfig.getParameter<double>("FwdPosSingleMatchQualLUTMaxDR"));
    m_params_helper.setFwdNegSingleMatchQualLUTMaxDR(iConfig.getParameter<double>("FwdNegSingleMatchQualLUTMaxDR"));
    m_params_helper.setOvlPosSingleMatchQualLUTMaxDR(iConfig.getParameter<double>("OvlPosSingleMatchQualLUTMaxDR"));
