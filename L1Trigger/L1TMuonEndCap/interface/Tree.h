@@ -10,6 +10,8 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "CondFormats/Serialization/interface/Serializable.h"
+
 
 //class Node;
 
@@ -32,6 +34,8 @@ class Tree
         void calcError();
         void filterEvents(std::vector<Event*>& tEvents);
         void filterEventsRecursive(Node* node);
+        Node* filterEvent(Event* e);
+        Node* filterEventRecursive(Node* node, Event* e);
 
         void saveToXML(const char* filename);
         void saveToXMLRecursive(TXMLEngine* xml, Node* node, XMLNodePointer_t np);
@@ -43,11 +47,18 @@ class Tree
         void rankVariables(std::vector<Double_t>& v);
         void rankVariablesRecursive(Node* node, std::vector<Double_t>& v);
 
+        void getSplitValues(std::vector<std::vector<Double_t>>& v);
+        void getSplitValuesRecursive(Node* node, std::vector<std::vector<Double_t>>& v);
+		
+	
+
     private:
         Node *rootNode;
         std::list<Node*> terminalNodes;
         Int_t numTerminalNodes;
         Double_t rmsError;
+		
+		COND_SERIALIZABLE;
 };
 
 #endif

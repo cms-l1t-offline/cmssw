@@ -7,9 +7,11 @@
 
 #include "L1Trigger/L1TMuonEndCap/interface/EmulatorClasses.h"
 #include "L1Trigger/L1TMuonEndCap/interface/PhiMemoryImage.h"
+#include "CondFormats/DataRecord/interface/L1TMuonEndcapParamsRcd.h"
+#include "CondFormats/L1TObjects/interface/L1TMuonEndcapParams.h"
 
 
-MatchingOutput PhiMatching(SortingOutput Sout){
+MatchingOutput PhiMatching(SortingOutput Sout, const L1TMuonEndcapParams& emtfParams){
 
 	bool verbose = false;
 
@@ -17,6 +19,11 @@ MatchingOutput PhiMatching(SortingOutput Sout){
 	std::vector<std::vector<Winner>> Winners = Sout.Winners();
 	std::vector<int> segment (4,0);
 	int phdiff[4] = {15,15,7,7};
+	phdiff[0] = emtfParams.GetSt1PhiMatchWindow();
+	phdiff[1] = emtfParams.GetSt2PhiMatchWindow();
+	phdiff[2] = emtfParams.GetSt3PhiMatchWindow();
+	phdiff[3] = emtfParams.GetSt4PhiMatchWindow();
+	
 	
 	/////////////////////////////////////////
 	//// Set Null Ph and Th outputs /////////
@@ -68,7 +75,7 @@ MatchingOutput PhiMatching(SortingOutput Sout){
 					if(inzone && verbose)
 						std::cout<<"setstation = "<<setstation<<std::endl;
 					
-					if((fabs((Winners[z][w].Strip()) - i->Zhit()) < phdiff[setstation]) && inzone){//is close to winner keystrip and in same zone?
+					if((fabs((Winners[z][w].Strip()) - i->Zhit()) < phdiff[setstation]) /*&& inzone*/){//is close to winner keystrip and in same zone?
 					
 						if(ph_output[z][w][setstation].Phi() == -999){//has this already been set? no
 						

@@ -42,6 +42,9 @@
     <field name="sparams_" mapping="blob"/>
     <field name="uparams_" mapping="blob"/>
   </class>
+  <class name="L1TMuonEndcapParams">
+    <field name="pnodes_" mapping="blob"/>
+  </class>
   <class name="L1TMuonBarrelParams">
     <field name="pnodes_" mapping="blob"/>
   </class>

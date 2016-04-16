@@ -14,6 +14,9 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/EDProducer.h"
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "CondFormats/DataRecord/interface/L1TMuonEndcapParamsRcd.h"
+#include "CondFormats/L1TObjects/interface/L1TMuonEndcapParams.h"
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 
@@ -61,6 +64,8 @@ public:
  void produce(edm::Event&, const edm::EventSetup&); 
   void beginJob();
   void endJob();
+  
+  edm::ESHandle< L1TMuonEndcapParams > emtfParamsHandle;
   
   ///////////////////////////////////////
   //// For Emulator with timing /////////

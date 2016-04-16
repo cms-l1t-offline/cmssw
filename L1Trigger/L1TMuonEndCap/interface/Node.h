@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "L1Trigger/L1TMuonEndCap/interface/Event.h"
+#include "CondFormats/Serialization/interface/Serializable.h"
 
 class Node
 {
@@ -52,6 +53,7 @@ class Node
 
         void calcOptimumSplit();
         void filterEventsToDaughters();
+        Node* filterEventToDaughter(Event* e);
         void listEvents();
         void theMiracleOfChildBirth();
  
@@ -73,6 +75,8 @@ class Node
         Int_t numEvents;
 
         std::vector< std::vector<Event*> > events;
+		
+		COND_SERIALIZABLE;
 };
 
 #endif

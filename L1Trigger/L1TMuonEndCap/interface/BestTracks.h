@@ -181,10 +181,10 @@ std::vector<BTrack> BestTracks(std::vector<std::vector<DeltaOutput>> Dout){
 			
 				BTrack bests;
 				
-				//if(verbose) std::cout<<"Best Rank "<<n<<" = "<<Dout[i%4][i/4].GetWinner().Rank()<<"\n\n";
-				//if(verbose) std::cout<<"Phi = "<<Dout[i%4][i/4].Phi()<<" and Theta = "<<Dout[i%4][i/4].Theta()<<"\n\n";
-				//if(verbose) std::cout<<"Ph Deltas: "<<Dout[i%4][i/4].Deltas()[0][0]<<" "<<Dout[i%4][i/4].Deltas()[0][1]<<"   Th Deltas: "<<Dout[i%4][i/4].Deltas()[1][0]
-				//													     <<" "<<Dout[i%4][i/4].Deltas()[1][1]<<"\n\n";
+				//std::cout<<"Best Rank "<<n<<" = "<<Dout[i%4][i/4].GetWinner().Rank()<<"\n\n";
+				//std::cout<<"Phi = "<<Dout[i%4][i/4].Phi()<<" and Theta = "<<Dout[i%4][i/4].Theta()<<"\n\n";
+				//std::cout<<"Ph Deltas: "<<Dout[i%4][i/4].Deltas()[0][0]<<" "<<Dout[i%4][i/4].Deltas()[0][1]<<"   Th Deltas: "<<Dout[i%4][i/4].Deltas()[1][0]
+				//    									   <<" "<<Dout[i%4][i/4].Deltas()[1][1]<<"\n\n";
 						
 				bests.winner = Dout[i%4][i/4].GetWinner();
 				bests.phi = Dout[i%4][i/4].Phi();

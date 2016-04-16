@@ -8,6 +8,7 @@
 #include "TMath.h"
 #include <vector>
 #include <iostream>
+#include "CondFormats/Serialization/interface/Serializable.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ----------------------------------------------------------------------
@@ -48,6 +49,8 @@ struct Event
     }
   
     void resetPredictedValue(){ predictedValue = 0; }
+	
+	COND_SERIALIZABLE;
 };
 
 #endif
