@@ -12,14 +12,15 @@ L1Analysis::L1AnalysisEvent::L1AnalysisEvent(std::string puMCFile,
 					     std::string puDataFile, 
 					     std::string puDataHist,
 					     bool useAvgVtx,
-					     double maxWeight) :
+					     double maxWeight,
+					     edm::ConsumesCollector && iConsumes) :
   fillHLT_(true),
   doPUWeights_(false),
   useAvgVtx_(useAvgVtx),
   maxAllowedWeight_(maxWeight),
   lumiWeights_()
 {
- 
+  pileupSummaryInfoToken_ = iConsumes.consumes<std::vector<PileupSummaryInfo>>(edm::InputTag("addPileupInfo"));
   // check PU files exists, and reweight if they do
   struct stat buf;
   if ((stat(puMCFile.c_str(), &buf) != -1) && (stat(puDataFile.c_str(), &buf) != -1)) {
@@ -41,7 +42,7 @@ L1Analysis::L1AnalysisEvent::~L1AnalysisEvent()
 
 }
 
-void L1Analysis::L1AnalysisEvent::Set(const edm::Event& e, const edm::EDGetTokenT<edm::TriggerResults>& hlt_)
+void L1Analysis::L1AnalysisEvent::Set(const edm::Event& e, const edm::EDGetTokenT<edm::TriggerResults>& hlt_,edm::ConsumesCollector && iConsumes)
 {
 
   event_.run = e.id().run();
@@ -91,10 +92,23 @@ void L1Analysis::L1AnalysisEvent::Set(const edm::Event& e, const edm::EDGetToken
       
       weight = lumiWeights_.weight( npv );
       if (maxAllowedWeight_ > 0. && weight > maxAllowedWeight_) 
-	weight = maxAllowedWeight_;
-      
+	weight = maxAllowedWeight_; 
     }
+  }
 
+  if (! e.eventAuxiliary().isRealData()){
+    
+    edm::Handle<std::vector<PileupSummaryInfo>>  puInfo;
+    e.getByToken(pileupSummaryInfoToken_, puInfo);
+    if (puInfo.isValid()) {
+      for(std::vector<PileupSummaryInfo>::const_iterator pvi=puInfo->begin();pvi!=puInfo->end();pvi++){
+        int bx = pvi->getBunchCrossing();
+        if (bx==0) {
+          event_.nPV = pvi->getPU_NumInteractions();
+          event_.nPV_True = pvi->getTrueNumInteractions();
+        }
+      }
+    }
   }
 
   event_.puWeight = weight;

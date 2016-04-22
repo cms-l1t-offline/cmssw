@@ -146,7 +146,7 @@ L1NtupleProducer::L1NtupleProducer(const edm::ParameterSet& ps) : csctfPtLUTs_(N
 
   pL1evt                = new L1Analysis::L1AnalysisEvent(puMCFile, puMCHist, 
 							  puDataFile, puDataHist,
-							  useAvgVtx, maxAllowedWeight);
+							  useAvgVtx, maxAllowedWeight,consumesCollector());
   pL1gmt                = new L1Analysis::L1AnalysisGMT();
   pL1rct                = new L1Analysis::L1AnalysisRCT(maxRCTREG_);
   pL1gt                 = new L1Analysis::L1AnalysisGT();
@@ -235,7 +235,7 @@ void L1NtupleProducer::analyzeEvent(const edm::Event& e) {
   
   if(!hltSource_.isUninitialized()) {
     pL1evt->Reset();
-    pL1evt->Set(e,hltSource_); 
+    pL1evt->Set(e,hltSource_,consumesCollector()); 
   }
 }
 

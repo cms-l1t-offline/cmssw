@@ -18,6 +18,9 @@
 
 #include "L1AnalysisEventDataFormat.h"
 
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+
 #include <string>
 
 namespace L1Analysis
@@ -30,11 +33,12 @@ namespace L1Analysis
 		    std::string puDataFile, 
 		    std::string puDataHist,
 		    bool useAvgVtx,
-		    double maxWeight);
+		    double maxWeight,
+		    edm::ConsumesCollector &&);
     ~L1AnalysisEvent();
     
     //void Print(std::ostream &os = std::cout) const;
-    void Set(const edm::Event& e, const edm::EDGetTokenT<edm::TriggerResults>& hlt_);
+    void Set(const edm::Event& e, const edm::EDGetTokenT<edm::TriggerResults>& hlt_, edm::ConsumesCollector &&);
     void Reset() {event_.Reset();}
     L1AnalysisEventDataFormat * getData() {return &event_;}
 
@@ -48,6 +52,8 @@ namespace L1Analysis
     double maxAllowedWeight_;
 
     edm::LumiReWeighting lumiWeights_;
+
+    edm::EDGetTokenT<std::vector<PileupSummaryInfo>> pileupSummaryInfoToken_;
   
     L1Analysis::L1AnalysisEventDataFormat event_;
     
