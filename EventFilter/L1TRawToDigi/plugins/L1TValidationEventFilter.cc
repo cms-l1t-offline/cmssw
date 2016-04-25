@@ -57,6 +57,7 @@ private:
   // ----------member data ---------------------------
   edm::EDGetTokenT<FEDRawDataCollection> fedData_;
 
+  int fed_;
   int period_;       // validation event period
 
 };
@@ -66,6 +67,7 @@ private:
 // constructors and destructor
 //
 L1TValidationEventFilter::L1TValidationEventFilter(const edm::ParameterSet& iConfig) :
+  fed_( iConfig.getUntrackedParameter<int>("fed", 1024) ),
   period_( iConfig.getUntrackedParameter<int>("period", 107) )
 {
   //now do what ever initialization is needed
@@ -102,7 +104,7 @@ L1TValidationEventFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSet
     return false;
   }
 
-  const FEDRawData& l1tRcd = feds->FEDData(1024);
+  const FEDRawData& l1tRcd = feds->FEDData(fed_);
 
   const unsigned char *data = l1tRcd.data();
   FEDHeader header(data);

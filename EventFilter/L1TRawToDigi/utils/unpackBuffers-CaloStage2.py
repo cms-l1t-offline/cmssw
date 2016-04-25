@@ -179,12 +179,18 @@ process.load('EventFilter.L1TRawToDigi.stage2MP7BufferRaw_cff')
 # skip events
 dmOffset = options.dmOffset + (options.skipEvents * options.dmFramesPerEvent)
 
-mpOffsets = cms.untracked.vint32()
+mpOffsets   = cms.untracked.vuint32()
+mpBoardIds  = cms.untracked.vint32()
+mpLatencies = cms.untracked.vuint32()
+mpBlocks  = cms.untracked.VPSet()
 for i in range (0,options.nMP):
     offset = options.mpOffset + (options.skipEvents / options.nMP)
     if (i < options.skipEvents % options.nMP):
         offset = offset + 1    
     mpOffsets.append(offset)
+    mpBoardIds.append(i)
+    mpLatencies.append(options.mpLatency)
+    mpBlocks.append(process.mpblocks)
 
 boardOffset = options.skipEvents % options.nMP
 
@@ -201,15 +207,15 @@ if (options.doMP):
     print "MP config :"
     print "nBoards       = ", options.nMP
     print "mpBoardOffset = ", boardOffset
-    print "mpOffset      = ", mpOffsets
     print " "
 
-process.stage2MPRaw.nFramesPerEvent    = cms.untracked.int32(options.mpFramesPerEvent)
-process.stage2MPRaw.nFramesOffset    = cms.untracked.vuint32(mpOffsets)
-process.stage2MPRaw.boardOffset    = cms.untracked.int32(boardOffset)
+process.stage2MPRaw.nFramesPerEvent = cms.untracked.int32(options.mpFramesPerEvent)
+process.stage2MPRaw.nFramesOffset   = mpOffsets
+process.stage2MPRaw.nFramesLatency  = mpLatencies
+process.stage2MPRaw.boardId         = mpBoardIds
+process.stage2MPRaw.blocks          = mpBlocks
 process.stage2MPRaw.rxKeyLink    = cms.untracked.int32(options.mpKeyLinkRx)
 process.stage2MPRaw.txKeyLink    = cms.untracked.int32(options.mpKeyLinkTx)
-#process.stage2MPRaw.nFramesLatency   = cms.untracked.vuint32(mpLatencies)
 process.stage2MPRaw.nHeaderFrames = cms.untracked.int32(options.mpHeaderFrames)
 process.stage2MPRaw.rxFile = cms.untracked.string("mp_rx_summary.txt")
 process.stage2MPRaw.txFile = cms.untracked.string("mp_tx_summary.txt")

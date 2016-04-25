@@ -146,7 +146,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:startup', '')
 
 # validation event filter
 process.load('EventFilter.L1TRawToDigi.validationEventFilter_cfi')
-
+process.validationEventFilter.fed = cms.untracked.int32(1360)
 # MP selectah
 process.load('EventFilter.L1TRawToDigi.tmtFilter_cfi')
 process.tmtFilter.mpList = cms.untracked.vint32(options.mps)
