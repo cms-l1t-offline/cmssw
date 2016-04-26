@@ -79,6 +79,7 @@ public:
 private:
 
   edm::EDGetTokenT<CSCCorrelatedLCTDigiCollection> inputTokenCSC;
+  bool isData;
   
 };
 

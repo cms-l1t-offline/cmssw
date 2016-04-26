@@ -45,6 +45,8 @@ namespace l1t {
       virtual void registerProducts(edm::stream::EDProducerBase& prod) override {
 	prod.produces<RegionalMuonCandBxCollection>();
 	prod.produces<EMTFOutputCollection>();
+	prod.produces<EMTFHitCollection>();
+	prod.produces<EMTFTrackCollection>();
       };
       
       // Not sure what this function does - AWB 27.01.16
@@ -53,6 +55,8 @@ namespace l1t {
       };
       
       virtual UnpackerMap getUnpackers(int fed, int board, int amc, unsigned int fw) override {
+	// std::cout << "Inside EMTFSetup.cc: getUnpackers" << std::endl;
+
 	// Presumably need some logic based on fed, amc, etc (c.f. CaloSetup.cc) - AWB 11.01.16
 	UnpackerMap res;
 	

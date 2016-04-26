@@ -26,5 +26,12 @@
   <class name="l1t::emtf::MTF7Trailer"/>
   <class name="l1t::emtf::AMC13Trailer"/>
 
+  <class name="l1t::EMTFTrack"/>
+  <class name="l1t::EMTFTrackCollection"/>
+  <class name="edm::Wrapper<l1t::EMTFTrackCollection>"/>
+  <class name="l1t::EMTFHit"/>
+  <class name="l1t::EMTFHitCollection"/>
+  <class name="edm::Wrapper<l1t::EMTFHitCollection>"/>
+
  </selection>
 </lcgdict>

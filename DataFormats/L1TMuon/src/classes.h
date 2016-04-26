@@ -6,6 +6,8 @@
 #include "DataFormats/L1TMuon/interface/RegionalMuonCandFwd.h"
 #include "DataFormats/L1TMuon/interface/RegionalMuonCand.h"
 #include "DataFormats/L1TMuon/interface/EMTFOutput.h"
+#include "DataFormats/L1TMuon/interface/EMTFTrack.h"
+#include "DataFormats/L1TMuon/interface/EMTFHit.h"
 
 namespace {
   struct dictionary {
@@ -17,6 +19,12 @@ namespace {
    
     l1t::EMTFOutputCollection emtfOutput;
     edm::Wrapper<l1t::EMTFOutputCollection> emtfOutputWrap;
+   
+    l1t::EMTFTrackCollection emtfTrack;
+    edm::Wrapper<l1t::EMTFTrackCollection> emtfTrackWrap;
+   
+    l1t::EMTFHitCollection emtfHit;
+    edm::Wrapper<l1t::EMTFHitCollection> emtfHitWrap;
    
   };
 }
