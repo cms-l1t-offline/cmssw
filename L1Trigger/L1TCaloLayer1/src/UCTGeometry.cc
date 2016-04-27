@@ -193,15 +193,15 @@ UCTTowerIndex UCTGeometry::getUCTTowerIndex(UCTRegionIndex region, uint32_t iEta
   }
   int regionEta = region.first;
   int absRegionEta = abs(regionEta);
-  int towerEta = (regionEta / absRegionEta) * (absRegionEta * getNEta(absRegionEta) + iEta);
+  int towerEta = (regionEta / absRegionEta) * (absRegionEta * NEtaInRegion + iEta);
   uint32_t regionPhi = region.second;
-  int towerPhi = regionPhi * getNPhi(absRegionEta) + iPhi;
+  int towerPhi = regionPhi * NPhiInRegion + iPhi;
   return UCTTowerIndex(towerEta, towerPhi);
 }
 
 double UCTGeometry::getUCTTowerEta(int caloEta) {
   static bool first = true;
-  static double twrEtaValues[29];
+  static double twrEtaValues[42];
   if(first) {
     twrEtaValues[0] = 0;
     for(unsigned int i = 0; i < 20; i++) {
@@ -215,14 +215,32 @@ double UCTGeometry::getUCTTowerEta(int caloEta) {
     twrEtaValues[26] = 2.411;
     twrEtaValues[27] = 2.575;
     twrEtaValues[28] = 2.825;
+    twrEtaValues[29] = 999.;
+    twrEtaValues[30] = (3.15+2.98)/2.;
+    twrEtaValues[31] = (3.33+3.15)/2.;
+    twrEtaValues[32] = (3.50+3.33)/2.;
+    twrEtaValues[33] = (3.68+3.50)/2.;
+    twrEtaValues[34] = (3.68+3.85)/2.;
+    twrEtaValues[35] = (3.85+4.03)/2.;
+    twrEtaValues[36] = (4.03+4.20)/2.;
+    twrEtaValues[37] = (4.20+4.38)/2.;
+    twrEtaValues[38] = (4.74+4.38*3)/4.;
+    twrEtaValues[39] = (4.38+4.74*3)/4.;
+    twrEtaValues[40] = (5.21+4.74*3)/4.;
+    twrEtaValues[41] = (4.74+5.21*3)/4.;
     first = false;
   }
   uint32_t absCaloEta = abs(caloEta);
-  if(absCaloEta <= 28) return twrEtaValues[absCaloEta];
+  if(absCaloEta <= 41) {
+    if(caloEta < 0)
+      return -twrEtaValues[absCaloEta];
+    else
+      return +twrEtaValues[absCaloEta];
+  }
   else return -999.;
 }
 
-double UCTGeometry::getUCTTowerPhi(int caloPhi, int caloEta) {
+double UCTGeometry::getUCTTowerPhi(int caloPhi) {
   if(caloPhi < 0) return -999.;
   uint32_t absCaloPhi = abs(caloPhi) - 1;
   return (((double) absCaloPhi + 0.5) * 0.0872);

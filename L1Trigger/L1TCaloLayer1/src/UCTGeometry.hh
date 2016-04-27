@@ -125,7 +125,8 @@ public:
 
   uint32_t getUCTRegionPhiIndex(int caloPhi) {
     if(caloPhi < 71) return ((caloPhi + 1) / 4);
-    else return 17;
+    else if(caloPhi < 73) return 0;
+    else return 0xDEADBEEF;
   }
   uint32_t getUCTRegionEtaIndex(int caloEta) {
     // Region index is same for all phi; so get for phi = 1
@@ -153,7 +154,7 @@ public:
   UCTTowerIndex getUCTTowerIndex(UCTRegionIndex r, uint32_t iEta = 0, uint32_t iPhi = 0);
 
   double getUCTTowerEta(int caloEta);
-  double getUCTTowerPhi(int caloPhi, int caloEta);
+  double getUCTTowerPhi(int caloPhi);
 
 };
 

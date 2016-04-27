@@ -31,6 +31,11 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/L1TCalorimeter/interface/CaloTower.h"
+#include "DataFormats/L1CaloTrigger/interface/L1CaloCollections.h"
+#include "DataFormats/L1CaloTrigger/interface/L1CaloRegion.h"
+
+#include "L1Trigger/L1TCaloLayer1/src/UCTGeometry.hh"
+
 using namespace l1t;
 
 //
@@ -57,10 +62,11 @@ class L1TCaloLayer1Validator : public edm::EDAnalyzer {
 
       // ----------member data ---------------------------
 
-  edm::EDGetTokenT<CaloTowerBxCollection> testSource;
-  std::string testLabel;
-  edm::EDGetTokenT<CaloTowerBxCollection> emulSource;
-  std::string emulLabel;
+  edm::EDGetTokenT<CaloTowerBxCollection> testTowerToken;
+  edm::EDGetTokenT<CaloTowerBxCollection> emulTowerToken;
+
+  edm::EDGetTokenT<L1CaloRegionCollection> testRegionToken;
+  edm::EDGetTokenT<L1CaloRegionCollection> emulRegionToken;
 
   uint32_t eventCount;
   uint32_t badEventCount;
@@ -68,6 +74,13 @@ class L1TCaloLayer1Validator : public edm::EDAnalyzer {
   uint32_t badTowerCount;
   uint32_t nonZeroTowerCount;
   uint32_t badNonZeroTowerCount;
+  uint32_t regionCount;
+  uint32_t badRegionCount;
+  uint32_t nonZeroRegionCount;
+  uint32_t badNonZeroRegionCount;
+
+  bool validateTowers;
+  bool validateRegions;
 
   bool verbose;
 
@@ -85,14 +98,22 @@ class L1TCaloLayer1Validator : public edm::EDAnalyzer {
 // constructors and destructor
 //
 L1TCaloLayer1Validator::L1TCaloLayer1Validator(const edm::ParameterSet& iConfig) :
-  testSource(consumes<CaloTowerBxCollection>(iConfig.getParameter<edm::InputTag>("testSource"))),
-  emulSource(consumes<CaloTowerBxCollection>(iConfig.getParameter<edm::InputTag>("emulSource"))),
+  testTowerToken(consumes<CaloTowerBxCollection>(iConfig.getParameter<edm::InputTag>("testTowerToken"))),
+  emulTowerToken(consumes<CaloTowerBxCollection>(iConfig.getParameter<edm::InputTag>("emulTowerToken"))),
+  testRegionToken(consumes<L1CaloRegionCollection>(iConfig.getParameter<edm::InputTag>("testRegionToken"))),
+  emulRegionToken(consumes<L1CaloRegionCollection>(iConfig.getParameter<edm::InputTag>("emulRegionToken"))),
   eventCount(0),
   badEventCount(0),
   towerCount(0),
   badTowerCount(0),
   nonZeroTowerCount(0),
   badNonZeroTowerCount(0),
+  regionCount(0),
+  badRegionCount(0),
+  nonZeroRegionCount(0),
+  badNonZeroRegionCount(0),
+  validateTowers(iConfig.getParameter<bool>("validateTowers")),
+  validateRegions(iConfig.getParameter<bool>("validateRegions")),
   verbose(iConfig.getParameter<bool>("verbose")) {}
 
 L1TCaloLayer1Validator::~L1TCaloLayer1Validator() {}
@@ -105,56 +126,61 @@ L1TCaloLayer1Validator::~L1TCaloLayer1Validator() {}
 void
 L1TCaloLayer1Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+
    using namespace edm;
    bool badEvent = false;
-   edm::Handle<CaloTowerBxCollection> testTowers;
-   iEvent.getByToken(testSource, testTowers);
-   edm::Handle<CaloTowerBxCollection> emulTowers;
-   iEvent.getByToken(emulSource, emulTowers);
-   int theBX = 0;
-   for(std::vector<CaloTower>::const_iterator testTower = testTowers->begin(theBX);
-       testTower != testTowers->end(theBX);
-       ++testTower) {
-     for(std::vector<CaloTower>::const_iterator emulTower = emulTowers->begin(theBX);
-	 emulTower != emulTowers->end(theBX);
-	 ++emulTower) {
+
+   if(validateTowers) {
+     edm::Handle<CaloTowerBxCollection> testTowers;
+     iEvent.getByToken(testTowerToken, testTowers);
+     edm::Handle<CaloTowerBxCollection> emulTowers;
+     iEvent.getByToken(emulTowerToken, emulTowers);
+     int theBX = 0;
+     for(std::vector<CaloTower>::const_iterator testTower = testTowers->begin(theBX);
+	 testTower != testTowers->end(theBX);
+	 ++testTower) {
        int test_iEta = testTower->hwEta();
        int test_iPhi = testTower->hwPhi();
        int test_et = testTower->hwPt();
        int test_er = testTower->hwEtRatio();
        int test_fb = testTower->hwQual();
-       int emul_iEta = emulTower->hwEta();
-       int emul_iPhi = emulTower->hwPhi();
-       int emul_et = emulTower->hwPt();
-       int emul_er = emulTower->hwEtRatio();
-       int emul_fb = emulTower->hwQual();
-       bool success = true;
-       if(test_iEta == emul_iEta && test_iPhi == emul_iPhi) {
-	 if(test_et != emul_et) {success = false;}
-	 if(test_er != emul_er) {success = false;}
-	 if(test_fb != emul_fb) {success = false;}
-	 if(!success) {
-	   if(test_et != emul_et) {if(verbose) std::cout << "ET ";}
-	   if(test_er != emul_er) {if(verbose) std::cout << "ER ";}
-	   if(test_fb != emul_fb) {if(verbose) std::cout << "FB ";}
-	   if(verbose) std::cout << "Checks failed for ("
-				 << test_iEta << ", "
-				 << test_iPhi << ") : ("
-				 << test_et << ", "
-				 << test_er << ", "
-				 << test_fb << ") != ("
-				 << emul_et << ", "
-				 << emul_er << ", "
-				 << emul_fb << ")" << std::endl;
-	   badEvent = true;
-	   badTowerCount++;
-	   if(test_et > 0) badNonZeroTowerCount++;
+       for(std::vector<CaloTower>::const_iterator emulTower = emulTowers->begin(theBX);
+	   emulTower != emulTowers->end(theBX);
+	   ++emulTower) {
+	 int emul_iEta = emulTower->hwEta();
+	 int emul_iPhi = emulTower->hwPhi();
+	 int emul_et = emulTower->hwPt();
+	 int emul_er = emulTower->hwEtRatio();
+	 int emul_fb = emulTower->hwQual();
+	 bool success = true;
+	 if(test_iEta == emul_iEta && test_iPhi == emul_iPhi) {
+	   if(test_et != emul_et) {success = false;}
+	   if(test_er != emul_er) {success = false;}
+	   if(test_fb != emul_fb) {success = false;}
+	   if(!success) {
+	     if(test_et != emul_et) {if(verbose) std::cout << "ET ";}
+	     if(test_er != emul_er) {if(verbose) std::cout << "ER ";}
+	     if(test_fb != emul_fb) {if(verbose) std::cout << "FB ";}
+	     if(verbose) std::cout << "Checks failed for tower ("
+				   << std::dec
+				   << test_iEta << ", "
+				   << test_iPhi << ") : ("
+				   << test_et << ", "
+				   << test_er << ", "
+				   << test_fb << ") != ("
+				   << emul_et << ", "
+				   << emul_er << ", "
+				   << emul_fb << ")" << std::endl;
+	     badEvent = true;
+	     badTowerCount++;
+	     if(test_et > 0) badNonZeroTowerCount++;
+	   }
+	   towerCount++;
+	   if(test_et > 0) nonZeroTowerCount++;
 	 }
-	 towerCount++;
-	 if(test_et > 0) nonZeroTowerCount++;
-       }
-       if(!success && test_et == emul_et && test_iPhi == emul_iPhi) {
-	   if(verbose) std::cout << "Incidental match for ("
+	 if(!success && test_et == emul_et && test_iPhi == emul_iPhi) {
+	   if(verbose) std::cout << "Incidental match for tower ("
+				 << std::dec
 				 << test_iEta << ", "
 				 << test_iPhi << ") : ("
 				 << test_et << ", "
@@ -165,11 +191,109 @@ L1TCaloLayer1Validator::analyze(const edm::Event& iEvent, const edm::EventSetup&
 				 << emul_et << ", "
 				 << emul_er << ", "
 				 << emul_fb << ")" << std::endl;
+	 }
        }
      }
    }
+
+   // Region Validation
+
+   if(validateRegions) {
+     UCTGeometry g;
+     edm::Handle<L1CaloRegionCollection> testRegions;
+     iEvent.getByToken(testRegionToken, testRegions);
+     edm::Handle<L1CaloRegionCollection> emulRegions;
+     iEvent.getByToken(emulRegionToken, emulRegions);
+     for(std::vector<L1CaloRegion>::const_iterator testRegion = testRegions->begin();
+	 testRegion != testRegions->end();
+	 ++testRegion) {
+       uint16_t test_raw = testRegion->raw();
+       uint32_t test_et = testRegion->et();
+       uint32_t test_rEta = testRegion->id().ieta();
+       uint32_t test_rPhi = testRegion->id().iphi();
+       uint32_t test_iEta = (test_raw >> 12) & 0x3;
+       uint32_t test_iPhi = (test_raw >> 14) & 0x3;
+       bool test_negativeEta = false;
+       int test_cEta = (test_rEta - 11) * 4 + 1;//test_iEta + 1;
+       if(test_rEta < 11) {
+	 test_negativeEta = true;
+	 test_cEta = -((10 - test_rEta) * 4 + 1);//test_iEta + 1);
+       }
+       int test_cPhi = test_rPhi * 4 + 1;//test_iPhi + 1;
+       uint32_t test_crate = g.getCrate(test_cEta, test_cPhi);
+       uint32_t test_card = g.getCard(test_cEta, test_cPhi);
+       uint32_t test_region = g.getRegion(test_cEta, test_cPhi);
+       for(std::vector<L1CaloRegion>::const_iterator emulRegion = emulRegions->begin();
+	   emulRegion != emulRegions->end();
+	   ++emulRegion) {
+	 uint16_t emul_raw = emulRegion->raw();
+	 uint32_t emul_et = emulRegion->et();
+	 uint32_t emul_rEta = emulRegion->id().ieta();
+	 uint32_t emul_rPhi = emulRegion->id().iphi();
+	 uint32_t emul_iEta = (emul_raw >> 12) & 0x3;
+	 uint32_t emul_iPhi = (emul_raw >> 14) & 0x3;
+	 bool emul_negativeEta = false;
+	 int emul_cEta = (emul_rEta - 11) * 4 + 1;//emul_iEta + 1;
+	 if(emul_rEta < 11) {
+	   emul_negativeEta = true;
+	   emul_cEta = -((10 - emul_rEta) * 4 + 1);//emul_iEta + 1);
+	 }
+	 int emul_cPhi = emul_rPhi * 4 + 1;//emul_iPhi + 1;
+	 uint32_t emul_crate = g.getCrate(emul_cEta, emul_cPhi);
+	 uint32_t emul_card = g.getCard(emul_cEta, emul_cPhi);
+	 uint32_t emul_region = g.getRegion(emul_cEta, emul_cPhi);
+	 bool success = true;
+	 if(test_rEta == emul_rEta && test_rPhi == emul_rPhi) {
+	   if(test_et != emul_et) success = false;
+	   //if(test_iEta != emul_iEta) success = false;
+	   //if(test_iPhi != emul_iPhi) success = false;
+	   if(!success) {
+	     std::cout << "Checks failed for region ("
+		       << std::dec
+		       << test_negativeEta << ", "
+		       << test_crate << ", "
+		       << test_card << ", "
+		       << test_region << ", "
+		       << test_iEta << ", "
+		       << test_iPhi << ", "
+		       << test_et << ") != ("
+		       << emul_negativeEta << ", "
+		       << emul_crate << ", "
+		       << emul_card << ", "
+		       << emul_region << ", "
+		       << emul_iEta << ", "
+		       << emul_iPhi << ", "
+		       << emul_et << ")"<< std::endl;
+	     badEvent = true;
+	     badRegionCount++;
+	     if(test_et > 0) badNonZeroRegionCount++;
+	   }
+	   regionCount++;
+	   if(test_et > 0) nonZeroRegionCount++;
+	 }
+	 if(!success && test_et == emul_et) {// && test_iPhi == emul_iPhi) {
+	   if(verbose) std::cout << "Incidental match for region ("
+				 << std::dec
+				 << test_rEta << ", "
+				 << test_rPhi << ", "
+				 << test_iEta << ", "
+				 << test_iPhi << ", "
+				 << test_et << ") != ("
+				 << emul_rEta << ", "
+				 << emul_rPhi << ", "
+				 << emul_iEta << ", "
+				 << emul_iPhi << ", "
+				 << emul_et << ")"<< std::endl;
+	 }
+       }
+     }
+   }
+
+   // Event counters
+
    if(badEvent) badEventCount++;
    eventCount++;
+
 }
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -182,10 +306,16 @@ L1TCaloLayer1Validator::beginJob()
 void 
 L1TCaloLayer1Validator::endJob() 
 {
-  std::cout << "L1TCaloLayer1Vaidator: Summary is Non-Zero Bad Tower / Bad Tower / Event Count = ("
-	    << badNonZeroTowerCount << " of " << nonZeroTowerCount << ") / ("
-	    << badTowerCount << " of " << towerCount << ") / ("
-	    << badEventCount << " of " << eventCount << ")" << std::endl;
+  if(validateTowers)
+    std::cout << "L1TCaloLayer1Vaidator: Summary is Non-Zero Bad Tower / Bad Tower / Event Count = ("
+	      << badNonZeroTowerCount << " of " << nonZeroTowerCount << ") / ("
+	      << badTowerCount << " of " << towerCount << ") / ("
+	      << badEventCount << " of " << eventCount << ")" << std::endl;
+  if(validateRegions)
+    std::cout << "L1TCaloLayer1Vaidator: Summary is Non-Zero Bad Region / Bad Region / Event Count = ("
+	      << badNonZeroRegionCount << " of " << nonZeroRegionCount << ") / ("
+	      << badRegionCount << " of " << regionCount << ") / ("
+	      << badEventCount << " of " << eventCount << ")" << std::endl;
 }
 
 // ------------ method called when starting to processes a run  ------------

@@ -7,8 +7,18 @@
 #include "UCTTower.hh"
 
 #define RegionETMask  0x000003FF
-#define RegionLocBits 0x0000F000
+#define RegionEGVeto  0x00000400
+#define RegionTauVeto 0x00000800
+#define HitTowerBits  0x0000F000
+#define RegionNoBits  0x000F0000
+#define CardNoBits    0x00700000
+#define CrateNoBits   0x01800000
+#define NegEtaBit     0x80000000
+#define LocationBits  0xFFFFF000
 #define LocationShift 12
+#define RegionNoShift 16
+#define CardNoShift   20
+#define CrateNoShift  23
 
 class UCTRegion {
 public:
@@ -31,16 +41,16 @@ public:
   // Packed data access
 
   const uint32_t rawData() const {return regionSummary;}
-  const uint32_t location() const {return ((regionSummary & RegionLocBits) >> LocationShift);}
+  const uint32_t location() const {return ((regionSummary & LocationBits) >> LocationShift);}
 
   const int hitCaloEta() const {
-    uint32_t highestTowerLocation = location();
-    return towers[highestTowerLocation]->caloEta();
+    uint32_t hitTowerLocation = (location() & 0xF);
+    return towers[hitTowerLocation]->caloEta();
   }
 
   const int hitCaloPhi() const {
-    uint32_t highestTowerLocation = (location() & 0xF);
-    return towers[highestTowerLocation]->caloPhi();
+    uint32_t hitTowerLocation = (location() & 0xF);
+    return towers[hitTowerLocation]->caloPhi();
   }
 
   const UCTTowerIndex hitTowerIndex() const {
@@ -58,6 +68,8 @@ public:
   // Note that the bit fields are limited in hardware
 
   const uint32_t et() const {return (RegionETMask & regionSummary);}
+  const bool isEGammaLike() const {return !((RegionEGVeto & regionSummary) == RegionEGVeto);}
+  const bool isTauLike() const {return !((RegionTauVeto & regionSummary) == RegionTauVeto);}
 
   // More access functions
 
