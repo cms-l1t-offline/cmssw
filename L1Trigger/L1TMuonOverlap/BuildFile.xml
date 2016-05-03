@@ -2,6 +2,7 @@
   <lib name="1"/>  
   <use name="DataFormats/L1TMuon"/>
   <use name="L1Trigger/RPCTrigger"/>
+  <use name="L1Trigger/L1TCommon"/>
   <use name="DataFormats/L1TMuon"/>
   <use name="Geometry/Records"/>
   <use name="Geometry/DTGeometry"/>
@@ -15,6 +16,7 @@
 <use name="root"/>
 
 <use name="L1Trigger/RPCTrigger"/>
+<use name="L1Trigger/L1TCommon"/>
 <use name="DataFormats/L1TMuon"/>
 
 <use name="Geometry/Records"/>

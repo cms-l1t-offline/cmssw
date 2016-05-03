@@ -18,7 +18,7 @@ void L1MuonOverlapParamsDBProducer::beginRun(edm::Run const& run, edm::EventSetu
   
   edm::ESHandle<L1TMuonOverlapParams> omtfParamsHandle;
   
-  omtfParamsRcd.get("params",omtfParamsHandle);
+  omtfParamsRcd.get(omtfParamsHandle);
 
   omtfParams = std::unique_ptr<L1TMuonOverlapParams>(new L1TMuonOverlapParams(*omtfParamsHandle.product()));
   if (!omtfParams) {

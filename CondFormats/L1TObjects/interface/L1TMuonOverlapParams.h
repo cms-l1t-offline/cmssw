@@ -108,6 +108,9 @@ class L1TMuonOverlapParams {
   unsigned fwVersion() const { return fwVersion_; }
   void setFwVersion(unsigned fwVersion) { fwVersion_ = fwVersion; }
 
+  unsigned patternsVersion() const { return patternsVersion_; }
+  void setPatternsVersion(unsigned patternsVersion) { patternsVersion_ = patternsVersion; }
+
   ///General definitions
   const std::vector<int>* generalParams()   const     { return &pnodes_[GENERAL].iparams_; }
   void setGeneralParams (const std::vector<int> & paramsVec) { pnodes_[GENERAL].type_ = "INT"; pnodes_[GENERAL].iparams_ = paramsVec;}
@@ -187,6 +190,7 @@ class L1TMuonOverlapParams {
 
   ///Version of firmware configuration
   unsigned fwVersion_;
+  unsigned patternsVersion_;
     
   ///vector of LUT like parameters
   std::vector<Node> pnodes_;

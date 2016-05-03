@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <cmath>
 #include <algorithm>
 #include <utility>
@@ -107,6 +108,23 @@ void XMLConfigReader::readLUT(l1t::LUT *lut,const L1TMuonOverlapParams & aConfig
   } 
   ///Read the data into LUT
   lut->read(strStream);
+}
+//////////////////////////////////////////////////
+//////////////////////////////////////////////////
+unsigned int XMLConfigReader::getPatternsVersion() const{
+
+  if(!patternsFile.size()) return 0;
+
+  parser->parse(patternsFile.c_str()); 
+  xercesc::DOMDocument* doc = parser->getDocument();
+  assert(doc);
+
+  DOMNode *aNode = doc->getElementsByTagName(_toDOMS("OMTF"))->item(0);
+  DOMElement* aOMTFElement = static_cast<DOMElement *>(aNode);
+
+  unsigned int version = std::stoul(_toString(aOMTFElement->getAttribute(_toDOMS("version"))), nullptr, 16);
+  
+  return version;
 }
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -317,8 +335,8 @@ void XMLConfigReader::readConfig(L1TMuonOverlapParams *aConfig) const{
   DOMNode *aNode = doc->getElementsByTagName(_toDOMS("OMTF"))->item(0);
   DOMElement* aOMTFElement = static_cast<DOMElement *>(aNode);
 
-  unsigned int version = std::stoul(_toString(aOMTFElement->getAttribute(_toDOMS("version"))), nullptr, 16);
-  aConfig->setFwVersion(version);
+  unsigned int connectionsVersion = std::stoul(_toString(aOMTFElement->getAttribute(_toDOMS("version"))), nullptr, 16);
+  aConfig->setFwVersion(connectionsVersion);
 
   ///Addresing bits numbers
   nElem = aOMTFElement->getElementsByTagName(_toDOMS("GlobalData"))->getLength();
