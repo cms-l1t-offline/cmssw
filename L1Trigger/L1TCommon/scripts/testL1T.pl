@@ -342,6 +342,7 @@ sub run_job {
     } else {
 	system "mkdir $JOBDIR";
 	chdir $JOBDIR;
+	system "cp ../../*.xml .";
     }
     open STDOUT,">",$JOB_LOG or die $!;
     open STDERR,">",$JOB_LOG or die $!;
