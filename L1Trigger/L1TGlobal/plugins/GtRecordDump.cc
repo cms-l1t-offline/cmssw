@@ -90,6 +90,7 @@ namespace l1t {
     unsigned int formatJet(std::vector<l1t::Jet>::const_iterator jet);
     unsigned int formatMissET(std::vector<l1t::EtSum>::const_iterator etSum);
     unsigned int formatTotalET(std::vector<l1t::EtSum>::const_iterator etSum);
+    unsigned int formatHMB(std::vector<l1t::EtSum>::const_iterator etSum);
     std::map<std::string, std::vector<int> > m_algoSummary;
     
     
@@ -141,6 +142,8 @@ namespace l1t {
 
       m_gtUtil = new L1TGlobalUtil();
       m_gtUtil->OverridePrescalesAndMasks(preScaleFileName,preScColumn);
+
+
   }
   
   // loop over events
@@ -180,7 +183,7 @@ namespace l1t {
      
      // grab the map for the final decisions
      const std::vector<std::pair<std::string, bool> > initialDecisions = m_gtUtil->decisionsInitial();
-     const std::vector<std::pair<std::string, bool> > prescaledDecisions = m_gtUtil->decisionsPrescaled();
+     const std::vector<std::pair<std::string, bool> > intermDecisions = m_gtUtil->decisionsInterm();
      const std::vector<std::pair<std::string, bool> > finalDecisions = m_gtUtil->decisionsFinal();
      const std::vector<std::pair<std::string, int> >  prescales = m_gtUtil->prescales();
      const std::vector<std::pair<std::string, bool> > masks = m_gtUtil->masks();
@@ -190,7 +193,7 @@ namespace l1t {
 
      // Dump the results
      if(m_dumpTriggerResults) {
-       cout << "    Bit                  Algorithm Name                                      Init    PScd  Final   PS Factor     Masked    Veto " << endl;
+       cout << "    Bit                  Algorithm Name                                      Init    aBXM  Final   PS Factor     Masked    Veto " << endl;
        cout << "================================================================================================================================" << endl;
      }
      for(unsigned int i=0; i<initialDecisions.size(); i++) {
@@ -208,8 +211,8 @@ namespace l1t {
        if (resultInit) (m_algoSummary.find(name)->second).at(0) += 1;
 
        // get prescaled and final results (need some error checking here)
-       bool resultPre = (prescaledDecisions.at(i)).second;
-       if (resultPre) (m_algoSummary.find(name)->second).at(1) += 1;
+       bool resultInterm = (intermDecisions.at(i)).second;
+       if (resultInterm) (m_algoSummary.find(name)->second).at(1) += 1;
        bool resultFin = (finalDecisions.at(i)).second;
        if (resultFin) (m_algoSummary.find(name)->second).at(2) += 1;
        
@@ -218,7 +221,7 @@ namespace l1t {
        bool mask    = (masks.at(i)).second;
        bool veto    = (vetoMasks.at(i)).second;
        
-       if(m_dumpTriggerResults && name != "NULL") cout << std::dec << setfill(' ') << "   " << setw(5) << i << "   " << setw(60) << name.c_str() << "   " << setw(7) << resultInit << setw(7) << resultPre << setw(7) << resultFin << setw(10) << prescale << setw(11) << mask << setw(9) << veto << endl;
+       if(m_dumpTriggerResults && name != "NULL") cout << std::dec << setfill(' ') << "   " << setw(5) << i << "   " << setw(60) << name.c_str() << "   " << setw(7) << resultInit << setw(7) << resultInterm << setw(7) << resultFin << setw(10) << prescale << setw(11) << mask << setw(9) << veto << endl;
      }
      bool finOR = m_gtUtil->getFinalOR();
      if(m_dumpTriggerResults) {
@@ -334,17 +337,29 @@ namespace l1t {
 	       for(std::vector<l1t::EtSum>::const_iterator etsum = etsums->begin(i); etsum != etsums->end(i); ++etsum) {
 	            switch ( etsum->getType() ) {
 		       case l1t::EtSum::EtSumType::kMissingEt:
-			 cout << " ETM: ";
+			 cout << " ETM:  ";
 			 break; 
 		       case l1t::EtSum::EtSumType::kMissingHt:
-			 cout << " HTM: ";
+			 cout << " HTM:  ";
 			 break; 		     
 		       case l1t::EtSum::EtSumType::kTotalEt:
-			 cout << " ETT: ";
+			 cout << " ETT:  ";
 			 break; 		     
 		       case l1t::EtSum::EtSumType::kTotalHt:
-			 cout << " HTT: ";
-			 break; 		     
+			 cout << " HTT:  ";
+			 break; 
+		       case l1t::EtSum::EtSumType::kMinBiasHFP0:
+			 cout << " HFP0: ";
+			 break; 			 		     
+		       case l1t::EtSum::EtSumType::kMinBiasHFM0:
+			 cout << " HFM0: ";
+			 break; 
+		       case l1t::EtSum::EtSumType::kMinBiasHFP1:
+			 cout << " HFP1: ";
+			 break; 
+		       case l1t::EtSum::EtSumType::kMinBiasHFM1:
+			 cout << " HFM1: ";
+			 break; 
 		       default:
 		         cout << " Unknown: ";
 		         break;
@@ -425,7 +440,7 @@ GtRecordDump::endRun(edm::Run const&, edm::EventSetup const&)
 {
     // Dump the results
      cout << "=========================== Global Trigger Summary Report  ==================================" << endl;
-     cout << "                       Algorithm Name                              Init      PScd     Final   " << endl;
+     cout << "                       Algorithm Name                              Init     aBXM     Final   " << endl;
      cout << "=============================================================================================" << endl;
      for (std::map<std::string, std::vector<int> >::const_iterator itAlgo = m_algoSummary.begin(); itAlgo != m_algoSummary.end(); itAlgo++) {       
       
@@ -433,7 +448,7 @@ GtRecordDump::endRun(edm::Run const&, edm::EventSetup const&)
 	int initCnt = (itAlgo->second).at(0);
 	int initPre = (itAlgo->second).at(1);
 	int initFnl = (itAlgo->second).at(2);
-	if(name != "NULL") cout << std::dec << setfill(' ') <<  setw(60) << name.c_str() << setw(10) << initCnt << setw(10) << initPre << setw(10) << initFnl << endl; //<< "   " << setw(7) << resultInit << setw(7) << resultPre << setw(7) << resultFin << setw(10) << prescale << setw(11) << mask << setw(9) << veto
+	if(name != "NULL") cout << std::dec << setfill(' ') <<  setw(60) << name.c_str() << setw(10) << initCnt << setw(10) << initPre << setw(10) << initFnl << endl; 
      }
      cout << "===========================================================================================================" << endl;   
 }
@@ -522,6 +537,10 @@ void GtRecordDump::dumpTestVectors(int bx, std::ofstream& myOutFile,
    unsigned int HTTpackWd = 0;
    unsigned int ETMpackWd = 0;
    unsigned int HTMpackWd = 0;
+   unsigned int HFP0packWd = 0;
+   unsigned int HFM0packWd = 0;
+   unsigned int HFP1packWd = 0;
+   unsigned int HFM1packWd = 0;
 
    if(etsums.isValid()){
      for(std::vector<l1t::EtSum>::const_iterator etsum = etsums->begin(bx); etsum != etsums->end(bx); ++etsum) {
@@ -538,13 +557,30 @@ void GtRecordDump::dumpTestVectors(int bx, std::ofstream& myOutFile,
 	     break; 		     
 	   case l1t::EtSum::EtSumType::kTotalHt:
 	     HTTpackWd = formatTotalET(etsum);
-	     break; 		     
+	     break; 	
+	   case l1t::EtSum::EtSumType::kMinBiasHFP0:
+	     HFP0packWd = formatHMB(etsum);
+	     break;
+	   case l1t::EtSum::EtSumType::kMinBiasHFM0:
+	     HFM0packWd = formatHMB(etsum);
+	     break;	   
+	   case l1t::EtSum::EtSumType::kMinBiasHFP1:
+	     HFP1packWd = formatHMB(etsum);
+	     break;	   
+	   case l1t::EtSum::EtSumType::kMinBiasHFM1:
+	     HFM1packWd = formatHMB(etsum);
+	     break; 			     	     	     
            default:
 	     break;
 	} //end switch statement
      } //end loop over etsums
    }
 
+   // Temporary put HMB bits in upper part of other SumEt Words
+   ETTpackWd |= HFP0packWd;
+   HTTpackWd |= HFM0packWd;
+   ETMpackWd |= HFP1packWd;
+   HTMpackWd |= HFM1packWd;
 
    // Fill in the words in appropriate order
    myOutFile << " " << std::hex << std::setw(8) << std::setfill('0') << ETTpackWd;
@@ -670,6 +706,17 @@ unsigned int GtRecordDump::formatTotalET(std::vector<l1t::EtSum>::const_iterator
 
 // Pack Bits
   packedVal |= ((etSum->hwPt()     & 0xfff)   <<0); 
+  
+  return packedVal;
+}
+
+unsigned int GtRecordDump::formatHMB(std::vector<l1t::EtSum>::const_iterator etSum){
+
+  unsigned int packedVal = 0;
+  unsigned int shift = 28;
+  
+// Pack Bits
+  packedVal |= ((etSum->hwPt()     & 0xf)   << shift); 
   
   return packedVal;
 }
