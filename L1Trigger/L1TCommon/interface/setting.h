@@ -114,7 +114,8 @@ template <class varType> varType tableRow::getRowValue(const std::string& col)
 	int ct;
 	for (unsigned int i = 0; i < columns_.size(); i++)
 	{
-		if (columns_.at(i).find(col) != std::string::npos)
+	  //if (columns_.at(i).find(col) != std::string::npos)
+		if (columns_.at(i) == col )
 		{
 			found = true;
 			ct = i;
