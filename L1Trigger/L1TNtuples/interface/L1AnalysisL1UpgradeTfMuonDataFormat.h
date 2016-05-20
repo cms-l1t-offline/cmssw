@@ -24,6 +24,8 @@ namespace L1Analysis
       tfMuonTrackFinderType.clear();
       tfMuonHwHF.clear();
       tfMuonBx.clear();
+      tfMuonWh.clear();
+      tfMuonTrAdd.clear();
     }
    
     unsigned short int nTfMuons;
@@ -38,6 +40,8 @@ namespace L1Analysis
     std::vector<short int> tfMuonTrackFinderType;
     std::vector<short int> tfMuonHwHF;
     std::vector<short int> tfMuonBx;
+    std::vector<short int> tfMuonWh;
+    std::vector<short int> tfMuonTrAdd;
   }; 
 }
 #endif
