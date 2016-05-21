@@ -59,7 +59,6 @@ process.selfFatEventFilter = cms.EDFilter("HLTL1NumberFilter",
         fedId = cms.int32(1024)
         )
 
-
 process.load("DQM.L1TMonitor.L1TStage2Emulator_cff")
 
 process.l1tEmulatorMonitorPath = cms.Path(
@@ -76,6 +75,11 @@ process.load('L1Trigger.L1TCalorimeter.caloStage2Params_cfi')
 # To get CaloTPGTranscoder
 process.load('SimCalorimetry.HcalTrigPrimProducers.hcaltpdigi_cff')
 process.HcalTPGCoderULUT.LUTGenerationMode = cms.bool(False)
+
+# To get L1 uGT parameters:
+# TODO: when L1 O2O is finished, this must be removed!
+#process.load('L1Trigger.L1TGlobal.hackConditions_cff')
+process.load('L1Triggdder.L1TGlobal.GlobalParameters_cff')
 
 #--------------------------------------------------
 # TODO: Stage2 Emulator Quality Tests
@@ -137,4 +141,3 @@ if (process.runType.getRunType() == process.runType.hi_run):
 
 from DQM.Integration.config.online_customizations_cfi import *
 process = customise(process)
-
