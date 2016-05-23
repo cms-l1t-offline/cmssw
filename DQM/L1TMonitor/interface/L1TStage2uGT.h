@@ -60,10 +60,10 @@ private:
    
    // Input parameters
    edm::EDGetTokenT<GlobalAlgBlkBxCollection> l1tStage2uGtSource_; // input tag for L1 uGT DAQ readout record
+   
+   std::string monitorDir_; // histogram folder for L1 uGT plots
   
    bool verbose_; // verbosity switch
-   
-   std::string histFolder_; // histogram folder for L1 uGT plots
    
    // Booking of histograms for the module
    
