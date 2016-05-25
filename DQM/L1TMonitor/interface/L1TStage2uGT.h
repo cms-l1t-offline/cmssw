@@ -60,40 +60,66 @@ private:
    
    // Input parameters
    edm::EDGetTokenT<GlobalAlgBlkBxCollection> l1tStage2uGtSource_; // input tag for L1 uGT DAQ readout record
-  
-   std::string monitorDir_; // histogram folder for L1 uGT plots
    
+   std::string monitorDir_; // histogram folder for L1 uGT plots
+  
    bool verbose_; // verbosity switch
    
    // Booking of histograms for the module
    
    // Algorithm bits
-   MonitorElement* algoBits_after_bxomask_;
-   MonitorElement* algoBits_after_prescaler_;
-   MonitorElement* algoBits_after_mask_;
+   MonitorElement* algoBits_after_bxomask_5BX_;
+   MonitorElement* algoBits_after_bxomask_1BX_;
+   
+   MonitorElement* algoBits_after_prescaler_5BX_;
+   MonitorElement* algoBits_after_prescaler_1BX_;
+   
+   MonitorElement* algoBits_after_mask_5BX_;
+   MonitorElement* algoBits_after_mask_1BX_;
   
    // Algorithm bits correlation
-   MonitorElement* algoBits_after_bxomask_corr_;
-   MonitorElement* algoBits_after_prescaler_corr_;
-   MonitorElement* algoBits_after_mask_corr_;
+   MonitorElement* algoBits_after_bxomask_corr_5BX_;
+   MonitorElement* algoBits_after_bxomask_corr_1BX_;
+   
+   MonitorElement* algoBits_after_prescaler_corr_5BX_;
+   MonitorElement* algoBits_after_prescaler_corr_1BX_;
+   
+   MonitorElement* algoBits_after_mask_corr_5BX_;
+   MonitorElement* algoBits_after_mask_corr_1BX_;
  
    // Algorithm bits vs global BX number
-   MonitorElement* algoBits_after_bxomask_bx_global_;
-   MonitorElement* algoBits_after_prescaler_bx_global_;
-   MonitorElement* algoBits_after_mask_bx_global_;
+   MonitorElement* algoBits_after_bxomask_bx_global_5BX_;
+   MonitorElement* algoBits_after_bxomask_bx_global_1BX_;
+   
+   MonitorElement* algoBits_after_prescaler_bx_global_5BX_;
+   MonitorElement* algoBits_after_prescaler_bx_global_1BX_;
+   
+   MonitorElement* algoBits_after_mask_bx_global_5BX_;
+   MonitorElement* algoBits_after_mask_bx_global_1BX_;
   
    // Algorithm bits vs BX number in event
-   MonitorElement* algoBits_after_bxomask_bx_inEvt_;
-   MonitorElement* algoBits_after_prescaler_bx_inEvt_;
-   MonitorElement* algoBits_after_mask_bx_inEvt_;
+   MonitorElement* algoBits_after_bxomask_bx_inEvt_5BX_;
+   MonitorElement* algoBits_after_bxomask_bx_inEvt_1BX_;
+   
+   MonitorElement* algoBits_after_prescaler_bx_inEvt_5BX_;
+   MonitorElement* algoBits_after_prescaler_bx_inEvt_1BX_;
+   
+   MonitorElement* algoBits_after_mask_bx_inEvt_5BX_;
+   MonitorElement* algoBits_after_mask_bx_inEvt_1BX_;
 
    // Algorithm bits vs LS
-   MonitorElement* algoBits_after_bxomask_lumi_;
-   MonitorElement* algoBits_after_prescaler_lumi_;
-   MonitorElement* algoBits_after_mask_lumi_;
+   MonitorElement* algoBits_after_bxomask_lumi_5BX_;
+   MonitorElement* algoBits_after_bxomask_lumi_1BX_;
+  
+   MonitorElement* algoBits_after_prescaler_lumi_5BX_;
+   MonitorElement* algoBits_after_prescaler_lumi_1BX_;
+   
+   MonitorElement* algoBits_after_mask_lumi_5BX_;
+   MonitorElement* algoBits_after_mask_lumi_1BX_;
  
    // Prescale factor index 
-   MonitorElement* prescaleFactorSet_;
+   MonitorElement* prescaleFactorSet_5BX_;
+   MonitorElement* prescaleFactorSet_1BX_;
 
 };
 

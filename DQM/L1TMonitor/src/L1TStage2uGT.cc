@@ -46,71 +46,132 @@ void L1TStage2uGT::bookHistograms(DQMStore::IBooker &ibooker, edm::Run const&, e
    ibooker.setCurrentFolder(monitorDir_);
    
    // Algorithm bits 
-   algoBits_after_bxomask_ = ibooker.book1D("algoBits_after_bxomask", "uGT: Algorithm Trigger Bits (after BX mask, before prescale)", numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_bxomask_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 1);
+   algoBits_after_bxomask_5BX_ = ibooker.book1D("algoBits_after_bxomask_5BX", "uGT: Algorithm Trigger Bits (after BX mask, before prescale) for 5 BX", numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_bxomask_5BX_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 1);
    
-   algoBits_after_prescaler_ = ibooker.book1D("algoBits_after_prescaler", "uGT: Algorithm Trigger Bits (after prescale)", numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_prescaler_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 1);
+   algoBits_after_bxomask_1BX_ = ibooker.book1D("algoBits_after_bxomask_1BX", "uGT: Algorithm Trigger Bits (after BX mask, before prescale) for Triggering BX", numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_bxomask_1BX_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 1);
    
-   algoBits_after_mask_ = ibooker.book1D("algoBits_after_mask", "uGT: Algorithm Trigger Bits (after mask)", numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_mask_->setAxisTitle("Algorithm Trigger Bits (after mask)", 1);
+   algoBits_after_prescaler_5BX_ = ibooker.book1D("algoBits_after_prescaler_5BX", "uGT: Algorithm Trigger Bits (after prescale) for 5 BX", numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_prescaler_5BX_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 1);
+   
+   algoBits_after_prescaler_1BX_ = ibooker.book1D("algoBits_after_prescaler_1BX", "uGT: Algorithm Trigger Bits (after prescale) for Triggering BX", numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_prescaler_1BX_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 1);
+  
+   algoBits_after_mask_5BX_ = ibooker.book1D("algoBits_after_mask_5BX", "uGT: Algorithm Trigger Bits (after mask) for 5 BX", numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_mask_5BX_->setAxisTitle("Algorithm Trigger Bits (after mask)", 1);
+   
+   algoBits_after_mask_1BX_ = ibooker.book1D("algoBits_after_mask_1BX", "uGT: Algorithm Trigger Bits (after mask) for Triggering BX", numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_mask_1BX_->setAxisTitle("Algorithm Trigger Bits (after mask)", 1);
   
    // Algorithm bits correlation 
-   algoBits_after_bxomask_corr_ = ibooker.book2D("algoBits_after_bxomask_corr","uGT: Algorithm Trigger Bit Correlation (after BX mask, before prescale)", numAlgs, -0.5, numAlgs_d-0.5, numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_bxomask_corr_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 1);
-   algoBits_after_bxomask_corr_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 2);
+   algoBits_after_bxomask_corr_5BX_ = ibooker.book2D("algoBits_after_bxomask_corr_5BX","uGT: Algorithm Trigger Bit Correlation (after BX mask, before prescale) for 5 BX", numAlgs, -0.5, numAlgs_d-0.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_bxomask_corr_5BX_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 1);
+   algoBits_after_bxomask_corr_5BX_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 2);
    
-   algoBits_after_prescaler_corr_ = ibooker.book2D("algoBits_after_prescaler_corr","uGT: Algorithm Trigger Bit Correlation (after prescale)", numAlgs, -0.5, numAlgs_d-0.5, numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_prescaler_corr_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 1);
-   algoBits_after_prescaler_corr_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 2);
+   algoBits_after_bxomask_corr_1BX_ = ibooker.book2D("algoBits_after_bxomask_corr_1BX","uGT: Algorithm Trigger Bit Correlation (after BX mask, before prescale) for Triggering BX", numAlgs, -0.5, numAlgs_d-0.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_bxomask_corr_1BX_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 1);
+   algoBits_after_bxomask_corr_1BX_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 2);
    
-   algoBits_after_mask_corr_ = ibooker.book2D("algoBits_after_mask_corr","uGT: Algorithm Trigger Bit Correlation (after mask)", numAlgs, -0.5, numAlgs_d-0.5, numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_mask_corr_->setAxisTitle("Algorithm Trigger Bits (after mask)", 1);
-   algoBits_after_mask_corr_->setAxisTitle("Algorithm Trigger Bits (after mask)", 2);
-  
+   algoBits_after_prescaler_corr_5BX_ = ibooker.book2D("algoBits_after_prescaler_corr_5BX","uGT: Algorithm Trigger Bit Correlation (after prescale) for 5 BX", numAlgs, -0.5, numAlgs_d-0.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_prescaler_corr_5BX_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 1);
+   algoBits_after_prescaler_corr_5BX_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 2);
+   
+   algoBits_after_prescaler_corr_1BX_ = ibooker.book2D("algoBits_after_prescaler_corr_1BX","uGT: Algorithm Trigger Bit Correlation (after prescale) for Triggering BX", numAlgs, -0.5, numAlgs_d-0.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_prescaler_corr_1BX_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 1);
+   algoBits_after_prescaler_corr_1BX_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 2);
+   
+   algoBits_after_mask_corr_5BX_ = ibooker.book2D("algoBits_after_mask_corr_5BX","uGT: Algorithm Trigger Bit Correlation (after mask) for 5 BX", numAlgs, -0.5, numAlgs_d-0.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_mask_corr_5BX_->setAxisTitle("Algorithm Trigger Bits (after mask)", 1);
+   algoBits_after_mask_corr_5BX_->setAxisTitle("Algorithm Trigger Bits (after mask)", 2);
+   
+   algoBits_after_mask_corr_1BX_ = ibooker.book2D("algoBits_after_mask_corr_1BX","uGT: Algorithm Trigger Bit Correlation (after mask) for Triggering BX", numAlgs, -0.5, numAlgs_d-0.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_mask_corr_1BX_->setAxisTitle("Algorithm Trigger Bits (after mask)", 1);
+   algoBits_after_mask_corr_1BX_->setAxisTitle("Algorithm Trigger Bits (after mask)", 2);
+   
    // Algorithm bits vs global BX number
-   algoBits_after_bxomask_bx_global_ = ibooker.book2D("algoBits_after_bxomask_bx_global", "uGT: Algorithm Trigger Bits (after BX mask, before prescale) vs. Global BX Number", numBx, 0.5, numBx_d + 0.5, numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_bxomask_bx_global_->setAxisTitle("Global Bunch Crossing Number", 1); 
-   algoBits_after_bxomask_bx_global_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 2);
+   algoBits_after_bxomask_bx_global_5BX_ = ibooker.book2D("algoBits_after_bxomask_bx_global_5BX", "uGT: Algorithm Trigger Bits (after BX mask, before prescale) vs. Global BX Number for 5 BX", numBx, 0.5, numBx_d + 0.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_bxomask_bx_global_5BX_->setAxisTitle("Global Bunch Crossing Number", 1); 
+   algoBits_after_bxomask_bx_global_5BX_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 2);
    
-   algoBits_after_prescaler_bx_global_ = ibooker.book2D("algoBits_after_prescaler_bx_global", "uGT: Algorithm Trigger Bits (after prescale) vs. Global BX Number", numBx, 0.5, numBx_d + 0.5, numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_prescaler_bx_global_->setAxisTitle("Global Bunch Crossing Number", 1); 
-   algoBits_after_prescaler_bx_global_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 2);
+   algoBits_after_bxomask_bx_global_1BX_ = ibooker.book2D("algoBits_after_bxomask_bx_global_1BX", "uGT: Algorithm Trigger Bits (after BX mask, before prescale) vs. Global BX Number for Triggering BX", numBx, 0.5, numBx_d + 0.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_bxomask_bx_global_1BX_->setAxisTitle("Global Bunch Crossing Number", 1); 
+   algoBits_after_bxomask_bx_global_1BX_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 2);
    
-   algoBits_after_mask_bx_global_ = ibooker.book2D("algoBits_after_mask_bx_global", "uGT: Algorithm Trigger Bits (after mask) vs. Global BX Number", numBx, 0.5, numBx_d + 0.5, numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_mask_bx_global_->setAxisTitle("Global Bunch Crossing Number", 1); 
-   algoBits_after_mask_bx_global_->setAxisTitle("Algorithm Trigger Bits (after mask)", 2);
+   algoBits_after_prescaler_bx_global_5BX_ = ibooker.book2D("algoBits_after_prescaler_bx_global_5BX", "uGT: Algorithm Trigger Bits (after prescale) vs. Global BX Number for 5 BX", numBx, 0.5, numBx_d + 0.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_prescaler_bx_global_5BX_->setAxisTitle("Global Bunch Crossing Number", 1); 
+   algoBits_after_prescaler_bx_global_5BX_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 2);
+   
+   algoBits_after_prescaler_bx_global_1BX_ = ibooker.book2D("algoBits_after_prescaler_bx_global_1BX", "uGT: Algorithm Trigger Bits (after prescale) vs. Global BX Number for Triggering BX", numBx, 0.5, numBx_d + 0.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_prescaler_bx_global_1BX_->setAxisTitle("Global Bunch Crossing Number", 1); 
+   algoBits_after_prescaler_bx_global_1BX_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 2);
+  
+   algoBits_after_mask_bx_global_5BX_ = ibooker.book2D("algoBits_after_mask_bx_global_5BX", "uGT: Algorithm Trigger Bits (after mask) vs. Global BX Number for 5 BX", numBx, 0.5, numBx_d + 0.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_mask_bx_global_5BX_->setAxisTitle("Global Bunch Crossing Number", 1); 
+   algoBits_after_mask_bx_global_5BX_->setAxisTitle("Algorithm Trigger Bits (after mask)", 2);
+
+   algoBits_after_mask_bx_global_1BX_ = ibooker.book2D("algoBits_after_mask_bx_global_1BX", "uGT: Algorithm Trigger Bits (after mask) vs. Global BX Number for Triggering BX", numBx, 0.5, numBx_d + 0.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_mask_bx_global_1BX_->setAxisTitle("Global Bunch Crossing Number", 1); 
+   algoBits_after_mask_bx_global_1BX_->setAxisTitle("Algorithm Trigger Bits (after mask)", 2);
   
    // Algorithm bits vs BX number in event
-   algoBits_after_bxomask_bx_inEvt_ = ibooker.book2D("algoBits_after_bxomask_bx_inEvt", "uGT: Algorithm Trigger Bits (after BX mask, before prescale) vs. BX Number in Event", 5, -2.5, 2.5, numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_bxomask_bx_inEvt_->setAxisTitle("Bunch Crossing Number in Event", 1);
-   algoBits_after_bxomask_bx_inEvt_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 2);
+   algoBits_after_bxomask_bx_inEvt_5BX_ = ibooker.book2D("algoBits_after_bxomask_bx_inEvt_5BX", "uGT: Algorithm Trigger Bits (after BX mask, before prescale) vs. BX Number in Event for 5 BX", 5, -2.5, 2.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_bxomask_bx_inEvt_5BX_->setAxisTitle("Bunch Crossing Number in Event", 1);
+   algoBits_after_bxomask_bx_inEvt_5BX_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 2);
    
-   algoBits_after_prescaler_bx_inEvt_ = ibooker.book2D("algoBits_after_prescaler_bx_inEvt", "uGT: Algorithm Trigger Bits (after prescale) vs. BX Number in Event", 5, -2.5, 2.5, numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_prescaler_bx_inEvt_->setAxisTitle("Bunch Crossing Number in Event", 1);
-   algoBits_after_prescaler_bx_inEvt_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 2);
+   algoBits_after_bxomask_bx_inEvt_1BX_ = ibooker.book2D("algoBits_after_bxomask_bx_inEvt_1BX", "uGT: Algorithm Trigger Bits (after BX mask, before prescale) vs. BX Number in Event for Triggering BX", 5, -2.5, 2.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_bxomask_bx_inEvt_1BX_->setAxisTitle("Bunch Crossing Number in Event", 1);
+   algoBits_after_bxomask_bx_inEvt_1BX_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 2);
    
-   algoBits_after_mask_bx_inEvt_ = ibooker.book2D("algoBits_after_mask_bx_inEvt", "uGT: Algorithm Trigger Bits (after mask) vs. BX Number in Event", 5, -2.5, 2.5, numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_mask_bx_inEvt_->setAxisTitle("Bunch Crossing Number in Event", 1);
-   algoBits_after_mask_bx_inEvt_->setAxisTitle("Algorithm Trigger Bits (after mask)", 2);
+   algoBits_after_prescaler_bx_inEvt_5BX_ = ibooker.book2D("algoBits_after_prescaler_bx_inEvt_5BX", "uGT: Algorithm Trigger Bits (after prescale) vs. BX Number in Event for 5 BX", 5, -2.5, 2.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_prescaler_bx_inEvt_5BX_->setAxisTitle("Bunch Crossing Number in Event", 1);
+   algoBits_after_prescaler_bx_inEvt_5BX_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 2);
+   
+   algoBits_after_prescaler_bx_inEvt_1BX_ = ibooker.book2D("algoBits_after_prescaler_bx_inEvt_1BX", "uGT: Algorithm Trigger Bits (after prescale) vs. BX Number in Event for Triggering BX", 5, -2.5, 2.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_prescaler_bx_inEvt_1BX_->setAxisTitle("Bunch Crossing Number in Event", 1);
+   algoBits_after_prescaler_bx_inEvt_1BX_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 2);
+  
+   algoBits_after_mask_bx_inEvt_5BX_ = ibooker.book2D("algoBits_after_mask_bx_inEvt_5BX", "uGT: Algorithm Trigger Bits (after mask) vs. BX Number in Event for 5 BX", 5, -2.5, 2.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_mask_bx_inEvt_5BX_->setAxisTitle("Bunch Crossing Number in Event", 1);
+   algoBits_after_mask_bx_inEvt_5BX_->setAxisTitle("Algorithm Trigger Bits (after mask)", 2);
+   
+   algoBits_after_mask_bx_inEvt_1BX_ = ibooker.book2D("algoBits_after_mask_bx_inEvt_1BX", "uGT: Algorithm Trigger Bits (after mask) vs. BX Number in Event for Triggering BX", 5, -2.5, 2.5, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_mask_bx_inEvt_1BX_->setAxisTitle("Bunch Crossing Number in Event", 1);
+   algoBits_after_mask_bx_inEvt_1BX_->setAxisTitle("Algorithm Trigger Bits (after mask)", 2);
   
    // Algorithm bits vs LS
-   algoBits_after_bxomask_lumi_ = ibooker.book2D("algoBits_after_bxomask_lumi","uGT: Algorithm Trigger Bits (after BX mask, before prescale) vs. LS", numLS, 0., numLS_d, numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_bxomask_lumi_->setAxisTitle("Luminosity Segment", 1);
-   algoBits_after_bxomask_lumi_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 2);
+   algoBits_after_bxomask_lumi_5BX_ = ibooker.book2D("algoBits_after_bxomask_lumi_5BX","uGT: Algorithm Trigger Bits (after BX mask, before prescale) vs. LS for 5 BX", numLS, 0., numLS_d, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_bxomask_lumi_5BX_->setAxisTitle("Luminosity Segment", 1);
+   algoBits_after_bxomask_lumi_5BX_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 2);
    
-   algoBits_after_prescaler_lumi_ = ibooker.book2D("algoBits_after_prescaler_lumi","uGT: Algorithm Trigger Bits (after prescale) vs. LS", numLS, 0., numLS_d, numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_prescaler_lumi_->setAxisTitle("Luminosity Segment", 1);
-   algoBits_after_prescaler_lumi_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 2);
+   algoBits_after_bxomask_lumi_1BX_ = ibooker.book2D("algoBits_after_bxomask_lumi_1BX","uGT: Algorithm Trigger Bits (after BX mask, before prescale) vs. LS for Triggering BX", numLS, 0., numLS_d, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_bxomask_lumi_1BX_->setAxisTitle("Luminosity Segment", 1);
+   algoBits_after_bxomask_lumi_1BX_->setAxisTitle("Algorithm Trigger Bits (after BX mask, before prescale)", 2);
+
+   algoBits_after_prescaler_lumi_5BX_ = ibooker.book2D("algoBits_after_prescaler_lumi_5BX","uGT: Algorithm Trigger Bits (after prescale) vs. LS for 5 BX", numLS, 0., numLS_d, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_prescaler_lumi_5BX_->setAxisTitle("Luminosity Segment", 1);
+   algoBits_after_prescaler_lumi_5BX_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 2);
   
-   algoBits_after_mask_lumi_ = ibooker.book2D("algoBits_after_mask_lumi","uGT: Algorithm Trigger Bits (after mask) vs. LS", numLS, 0., numLS_d, numAlgs, -0.5, numAlgs_d-0.5);
-   algoBits_after_mask_lumi_->setAxisTitle("Luminosity Segment", 1);
-   algoBits_after_mask_lumi_->setAxisTitle("Algorithm Trigger Bits (after mask)", 2);
+   algoBits_after_prescaler_lumi_1BX_ = ibooker.book2D("algoBits_after_prescaler_lumi_1BX","uGT: Algorithm Trigger Bits (after prescale) vs. LS for Triggering BX", numLS, 0., numLS_d, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_prescaler_lumi_1BX_->setAxisTitle("Luminosity Segment", 1);
+   algoBits_after_prescaler_lumi_1BX_->setAxisTitle("Algorithm Trigger Bits (after prescale)", 2);
+  
+   algoBits_after_mask_lumi_5BX_ = ibooker.book2D("algoBits_after_mask_lumi_5BX","uGT: Algorithm Trigger Bits (after mask) vs. LS for 5 BX", numLS, 0., numLS_d, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_mask_lumi_5BX_->setAxisTitle("Luminosity Segment", 1);
+   algoBits_after_mask_lumi_5BX_->setAxisTitle("Algorithm Trigger Bits (after mask)", 2);
+   
+   algoBits_after_mask_lumi_1BX_ = ibooker.book2D("algoBits_after_mask_lumi_1BX","uGT: Algorithm Trigger Bits (after mask) vs. LS for Triggering BX", numLS, 0., numLS_d, numAlgs, -0.5, numAlgs_d-0.5);
+   algoBits_after_mask_lumi_1BX_->setAxisTitle("Luminosity Segment", 1);
+   algoBits_after_mask_lumi_1BX_->setAxisTitle("Algorithm Trigger Bits (after mask)", 2);
 
    // Prescale factor index 
-   prescaleFactorSet_ = ibooker.book2D("prescaleFactorSet", "uGT: Index of Prescale Factor Set vs. LS", numLS, 0., numLS_d, 25, 0., 25.);
-   prescaleFactorSet_->setAxisTitle("Luminosity Segment", 1);
-   prescaleFactorSet_->setAxisTitle("Prescale Factor Set Index", 2);
+   prescaleFactorSet_5BX_ = ibooker.book2D("prescaleFactorSet_5BX", "uGT: Index of Prescale Factor Set vs. LS for 5 BX", numLS, 0., numLS_d, 25, 0., 25.);
+   prescaleFactorSet_5BX_->setAxisTitle("Luminosity Segment", 1);
+   prescaleFactorSet_5BX_->setAxisTitle("Prescale Factor Set Index", 2);
+   
+   prescaleFactorSet_1BX_ = ibooker.book2D("prescaleFactorSet_1BX", "uGT: Index of Prescale Factor Set vs. LS for Triggering BX", numLS, 0., numLS_d, 25, 0., 25.);
+   prescaleFactorSet_1BX_->setAxisTitle("Luminosity Segment", 1);
+   prescaleFactorSet_1BX_->setAxisTitle("Prescale Factor Set Index", 2);
 }
 
 void L1TStage2uGT::analyze(const edm::Event& evt, const edm::EventSetup& evtSetup) {
@@ -137,53 +198,96 @@ void L1TStage2uGT::analyze(const edm::Event& evt, const edm::EventSetup& evtSetu
    // Get uGT algo bit statistics
    else {
       //algoBits_->Fill(-1.); // fill underflow to normalize // FIXME: needed? 
-      for (int ibx=uGtAlgs->getFirstBX(); ibx <= uGtAlgs->getLastBX(); ++ibx) {
-         for (auto itr = uGtAlgs->begin(ibx); itr != uGtAlgs->end(ibx); ++itr) { // FIXME: redundant loop over 1-dim vector?
+      for (int ibx = uGtAlgs->getFirstBX(); ibx <= uGtAlgs->getLastBX(); ++ibx) {
+         for (auto itr = uGtAlgs->begin(ibx); itr != uGtAlgs->end(ibx); ++itr) { // FIXME: redundant loop? 
             
             // Fills prescale factor set histogram
-            prescaleFactorSet_->Fill(lumi, itr->getPreScColumn());
-             
+            prescaleFactorSet_5BX_->Fill(lumi, itr->getPreScColumn());
+            
+            if(ibx == 0) {
+               prescaleFactorSet_1BX_->Fill(lumi, itr->getPreScColumn());
+            }
+           
             // Fills algorithm bits histograms
             for(int algoBit = 0; algoBit < numAlgs; ++algoBit) {
               
                // Algorithm bits after BX mask, before prescale 
                if(itr->getAlgoDecisionInitial(algoBit)) {
-                  algoBits_after_bxomask_->Fill(algoBit);
-                  algoBits_after_bxomask_lumi_->Fill(lumi, algoBit);
-                  algoBits_after_bxomask_bx_global_->Fill(bx, algoBit);
-                  algoBits_after_bxomask_bx_inEvt_->Fill(ibx, algoBit); // FIXME: or itr->getbxInEventNr()/getbxNr()?
                   
+                  algoBits_after_bxomask_5BX_->Fill(algoBit);
+                  algoBits_after_bxomask_lumi_5BX_->Fill(lumi, algoBit);
+                  algoBits_after_bxomask_bx_inEvt_5BX_->Fill(ibx, algoBit); // FIXME: or itr->getbxInEventNr()/getbxNr()?
+                  algoBits_after_bxomask_bx_global_5BX_->Fill(bx + ibx, algoBit);
+                  
+                  if(ibx == 0) {
+                     algoBits_after_bxomask_1BX_->Fill(algoBit);
+                     algoBits_after_bxomask_lumi_1BX_->Fill(lumi, algoBit);
+                     algoBits_after_bxomask_bx_inEvt_1BX_->Fill(ibx, algoBit);
+                     algoBits_after_bxomask_bx_global_1BX_->Fill(bx + ibx, algoBit);
+                  }
+ 
                   for(int algoBit2 = 0; algoBit2 < numAlgs; ++algoBit2) {
                      if(itr->getAlgoDecisionInitial(algoBit2)) {
-                        algoBits_after_bxomask_corr_->Fill(algoBit, algoBit2);
+                        
+                        algoBits_after_bxomask_corr_5BX_->Fill(algoBit, algoBit2);
+                        
+                        if(ibx == 0) {
+                           algoBits_after_bxomask_corr_1BX_->Fill(algoBit, algoBit2);
+                        }
                      }
                   }
                }  
                
                // Algorithm bits after prescale 
                if(itr->getAlgoDecisionInterm(algoBit)) {
-                  algoBits_after_prescaler_->Fill(algoBit);
-                  algoBits_after_prescaler_lumi_->Fill(lumi, algoBit);
-                  algoBits_after_prescaler_bx_global_->Fill(bx, algoBit);
-                  algoBits_after_prescaler_bx_inEvt_->Fill(ibx, algoBit); // FIXME: or itr->getbxInEventNr()/getbxNr()?
+                  
+                  algoBits_after_prescaler_5BX_->Fill(algoBit);
+                  algoBits_after_prescaler_lumi_5BX_->Fill(lumi, algoBit);
+                  algoBits_after_prescaler_bx_inEvt_5BX_->Fill(ibx, algoBit); // FIXME: or itr->getbxInEventNr()/getbxNr()?
+                  algoBits_after_prescaler_bx_global_5BX_->Fill(bx + ibx, algoBit);
+                 
+                  if(ibx == 0) {  
+                     algoBits_after_prescaler_1BX_->Fill(algoBit);
+                     algoBits_after_prescaler_lumi_1BX_->Fill(lumi, algoBit);
+                     algoBits_after_prescaler_bx_inEvt_1BX_->Fill(ibx, algoBit);
+                     algoBits_after_prescaler_bx_global_1BX_->Fill(bx + ibx, algoBit);
+                  } 
                   
                   for(int algoBit2 = 0; algoBit2 < numAlgs; ++algoBit2) {
                      if(itr->getAlgoDecisionInterm(algoBit2)) {
-                        algoBits_after_prescaler_corr_->Fill(algoBit, algoBit2);
+                  
+                        algoBits_after_prescaler_corr_5BX_->Fill(algoBit, algoBit2);
+                        
+                        if(ibx == 0) {
+                           algoBits_after_prescaler_corr_1BX_->Fill(algoBit, algoBit2);
+                        }
                      }
                   }
                }  
                
                // Algorithm bits after mask 
                if(itr->getAlgoDecisionFinal(algoBit)) {
-                  algoBits_after_mask_->Fill(algoBit);
-                  algoBits_after_mask_lumi_->Fill(lumi, algoBit);
-                  algoBits_after_mask_bx_global_->Fill(bx, algoBit);
-                  algoBits_after_mask_bx_inEvt_->Fill(ibx, algoBit); // FIXME: or itr->getbxInEventNr()/getbxNr()?
+                 
+                  algoBits_after_mask_5BX_->Fill(algoBit);
+                  algoBits_after_mask_lumi_5BX_->Fill(lumi, algoBit);
+                  algoBits_after_mask_bx_inEvt_5BX_->Fill(ibx, algoBit); // FIXME: or itr->getbxInEventNr()/getbxNr()?
+                  algoBits_after_mask_bx_global_5BX_->Fill(bx + ibx, algoBit);
                   
+                  if(ibx == 0) {
+                     algoBits_after_mask_1BX_->Fill(algoBit);
+                     algoBits_after_mask_lumi_1BX_->Fill(lumi, algoBit);
+                     algoBits_after_mask_bx_global_1BX_->Fill(bx, algoBit);
+                     algoBits_after_mask_bx_inEvt_1BX_->Fill(ibx, algoBit);
+                  } 
+                 
                   for(int algoBit2 = 0; algoBit2 < numAlgs; ++algoBit2) {
                      if(itr->getAlgoDecisionFinal(algoBit2)) {
-                        algoBits_after_mask_corr_->Fill(algoBit, algoBit2);
+                
+                        algoBits_after_mask_corr_5BX_->Fill(algoBit, algoBit2);
+                        
+                        if(ibx == 0) {
+                           algoBits_after_mask_corr_1BX_->Fill(algoBit, algoBit2);
+                        }
                      }
                   }
                }  
