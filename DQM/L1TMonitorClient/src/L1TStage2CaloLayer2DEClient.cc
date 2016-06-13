@@ -58,8 +58,7 @@ void L1TStage2CaloLayer2DEClient::processHistograms(DQMStore::IGetter &igetter){
 
     CenJetRankRatio->Divide(cjrNum, cjrDen);
   }
-  
-  
+    
   dataHist_ = igetter.get(input_dir_data_+"/"+"CenJetsEta");
   emulHist_ = igetter.get(input_dir_emul_+"/"+"CenJetsEta");
 
