@@ -2,7 +2,6 @@
 
 #include "DQM/L1TMonitor/interface/L1TdeStage2EMTF.h"
 
-
 L1TdeStage2EMTF::L1TdeStage2EMTF(const edm::ParameterSet& ps)
     : dataToken(consumes<l1t::RegionalMuonCandBxCollection>(ps.getParameter<edm::InputTag>("dataProducer"))),
       emulToken(consumes<l1t::RegionalMuonCandBxCollection>(ps.getParameter<edm::InputTag>("emulProducer"))),

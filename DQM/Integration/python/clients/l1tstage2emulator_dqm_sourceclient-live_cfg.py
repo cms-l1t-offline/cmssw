@@ -59,7 +59,6 @@ process.selfFatEventFilter = cms.EDFilter("HLTL1NumberFilter",
         fedId = cms.int32(1024)
         )
 
-
 process.load("DQM.L1TMonitor.L1TStage2Emulator_cff")
 
 process.l1tEmulatorMonitorPath = cms.Path(
