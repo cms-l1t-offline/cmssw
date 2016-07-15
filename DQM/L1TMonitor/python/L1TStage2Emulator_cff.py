@@ -54,7 +54,8 @@ valCaloStage2Layer2Digis.towerToken = cms.InputTag("caloStage2Digis", "CaloTower
 # EMTF
 from L1Trigger.L1TMuonEndCap.simEmtfDigis_cfi import *
 valEmtfStage2Digis = simEmtfDigis.clone()
-valEmtfStage2Digis.CSCInput = "csctfDigis"
+valEmtfStage2Digis.CSCInput = "emtfStage2Digis"
+#valEmtfStage2Digis.CSCInput = "csctfDigis"
 
 # uGT
 from L1Trigger.L1TGlobal.simGtStage2Digis_cfi import simGtStage2Digis
@@ -88,6 +89,8 @@ from DQM.L1TMonitor.L1TStage2CaloLayer2_cfi import *
 from DQM.L1TMonitor.L1TStage2CaloLayer2Emul_cfi import *
 
 # EMTF
+from DQM.L1TMonitor.L1TStage2EMTFData_cfi import *
+from DQM.L1TMonitor.L1TStage2EMTFEmul_cfi import *
 from DQM.L1TMonitor.L1TdeStage2EMTF_cfi import *
 
 # uGT
@@ -101,6 +104,6 @@ l1tStage2EmulatorOnlineDQM = cms.Sequence(
     # We process both layer2 and layer2emu in same sourceclient
     # to be able to divide them in the MonitorClient
     l1tStage2CaloLayer2 + l1tStage2CaloLayer2Emul +
-    l1tdeStage2Emtf +
+    l1tStage2EmtfData + l1tStage2EmtfEmul + l1tdeStage2Emtf +
     l1tStage2uGtEmul
 )
