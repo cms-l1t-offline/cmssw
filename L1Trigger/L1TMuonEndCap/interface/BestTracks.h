@@ -23,9 +23,9 @@ std::vector<BTrack> BestTracks(std::vector<std::vector<DeltaOutput>> Dout){
     for(int t=0;t<3;t++){
       for(int d=0;d<4;d++){
 	
-	phi[r][t][d] = Dout[r][t].GetMatchOut().PhiMatch()[r][t][d].Phi();
+	phi[r][t][d] = Dout[r][t].GetMatchOut().PhiMatch().x[r][t][d].Phi();
 	//if(phi[r][t][d] != -999) std::cout<<"phi = "<<phi[r][t][d]<<"\n";
-	id[r][t][d] = Dout[r][t].GetMatchOut().PhiMatch()[r][t][d].Id();
+	id[r][t][d] = Dout[r][t].GetMatchOut().PhiMatch().x[r][t][d].Id();
       }
     }
   }
@@ -37,7 +37,7 @@ std::vector<BTrack> BestTracks(std::vector<std::vector<DeltaOutput>> Dout){
     for(int winner=0;winner<3;winner++){
       for(int station=0;station<4;station++){
 	
-	int cham = Dout[zone][winner].GetMatchOut().PhiMatch()[zone][winner][station].Id();
+	int cham = Dout[zone][winner].GetMatchOut().PhiMatch().x[zone][winner][station].Id();
 	//int relst = 0;
 	int relch = 0;
 	
@@ -83,11 +83,6 @@ std::vector<BTrack> BestTracks(std::vector<std::vector<DeltaOutput>> Dout){
     for(int j=0;j<12;j++){
       
       int rankj = Dout[j%4][j/4].GetWinner().Rank();
-      if(ranki && rankj){
-	
-	//std::cout<<"ranki = "<<ranki<<", and rankj = "<<rankj<<"\n";
-	
-      }
       bool greater = (ranki > rankj);
       bool equal = (ranki == rankj);
       
@@ -99,6 +94,7 @@ std::vector<BTrack> BestTracks(std::vector<std::vector<DeltaOutput>> Dout){
   }
   
   // ghost cancelltion. only in current BX so far(as in firmware as well)
+  int vmask[4] = {32,8,2,1};
   for(int k=0;k<12;k++){
     for(int l=0;l<12;l++){
       int sh_seg = 0;
@@ -111,6 +107,8 @@ std::vector<BTrack> BestTracks(std::vector<std::vector<DeltaOutput>> Dout){
 	   && ((phi[k%4][k/4][s] != -999) || (phi[l%4][l/4][s] != -999))
 	   && (phi[k%4][k/4][s] == phi[l%4][l/4][s])
 	   && (k != l)
+	   && (Dout[k%4][k/4].GetWinner().Rank() & vmask[s]) //station from track one is valid after deltas
+	   && (Dout[l%4][l/4].GetWinner().Rank() & vmask[s]) //station from track two is valid after deltas
 	   ){
 	  
 	  sh_seg++;
@@ -119,7 +117,6 @@ std::vector<BTrack> BestTracks(std::vector<std::vector<DeltaOutput>> Dout){
       
       if(sh_seg){
 	//kill candidate that has lower rank
-	//if(verbose) std::cout<<"\nsh_seg != 0\nk = "<<k<<" and l = "<<l<<"\n";
 	if(larger[k][l]){kill[l] = 1;}
 	else{kill[k] = 1;}
       }
@@ -177,8 +174,15 @@ std::vector<BTrack> BestTracks(std::vector<std::vector<DeltaOutput>> Dout){
 	bests.phi = Dout[i%4][i/4].Phi();
 	bests.theta = Dout[i%4][i/4].Theta();
 	bests.deltas = Dout[i%4][i/4].Deltas();
-	bests.clctpattern = Dout[i%4][i/4].GetMatchOut().PhiMatch()[i%4][i/4][0].Pattern();
-	bests.AHits = Dout[i%4][i/4].GetMatchOut().PhiMatch()[i%4][i/4];
+	bests.clctpattern = Dout[i%4][i/4].GetMatchOut().PhiMatch().x[i%4][i/4][0].Pattern();
+	// bests.AHits = Dout[i%4][i/4].GetMatchOut().PhiMatch().x[i%4][i/4];
+	// Was line above ... not sure if we should only push_back non-null converted hits - AWB 29.08.16
+	bests.AHits.clear();
+	for (int iPh = 0; iPh < 4; iPh++) {
+	  if ( Dout[i%4][i/4].GetMatchOut().PhiMatch().x[i%4][i/4][iPh].Theta() != -999 &&
+	       Dout[i%4][i/4].GetMatchOut().PhiMatch().x[i%4][i/4][iPh].Phi() > 0 )
+	    bests.AHits.push_back( Dout[i%4][i/4].GetMatchOut().PhiMatch().x[i%4][i/4][iPh] );
+	}
 
 	if (bests.phi != 0 && bests.theta == 0)
 	  std::cout << "In BestTracks.h, phi = " << bests.phi << " and theta = " << bests.theta << std::endl;
