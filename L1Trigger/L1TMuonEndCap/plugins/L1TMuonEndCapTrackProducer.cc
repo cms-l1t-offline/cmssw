@@ -4,7 +4,7 @@
 // Info: A human-readable version of the firmware based      //
 //       track finding algorithm which will be implemented   //
 //       in the upgraded endcaps of CMS. DT and RPC inputs   //
-//	     are not considered in this algorithm.           //
+//	     are not considered in this algorithm.se           //
 //							     //
 // Author: M. Carver (UF)				     //
 ///////////////////////////////////////////////////////////////
@@ -381,18 +381,26 @@ void L1TMuonEndCapTrackProducer::produce(edm::Event& ev,
   // Cancel out duplicate tracks
   for (unsigned int i1=0; i1 < AllTracks_PreCancel.size(); i1++) {
     bool dup = false;
-    int ebx = 20, sindex = -1;
+    int ebx = 20, sebx = 20, sindex = -1;
     for (std::vector<ConvertedHit>::iterator A = AllTracks_PreCancel[i1].AHits.begin(); A != AllTracks_PreCancel[i1].AHits.end(); A++) {
-      if (A->TP().getCSCData().bx < ebx) ebx = A->TP().getCSCData().bx;
+      if (A->TP().getCSCData().bx < ebx) {
+      	sebx = ebx;
+      	ebx = A->TP().getCSCData().bx;
+      }
+      else if (A->TP().getCSCData().bx < sebx) sebx = A->TP().getCSCData().bx;
       sindex = A->SectorIndex();
     }
     for (unsigned int i2 = i1+1; i2 < AllTracks_PreCancel.size(); i2++) {
-      int ebx2 = 20, sindex2 = -1;
+      int ebx2 = 20, sebx2 = 20, sindex2 = -1;
       for (std::vector<ConvertedHit>::iterator A2 = AllTracks_PreCancel[i1].AHits.begin(); A2 != AllTracks_PreCancel[i1].AHits.end(); A2++) {
-	if (A2->TP().getCSCData().bx < ebx2) ebx2 = A2->TP().getCSCData().bx;
+	if (A2->TP().getCSCData().bx < ebx2) {
+	  sebx2 = ebx2;
+	  ebx2 = A2->TP().getCSCData().bx;
+	}
+	else if (A2->TP().getCSCData().bx < sebx2) sebx2 = A2->TP().getCSCData().bx;
 	sindex2 = A2->SectorIndex();
       }
-      if (ebx == ebx2 && AllTracks_PreCancel[i1].theta == AllTracks_PreCancel[i2].theta && AllTracks_PreCancel[i1].phi == AllTracks_PreCancel[i2].phi && AllTracks_PreCancel[i1].winner.Rank() == AllTracks_PreCancel[i2].winner.Rank() && sindex == sindex2 && sindex != -1 && sindex2 != -1) dup = true;
+      if (sebx == sebx2 && AllTracks_PreCancel[i1].theta == AllTracks_PreCancel[i2].theta && AllTracks_PreCancel[i1].phi == AllTracks_PreCancel[i2].phi && AllTracks_PreCancel[i1].winner.Rank() == AllTracks_PreCancel[i2].winner.Rank() && sindex == sindex2 && sindex != -1 && sindex2 != -1) dup = true;
     }
     if (!dup) AllTracks.push_back(AllTracks_PreCancel[i1]);
   }
