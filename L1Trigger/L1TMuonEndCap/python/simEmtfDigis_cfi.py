@@ -15,4 +15,5 @@ simEmtfDigis = cms.EDProducer("L1TMuonEndCapTrackProducer",
                               CSCInput = cms.InputTag('simCscTriggerPrimitiveDigis','MPCSORTED'),
                               RPCInput = cms.InputTag('simMuonRPCDigis'),
                               CSCInputBxShift = cms.untracked.int32(0),
+                              PtAssignmentFromConds = cms.bool(False)
                               )

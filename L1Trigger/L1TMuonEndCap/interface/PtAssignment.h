@@ -13,6 +13,7 @@ namespace l1t {
   class EmtfPtAssignment {
   public: 
     EmtfPtAssignment(const char * tree_dir="L1Trigger/L1TMuon/data/emtf_luts/v_16_02_21/ModeVariables/trees");    
+    EmtfPtAssignment(const L1TMuonEndCapForest &forest);    
     
     unsigned long calculateAddress(L1TMuon::InternalTrack track, const edm::EventSetup& es, int mode);
     float calculatePt(unsigned long Address);    

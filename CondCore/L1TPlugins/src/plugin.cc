@@ -218,6 +218,13 @@ using namespace l1t;
 REGISTER_PLUGIN(L1TCaloParamsRcd, CaloParams);
 REGISTER_PLUGIN(L1TCaloConfigRcd, CaloConfig);
 
+#include "CondFormats/L1TObjects/interface/L1TMuonEndCapForest.h"
+#include "CondFormats/DataRecord/interface/L1TMuonEndCapForestRcd.h"
+
+#include "CondFormats/L1TObjects/interface/L1TMuonEndCapParams.h"
+#include "CondFormats/DataRecord/interface/L1TMuonEndcapParamsRcd.h"
+#include "CondFormats/DataRecord/interface/L1TMuonEndcapParamsO2ORcd.h"
+
 #include "CondFormats/L1TObjects/interface/L1TMuonOverlapParams.h"
 #include "CondFormats/DataRecord/interface/L1TMuonOverlapParamsRcd.h"
 
@@ -227,6 +234,8 @@ REGISTER_PLUGIN(L1TCaloConfigRcd, CaloConfig);
 #include "CondFormats/L1TObjects/interface/L1TMuonGlobalParams.h"
 #include "CondFormats/DataRecord/interface/L1TMuonGlobalParamsRcd.h"
 
+REGISTER_PLUGIN(L1TMuonEndcapParamsRcd,  L1TMuonEndCapParams);
+REGISTER_PLUGIN(L1TMuonEndCapForestRcd,  L1TMuonEndCapForest);
 REGISTER_PLUGIN(L1TMuonOverlapParamsRcd, L1TMuonOverlapParams);
 REGISTER_PLUGIN(L1TMuonBarrelParamsRcd, L1TMuonBarrelParams);
 REGISTER_PLUGIN(L1TMuonGlobalParamsRcd, L1TMuonGlobalParams);

@@ -1,10 +1,11 @@
 // Forest.h
 
-#ifndef ADD_FOREST
-#define ADD_FOREST
+#ifndef L1Trigger_L1TMuonEndCap_Forest
+#define L1Trigger_L1TMuonEndCap_Forest
 
 #include "L1Trigger/L1TMuonEndCap/interface/Tree.h"
 #include "L1Trigger/L1TMuonEndCap/interface/LossFunctions.h"
+#include "CondFormats/L1TObjects/interface/L1TMuonEndCapForest.h"
 
 class Forest
 {
@@ -33,6 +34,7 @@ class Forest
   void sortEventVectors(std::vector< std::vector<Event*> >& e);
   void generate(Int_t numTrainEvents, Int_t numTestEvents, double sigma);
   void loadForestFromXML(const char* directory, unsigned int numTrees); 
+  void loadFromCondPayload(const L1TMuonEndCapForest::DForest& payload);
   
   // Perform the regression
   void updateRegTargets(Tree *tree, double learningRate, LossFunction* l);

@@ -34,6 +34,11 @@
 #include "L1Trigger/L1TMuonEndCap/interface/EMTFTrackTools.h"
 #include "L1Trigger/L1TMuonEndCap/interface/EMTFHitTools.h"
 
+#include "CondFormats/L1TObjects/interface/L1TMuonEndCapForest.h"
+#include "CondFormats/L1TObjects/interface/L1TMuonEndCapParams.h"
+#include "CondFormats/DataRecord/interface/L1TMuonEndCapParamsRcd.h"
+#include "CondFormats/DataRecord/interface/L1TMuonEndCapForestRcd.h"
+
 using namespace L1TMuon;
 class RPCGeometry;
 // Pointers to the current geometry records
@@ -54,11 +59,29 @@ L1TMuonEndCapTrackProducer::L1TMuonEndCapTrackProducer(const PSet& p) {
   produces< l1t::EMTFHitExtraCollection >("CSC");  
   produces< l1t::EMTFHitExtraCollection >("RPC");  
 
+  if( p.getParameter<bool>("PtAssignmentFromConds") == false )
+      ptAssignment_ = new l1t::EmtfPtAssignment();
+  else
+      ptAssignment_ = 0; // will initialize it in produce
 }
 
 
 void L1TMuonEndCapTrackProducer::produce(edm::Event& ev,
 			       const edm::EventSetup& es) {
+
+  // unless Pt assignment unit was initialized from static XMLs in the constructor
+  //  we have to extract the forests from EventSetup and feed those to the new Pt assignment unit
+  if( ptAssignment_ == 0 ){
+    edm::ESHandle<L1TMuonEndCapForest> handle;
+    es.get<L1TMuonEndCapForestRcd>().get( handle ) ;
+    std::shared_ptr<L1TMuonEndCapForest> ptr(new L1TMuonEndCapForest(*(handle.product ())));
+    ptAssignment_ = new l1t::EmtfPtAssignment( *(ptr.get()) );
+  }
+
+  edm::ESHandle<L1TMuonEndCapParams> handle;
+  es.get<L1TMuonEndCapParamsRcd>().get( handle ) ;
+  boost::shared_ptr<L1TMuonEndCapParams> ptr(new L1TMuonEndCapParams(*(handle.product ())));
+  /// std::cout << ptr1->PtAssignVersion_ << std::endl;
 
   //bool verbose = false;
 
@@ -604,8 +627,8 @@ void L1TMuonEndCapTrackProducer::produce(edm::Event& ev,
       // float xmlpt = CalculatePt(tempTrack, es, mode, &xmlpt_address);
       
       // After Mulhearn cleanup, May 11
-      unsigned long xmlpt_address = ptAssignment_.calculateAddress(tempTrack, es, mode);
-      float xmlpt = ptAssignment_.calculatePt(xmlpt_address);
+      unsigned long xmlpt_address = ptAssignment_->calculateAddress(tempTrack, es, mode);
+      float xmlpt = ptAssignment_->calculatePt(xmlpt_address);
       
       tempTrack.pt = xmlpt*1.4;
       //FoundTracks->push_back(tempTrack);

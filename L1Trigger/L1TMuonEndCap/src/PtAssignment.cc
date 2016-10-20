@@ -29,6 +29,29 @@ EmtfPtAssignment::EmtfPtAssignment(const char * tree_dir):
   }
 }
 
+EmtfPtAssignment::EmtfPtAssignment(const L1TMuonEndCapForest &payload):
+  allowedModes_({3,5,9,6,10,12,7,11,13,14,15}){
+  
+  for (unsigned i=0;i<allowedModes_.size();i++){
+    int mode_inv = allowedModes_[i];
+
+    L1TMuonEndCapForest::DForestMap::const_iterator index = payload.forest_map_.find(mode_inv); // associates mode to index 
+
+    if( index == payload.forest_map_.end() ) continue;
+
+    forest_[ mode_inv ].loadFromCondPayload( payload.forest_coll_[index->second] );
+
+///    for(int t=0; t<64; t++){
+///        emtf::Tree* tree = forest_[ mode_inv ].getTree(t);
+///        stringstream ss;
+///        ss << mode_inv << "/" << t << ".xml";
+///        tree->saveToXML( ss.str().c_str() );
+///    }
+
+  }
+}
+
+
 //ModeVariables is a 2D arrary indexed by [TrackMode(13 Total Listed Below)][VariableNumber(20 Total Constructed Above)]
 // Variable numbering
 // 0 = dPhi12

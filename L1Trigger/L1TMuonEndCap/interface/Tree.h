@@ -1,7 +1,7 @@
 // Tree.h
 
-#ifndef ADD_TREE
-#define ADD_TREE
+#ifndef L1Trigger_L1TMuonEndCap_Tree
+#define L1Trigger_L1TMuonEndCap_Tree
 
 #include <list>
 #include "L1Trigger/L1TMuonEndCap/interface/Node.h"
@@ -10,6 +10,7 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "CondFormats/L1TObjects/interface/L1TMuonEndCapForest.h"
 
 
 //class Node;
@@ -43,6 +44,9 @@ class Tree
   void loadFromXML(const char* filename);
   void loadFromXMLRecursive(TXMLEngine* xml, XMLNodePointer_t node, Node* tnode);
   
+  void loadFromCondPayload(const L1TMuonEndCapForest::DTree& tree);
+  void loadFromCondPayloadRecursive(const L1TMuonEndCapForest::DTree& tree, const L1TMuonEndCapForest::DTreeNode& node, Node* tnode);
+
   void rankVariables(std::vector<Double_t>& v);
   void rankVariablesRecursive(Node* node, std::vector<Double_t>& v);
   

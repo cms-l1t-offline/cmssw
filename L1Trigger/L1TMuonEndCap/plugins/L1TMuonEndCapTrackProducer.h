@@ -93,7 +93,7 @@ public:
   edm::EDGetTokenT<RPCDigiCollection> inputTokenRPC;
   PrimitiveConverter primConv_;
   PrimitiveConverterRPC primConvRPC_;
-  l1t::EmtfPtAssignment ptAssignment_;
+  l1t::EmtfPtAssignment *ptAssignment_;
   
 };
 
