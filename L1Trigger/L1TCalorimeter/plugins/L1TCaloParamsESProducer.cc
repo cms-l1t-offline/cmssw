@@ -107,6 +107,9 @@ L1TCaloParamsESProducer::L1TCaloParamsESProducer(const edm::ParameterSet& conf)
 
   m_params_helper.setEgMaxHcalEt(conf.getParameter<double>("egMaxHcalEt"));
   m_params_helper.setEgMaxPtHOverE(conf.getParameter<double>("egMaxPtHOverE"));
+  m_params_helper.setEgHOverEcutBarrel(conf.getParameter<int>("egHOverEcutBarrel"));
+  m_params_helper.setEgHOverEcutEndcap(conf.getParameter<int>("egHOverEcutEndcap"));
+
   m_params_helper.setEgMinPtJetIsolation(conf.getParameter<int>("egMinPtJetIsolation"));
   m_params_helper.setEgMaxPtJetIsolation(conf.getParameter<int>("egMaxPtJetIsolation"));
   m_params_helper.setEgMinPtHOverEIsolation(conf.getParameter<int>("egMinPtHOverEIsolation"));

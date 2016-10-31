@@ -111,6 +111,10 @@ namespace l1t {
       // Et threshold to remove the H/E cut from the EGammas
       double maxPtHOverE_;
 
+      // H/E cut
+      int HoE_cut_barrel_;
+      int HoE_cut_endcap_;
+
       // Range of jet isolation for EG (in rank!) (Stage1Layer2)
       int minPtJetIsolation_;
       int maxPtJetIsolation_;
@@ -131,11 +135,11 @@ namespace l1t {
       // turn on/off EG ID cuts
       bool egBypassEGVetos_;
 
-      EgParams() : lsb_(0), seedThreshold_(0), neighbourThreshold_(0), hcalThreshold_(0), maxHcalEt_(0), maxPtHOverE_(0),
-		   minPtJetIsolation_(0), maxPtJetIsolation_(0), minPtHOverEIsolation_(0), maxPtHOverEIsolation_(0),
+    EgParams() : lsb_(0), seedThreshold_(0), neighbourThreshold_(0), hcalThreshold_(0), maxHcalEt_(0), maxPtHOverE_(0), HoE_cut_barrel_(0), HoE_cut_endcap_(0),
+	minPtJetIsolation_(0), maxPtJetIsolation_(0), minPtHOverEIsolation_(0), maxPtHOverEIsolation_(0),
 	isoAreaNrTowersEta_(0), isoAreaNrTowersPhi_(0), isoVetoNrTowersPhi_(0),
 	egBypassEGVetos_(0)
-      { /* no-op */ }
+	  { /* no-op */ }
 
       COND_SERIALIZABLE;
     };

@@ -112,6 +112,9 @@ namespace l1t {
     l1t::LUT* egTrimmingLUT() { return &pnode_[egTrimming].LUT_; }
     double egMaxHcalEt() const { return egp_.maxHcalEt_; }
     double egMaxPtHOverE() const {return egp_.maxPtHOverE_;}
+    int egHOverEcutBarrel() const {return egp_.HoE_cut_barrel_;}
+    int egHOverEcutEndcap() const {return egp_.HoE_cut_endcap_;}
+    
     l1t::LUT* egMaxHOverELUT() { return &pnode_[egMaxHOverE].LUT_; }
     l1t::LUT* egCompressShapesLUT() { return &pnode_[egCompressShapes].LUT_; }
     l1t::LUT* egShapeIdLUT() { return &pnode_[egShapeId].LUT_; }
@@ -145,6 +148,9 @@ namespace l1t {
     void setEgTrimmingLUT(const l1t::LUT & lut) { pnode_[egTrimming].LUT_ = lut; }
     void setEgMaxHcalEt(double cut) { egp_.maxHcalEt_ = cut; }
     void setEgMaxPtHOverE(double thresh) { egp_.maxPtHOverE_ = thresh;}
+    void setEgHOverEcutBarrel(int HoE) { egp_.HoE_cut_barrel_ = HoE;}
+    void setEgHOverEcutEndcap(int HoE) { egp_.HoE_cut_endcap_ = HoE;}
+
     void setEgMaxHOverELUT(const l1t::LUT & lut) { pnode_[egMaxHOverE].LUT_ = lut; }
     void setEgCompressShapesLUT(const l1t::LUT & lut) { pnode_[egCompressShapes].LUT_ = lut; }
     void setEgShapeIdLUT(const l1t::LUT & lut) { pnode_[egShapeId].LUT_ = lut; }

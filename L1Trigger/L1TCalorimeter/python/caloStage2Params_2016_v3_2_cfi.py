@@ -26,13 +26,15 @@ caloStage2Params.egNeighbourThreshold       = cms.double(1.)
 caloStage2Params.egHcalThreshold            = cms.double(0.)
 caloStage2Params.egTrimmingLUTFile          = cms.FileInPath("L1Trigger/L1TCalorimeter/data/egTrimmingLUT_10_v16.01.19.txt")
 caloStage2Params.egMaxHcalEt                = cms.double(0.)
-caloStage2Params.egMaxPtHOverE          = cms.double(128.)
+caloStage2Params.egMaxPtHOverE              = cms.double(128.)
+caloStage2Params.egHOverEcutBarrel          = cms.int32(5) #H/E < pow(2,-5) in barrel
+caloStage2Params.egHOverEcutEndcap         = cms.int32(4) #H/E < pow(2,-4) in endcaps
 caloStage2Params.egMaxHOverELUTFile         = cms.FileInPath("L1Trigger/L1TCalorimeter/data/HoverEIdentification_0.995_v15.12.23.txt")
 caloStage2Params.egCompressShapesLUTFile    = cms.FileInPath("L1Trigger/L1TCalorimeter/data/egCompressLUT_v4.txt")
 caloStage2Params.egShapeIdType              = cms.string("compressed")
 caloStage2Params.egShapeIdVersion           = cms.uint32(0)
 caloStage2Params.egShapeIdLUTFile           = cms.FileInPath("L1Trigger/L1TCalorimeter/data/shapeIdentification_adapt0.99_compressedieta_compressedE_compressedshape_v15.12.08.txt")
-caloStage2Params.egBypassEGVetos              = cms.bool(False)
+caloStage2Params.egBypassEGVetos            = cms.bool(False)
 
 caloStage2Params.egPUSType                  = cms.string("None")
 caloStage2Params.egIsolationType            = cms.string("compressed")
