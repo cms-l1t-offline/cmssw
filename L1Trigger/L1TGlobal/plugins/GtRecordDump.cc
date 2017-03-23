@@ -68,7 +68,8 @@ namespace l1t {
   public:
     explicit GtRecordDump(const edm::ParameterSet&);
     virtual ~GtRecordDump(){};
-    virtual void analyze(const edm::Event&, const edm::EventSetup&);  
+
+    virtual void analyze(const edm::Event&, const edm::EventSetup&);
     virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
 
     InputTag   uGtAlgInputTag;
@@ -843,6 +844,7 @@ unsigned int GtRecordDump::formatTotalET(std::vector<l1t::EtSum>::const_iterator
 
 // Pack Bits
   packedVal |= ((etSum->hwPt()     & 0xfff)   <<0);
+
 
   return packedVal;
 }
