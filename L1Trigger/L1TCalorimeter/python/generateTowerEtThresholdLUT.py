@@ -3,8 +3,8 @@
 import math
 
 # open LUT file for writing
-print "Creating tower Et threshold LUT with filename 'lut_etThresh_2017v1.txt'"
-towEtThreshLUTFile = open("L1Trigger/L1TCalorimeter/data/lut_etThresh_2017v1.txt", "w")
+print "Creating tower Et threshold LUT with filename 'lut_towEtThresh_2017v1.txt'"
+towEtThreshLUTFile = open("L1Trigger/L1TCalorimeter/data/lut_towEtThresh_2017v1.txt", "w")
 
 # write header info
 towEtThreshLUTFile.write(
