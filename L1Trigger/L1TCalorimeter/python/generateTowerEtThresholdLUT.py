@@ -31,12 +31,13 @@ towEtThreshLUTFile = open(os.environ['LOCALRT']+"/src/L1Trigger/L1TCalorimeter/d
 # write header info
 towEtThreshLUTFile.write(
     "# address to et sum tower Et threshold LUT\n"
-    "# maps 16 bits to 8 bits\n"
-    "# 16 bits = (nTT4<<6) + abs(ieta)\n"
-    "# nTT4 is unsigned 10 bits, abs(ieta) is 6 bits\n"
+    "# maps 13 bits to 8 bits\n"
+    "# 13 bits = (nTT4<<6) + abs(ieta)\n"
+    "# nTT4 is unsigned 7 bits, abs(ieta) is 6 bits\n"
+    "# data: tower energy threshold returned has 9 bits \n"
     "# anything after # is ignored with the exception of the header\n"
     "# the header is first valid line starting with #<header> versionStr nrBitsAddress nrBitsData </header>\n"
-    "#<header> v1 16 8 </header>\n" 
+    "#<header> v1 13 9 </header>\n" 
 
 )
 

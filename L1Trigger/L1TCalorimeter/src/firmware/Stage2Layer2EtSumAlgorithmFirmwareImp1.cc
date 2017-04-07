@@ -34,8 +34,11 @@ void l1t::Stage2Layer2EtSumAlgorithmFirmwareImp1::processEvent(const std::vector
   
   uint32_t ntowers(0);
   math::XYZTLorentzVector p4;
-
-  uint nTT4(0);
+  
+  //number of towers within abs(ieta)<=4, compressed by factor 4
+  //LUT has 128 bins in compNTT4, and when nTT4>512, towEtThresh set to 20 (10GeV)
+  double nTT4(0);
+  uint compNTT4(0);
   // get compressed PU estimate
   for (int etaSide=1; etaSide>=-1; etaSide-=2) {
     for (unsigned absieta=1; absieta<=4; absieta++) {
@@ -47,6 +50,7 @@ void l1t::Stage2Layer2EtSumAlgorithmFirmwareImp1::processEvent(const std::vector
       }
     }
   }
+  compNTT4=round(nTT4/4);
 
   // etaSide=1 is positive eta, etaSide=-1 is negative eta
   for (int etaSide=1; etaSide>=-1; etaSide-=2) {
@@ -60,9 +64,8 @@ void l1t::Stage2Layer2EtSumAlgorithmFirmwareImp1::processEvent(const std::vector
 
       int ieta = etaSide * absieta;
 
-      int32_t towEtThresh = floor(params_->etSumTowEtThreshLUT()->data(nTT4<<6 | abs(ieta)));
-
-      // TODO add the eta and Et thresholds
+      uint towEtLUTAddr = (compNTT4<<6) | (abs(ieta)-1);
+      int32_t towEtThresh = params_->etSumTowEtThreshLUT()->data(towEtLUTAddr);
 
       int32_t ringEx(0), ringEy(0), ringEt(0);
       int32_t ringExHF(0), ringEyHF(0), ringEtHF(0);
