@@ -254,7 +254,7 @@ L1TCaloStage2ParamsESProducer::L1TCaloStage2ParamsESProducer(const edm::Paramete
   edm::FileInPath etSumTowEtThreshLUTFile = conf.getParameter<edm::FileInPath>("etSumTowEtThreshLUTFile");
   std::ifstream etSumTowEtThreshLUTStream(etSumTowEtThreshLUTFile.fullPath());
   std::shared_ptr<LUT> etSumTowEtThreshLUT( new LUT(etSumTowEtThreshLUTStream) );
-  m_params_helper.setEtSumXPUSLUT(*etSumTowEtThreshLUT);
+  m_params_helper.setEtSumTowEtThreshLUT(*etSumTowEtThreshLUT);
 
   edm::FileInPath etSumXPUSLUTFile = conf.getParameter<edm::FileInPath>("etSumXPUSLUTFile");
   std::ifstream etSumXPUSLUTStream(etSumXPUSLUTFile.fullPath());

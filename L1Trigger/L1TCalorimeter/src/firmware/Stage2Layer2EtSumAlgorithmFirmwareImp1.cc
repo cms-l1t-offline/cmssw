@@ -31,7 +31,6 @@ l1t::Stage2Layer2EtSumAlgorithmFirmwareImp1::~Stage2Layer2EtSumAlgorithmFirmware
 void l1t::Stage2Layer2EtSumAlgorithmFirmwareImp1::processEvent(const std::vector<l1t::CaloTower> & towers,
                                                                std::vector<l1t::EtSum> & etsums) {
 
-  
   uint32_t ntowers(0);
   math::XYZTLorentzVector p4;
   
@@ -65,7 +64,7 @@ void l1t::Stage2Layer2EtSumAlgorithmFirmwareImp1::processEvent(const std::vector
       int ieta = etaSide * absieta;
 
       uint towEtLUTAddr = (compNTT4<<6) | (abs(ieta)-1);
-      int32_t towEtThresh = params_->etSumTowEtThreshLUT()->data(towEtLUTAddr);
+      int32_t towEtThresh_ = params_->etSumTowEtThreshLUT()->data(towEtLUTAddr);
 
       int32_t ringEx(0), ringEy(0), ringEt(0);
       int32_t ringExHF(0), ringEyHF(0), ringEtHF(0);
@@ -80,7 +79,7 @@ void l1t::Stage2Layer2EtSumAlgorithmFirmwareImp1::processEvent(const std::vector
 
 	// MET without HF
 
-	if (tower.hwPt()>towEtThresh && CaloTools::mpEta(abs(tower.hwEta()))<=CaloTools::mpEta(metEtaMax_)) {
+	if (tower.hwPt()>towEtThresh_ && CaloTools::mpEta(abs(tower.hwEta()))<=CaloTools::mpEta(metEtaMax_)) {
 
 	  // x- and -y coefficients are truncated by after multiplication of Et by trig coefficient.
 	  // The trig coefficients themselves take values [-1023,1023] and so were scaled by
@@ -91,21 +90,21 @@ void l1t::Stage2Layer2EtSumAlgorithmFirmwareImp1::processEvent(const std::vector
 	}
 
 	// MET *with* HF
-	if (tower.hwPt()>towEtThresh && CaloTools::mpEta(abs(tower.hwEta()))<=CaloTools::mpEta(metEtaMaxHF_)) {
+	if (tower.hwPt()>towEtThresh_ && CaloTools::mpEta(abs(tower.hwEta()))<=CaloTools::mpEta(metEtaMaxHF_)) {
 	  ringExHF += (int32_t) (tower.hwPt() * CaloTools::cos_coeff[iphi - 1] );
 	  ringEyHF += (int32_t) (tower.hwPt() * CaloTools::sin_coeff[iphi - 1] );	    
 	}
 
 	// scalar sum
-	if (tower.hwPt()>towEtThresh && CaloTools::mpEta(abs(tower.hwEta()))<=CaloTools::mpEta(ettEtaMax_)) 
+	if (tower.hwPt()>towEtThresh_ && CaloTools::mpEta(abs(tower.hwEta()))<=CaloTools::mpEta(ettEtaMax_)) 
 	  ringEt += tower.hwPt();
   
 	// scalar sum including HF
-	if (tower.hwPt()>towEtThresh && CaloTools::mpEta(abs(tower.hwEta()))<=CaloTools::mpEta(ettEtaMaxHF_)) 
+	if (tower.hwPt()>towEtThresh_ && CaloTools::mpEta(abs(tower.hwEta()))<=CaloTools::mpEta(ettEtaMaxHF_)) 
 	  ringEtHF += tower.hwPt();
 		
         // scalar sum (EM)
-        if (tower.hwPt()>towEtThresh && CaloTools::mpEta(abs(tower.hwEta()))<=ettEtaMax_)
+        if (tower.hwPt()>towEtThresh_ && CaloTools::mpEta(abs(tower.hwEta()))<=ettEtaMax_)
           ringEtEm += tower.hwEtEm();
 
 	// count HF tower HCAL flags

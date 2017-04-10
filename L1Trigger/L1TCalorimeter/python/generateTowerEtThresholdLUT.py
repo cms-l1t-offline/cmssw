@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import math
 import os
 import sys
 
@@ -56,7 +55,7 @@ printBins = ""
 
 for nTT4 in nTT4Range:
     for ieta in etaRange:
-        towEtThresh = int(math.floor((towerEtaWidths[ieta-1]/4.02)*ieta/5*(nTT4/12)))
+        towEtThresh = int(round((towerEtaWidths[ieta-1]/4.02)*ieta/5*(nTT4/10)))
         if towEtThresh > 20:
             towEtThresh = int(20)
         if (addr % 64) == 0:
