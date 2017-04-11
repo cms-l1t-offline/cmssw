@@ -31,8 +31,8 @@ towEtThreshLUTFile = open(os.environ['LOCALRT']+"/src/L1Trigger/L1TCalorimeter/d
 towEtThreshLUTFile.write(
     "# address to et sum tower Et threshold LUT\n"
     "# maps 13 bits to 8 bits\n"
-    "# 13 bits = (nTT4<<6) + abs(ieta)\n"
-    "# nTT4 is unsigned 7 bits, abs(ieta) is 6 bits\n"
+    "# 13 bits = (compNTT4<<6) | abs(ieta)\n"
+    "# compNTT4 is unsigned 7 bits, abs(ieta) is 6 bits\n"
     "# data: tower energy threshold returned has 9 bits \n"
     "# anything after # is ignored with the exception of the header\n"
     "# the header is first valid line starting with #<header> versionStr nrBitsAddress nrBitsData </header>\n"
@@ -49,17 +49,17 @@ towerEtaWidths = [1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,
                   3.29,2.01,2.02,2.01,2.02,2.0,2.03,1.99,2.01,2.03,1.99,3.47];
   
 etaRange = xrange(1,41) # 40 towers excluding ieta=29
-nTT4Range = xrange(0,128) #  one bin in nTT4 for every 4 towers. if nTT4 > 512, towEtThresh = 20 (10 GeV) for all eta. 
+compNTT4Range = xrange(0,128) #  one bin in nTT4 for every 4 towers. if nTT4 > 512, towEtThresh = 20 (10 GeV) for all eta. 
 addr = 0
 printBins = ""
 
-for nTT4 in nTT4Range:
+for compNTT4 in compNTT4Range:
     for ieta in etaRange:
-        towEtThresh = int(round((towerEtaWidths[ieta-1]/4.02)*ieta/5*(nTT4/10)))
+        towEtThresh = int(round((towerEtaWidths[ieta-1]/4.02)*ieta/5*(compNTT4/10)))
         if towEtThresh > 20:
             towEtThresh = int(20)
         if (addr % 64) == 0:
-            printBins = "             # nTT4 = " + str(4*nTT4) + "-" + str((4*nTT4)+4) + " ieta = " + str(ieta)  
+            printBins = "             # nTT4 = " + str(4*compNTT4) + "-" + str((4*compNTT4)+4) + " ieta = " + str(ieta)  
         else:
             printBins = ""
         towEtThreshLUTFile.write(

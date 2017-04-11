@@ -1,7 +1,7 @@
 # address to et sum tower Et threshold LUT
 # maps 13 bits to 8 bits
-# 13 bits = (nTT4<<6) + abs(ieta)
-# nTT4 is unsigned 7 bits, abs(ieta) is 6 bits
+# 13 bits = (compNTT4<<6) | abs(ieta)
+# compNTT4 is unsigned 7 bits, abs(ieta) is 6 bits
 # data: tower energy threshold returned has 9 bits 
 # anything after # is ignored with the exception of the header
 # the header is first valid line starting with #<header> versionStr nrBitsAddress nrBitsData </header>

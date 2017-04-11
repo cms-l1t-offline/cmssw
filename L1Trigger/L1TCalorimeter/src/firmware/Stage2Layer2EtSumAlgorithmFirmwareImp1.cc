@@ -64,7 +64,9 @@ void l1t::Stage2Layer2EtSumAlgorithmFirmwareImp1::processEvent(const std::vector
       int ieta = etaSide * absieta;
 
       uint towEtLUTAddr = (compNTT4<<6) | (abs(ieta)-1);
-      int32_t towEtThresh_ = params_->etSumTowEtThreshLUT()->data(towEtLUTAddr);
+      if(towEtLUTAddr > 8191) towEtThresh_ = 20;
+      else towEtThresh_ = params_->etSumTowEtThreshLUT()->data(towEtLUTAddr);
+      
 
       int32_t ringEx(0), ringEy(0), ringEt(0);
       int32_t ringExHF(0), ringEyHF(0), ringEtHF(0);
@@ -76,7 +78,7 @@ void l1t::Stage2Layer2EtSumAlgorithmFirmwareImp1::processEvent(const std::vector
 
         l1t::CaloTower tower = l1t::CaloTools::getTower(towers, CaloTools::caloEta(ieta), iphi);
 
-
+	
 	// MET without HF
 
 	if (tower.hwPt()>towEtThresh_ && CaloTools::mpEta(abs(tower.hwEta()))<=CaloTools::mpEta(metEtaMax_)) {
