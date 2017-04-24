@@ -16,29 +16,39 @@ class trigSystem
 	public:
 		trigSystem();
 		~trigSystem();
-		void configureSystem(const std::string& l1HltKey, const std::string& subSysName);
+		void configureSystemFromFiles(const std::string& hwCfgFile, const std::string& topCfgFile, const std::string& key);
 		void setHwInfo(/*JSONConfigReader*/);
-		void addProcRole(const std::string& role, const std::string& processor);
+		void addProcRole(const std::string& processor, const std::string& role);
+		void addProcCrate(const std::string& processor, const std::string& crate);
 		void addSetting(const std::string& type, const std::string& id, const std::string& value, const std::string& procRole);
+		void addSettingTable(const std::string& id, const std::string& columns, const std::string& types,  const std::vector<std::string>& rows, const std::string& procRole, const std::string& delim);
 		void addMask(const std::string& id, const std::string& procRole);
+		void disableDaqProc(const std::string& daqProc);
+		const std::map<std::string, std::string>& getProcRole() { return procRole_; };
+		const std::map<std::string, std::vector<std::string> >& getRoleProcs() { return roleProcs_; };
 		std::map<std::string, setting> getSettings (const std::string& processor);
 		std::map<std::string, mask> getMasks(const std::string& proccessor);
 		bool isMasked(const std::string& proccessor, const std::string& id);
-
+		bool isProcEnabled(const std::string& proccessor);
+		std::string systemId() { return sysId_; };
+		void setSystemId(const std::string id) { sysId_=id; };
+		void setConfigured(const bool state=true) { isConfigured_=state; };
 
 	private:
-		std::map<std::string, std::string> _procRole;
-		std::map<std::string, std::vector<std::string> > _roleProcs;
-		std::map<std::string, std::vector<setting> > _procSettings;
-		std::map<std::string, std::vector<mask> > _procMasks;
+		std::map<std::string, std::string> procRole_;
+		std::map<std::string, std::vector<std::string> > roleProcs_;
+		std::map<std::string, std::vector<std::string> > daqttcProcs_;
+		std::map<std::string, std::vector<setting> > procSettings_;
+		std::map<std::string, std::vector<mask> > procMasks_;
+		std::map<std::string, bool> procEnabled_;
 
-                bool _isConfigured; // TODO: check this in getters
-                std::string _sysId; // TODO: get from JSON
+	    bool isConfigured_; 
+		std::string sysId_;
 
-                XmlConfigReader _xmlRdr;
+		XmlConfigReader _xmlRdr;
 
-		template <class varType> bool checkIdExistsAndSetSetting(std::vector<varType>& vec, const std::string& id, const std::string& value, const std::string& procRole);
-	
+		bool checkIdExistsAndSetSetting_(std::vector<setting>& vec, const std::string& id, const std::string& value, const std::string& procRole);
+		bool checkIdExistsAndSetSetting_(std::vector<setting>& vec, const std::string& id, const std::string& columns, const std::string& types,  const std::vector<std::string>& rows, const std::string& procRole, const std::string& delim);
 };
 
 }

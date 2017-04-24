@@ -16,6 +16,9 @@
 #include <vector>
 
 #include "CondFormats/L1TObjects/interface/L1TMuonGlobalParams.h"
+#include "L1Trigger/L1TCommon/interface/trigSystem.h"
+#include "L1Trigger/L1TCommon/interface/setting.h"
+#include "L1Trigger/L1TCommon/interface/mask.h"
 
 class L1TMuonGlobalParamsHelper : public L1TMuonGlobalParams {
 
@@ -205,6 +208,9 @@ public:
   unsigned sortRankLUTPtFactor() const   { return pnodes_[sortRank].uparams_.size() > upIdx::ptFactor ? pnodes_[sortRank].uparams_[upIdx::ptFactor] : 0; }
   unsigned sortRankLUTQualFactor() const { return pnodes_[sortRank].uparams_.size() > upIdx::qualFactor ? pnodes_[sortRank].uparams_[upIdx::qualFactor] : 0; }
   void setSortRankLUTFactors(unsigned ptFactor, unsigned qualFactor) { pnodes_[sortRank].uparams_.push_back(ptFactor); pnodes_[sortRank].uparams_.push_back(qualFactor); }
+
+  // set parameters with a trigSystem object built from the online DB
+  void loadFromOnline(l1t::trigSystem& trgSys, const std::string& processorId = "");
 
   // print parameters to stream:
   void print(std::ostream&) const;

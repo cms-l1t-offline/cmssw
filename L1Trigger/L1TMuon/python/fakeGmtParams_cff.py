@@ -13,6 +13,11 @@ gmtParamsSource = cms.ESSource(
 )
 
 gmtParams = cms.ESProducer('L1TMuonGlobalParamsESProducer',
+    # id for uGMT settings
+    uGmtProcessorId = cms.string('ugmt_processor'),
+    # get configuration from DB and ignore values below this one
+    configFromDb = cms.bool(True),
+
     fwVersion = cms.uint32(1),
 
     # uGMT inputs to disable
