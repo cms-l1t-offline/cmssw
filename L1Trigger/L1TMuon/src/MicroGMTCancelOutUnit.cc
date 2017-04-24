@@ -15,14 +15,14 @@ MicroGMTCancelOutUnit::~MicroGMTCancelOutUnit ()
 void
 MicroGMTCancelOutUnit::initialise(L1TMuonGlobalParamsHelper* microGMTParamsHelper) {
     int fwVersion = microGMTParamsHelper->fwVersion();
-    m_boPosMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->bOPosMatchQualLUTPath(), microGMTParamsHelper->bOPosMatchQualLUTMaxDR(), cancel_t::omtf_bmtf_pos, fwVersion);
-    m_boNegMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->bONegMatchQualLUTPath(), microGMTParamsHelper->bONegMatchQualLUTMaxDR(), cancel_t::omtf_bmtf_neg, fwVersion);
-    m_foPosMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->fOPosMatchQualLUTPath(), microGMTParamsHelper->fOPosMatchQualLUTMaxDR(), cancel_t::omtf_emtf_pos, fwVersion);
-    m_foNegMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->fONegMatchQualLUTPath(), microGMTParamsHelper->fONegMatchQualLUTMaxDR(), cancel_t::omtf_emtf_neg, fwVersion);
-    m_ovlPosSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->ovlPosSingleMatchQualLUTPath(), microGMTParamsHelper->ovlPosSingleMatchQualLUTMaxDR(), cancel_t::omtf_omtf_pos, fwVersion);
-    m_ovlNegSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->ovlNegSingleMatchQualLUTPath(), microGMTParamsHelper->ovlNegSingleMatchQualLUTMaxDR(), cancel_t::omtf_omtf_neg, fwVersion);
-    m_fwdPosSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->fwdPosSingleMatchQualLUTPath(), microGMTParamsHelper->fwdPosSingleMatchQualLUTMaxDR(), cancel_t::emtf_emtf_pos, fwVersion);
-    m_fwdNegSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->fwdNegSingleMatchQualLUTPath(), microGMTParamsHelper->fwdNegSingleMatchQualLUTMaxDR(), cancel_t::emtf_emtf_neg, fwVersion);
+    m_boPosMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->bOPosMatchQualLUT(), cancel_t::omtf_bmtf_pos, fwVersion);
+    m_boNegMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->bONegMatchQualLUT(), cancel_t::omtf_bmtf_neg, fwVersion);
+    m_foPosMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->fOPosMatchQualLUT(), cancel_t::omtf_emtf_pos, fwVersion);
+    m_foNegMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->fONegMatchQualLUT(), cancel_t::omtf_emtf_neg, fwVersion);
+    m_ovlPosSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->ovlPosSingleMatchQualLUT(), cancel_t::omtf_omtf_pos, fwVersion);
+    m_ovlNegSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->ovlNegSingleMatchQualLUT(), cancel_t::omtf_omtf_neg, fwVersion);
+    m_fwdPosSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->fwdPosSingleMatchQualLUT(), cancel_t::emtf_emtf_pos, fwVersion);
+    m_fwdNegSingleMatchQualLUT = l1t::MicroGMTMatchQualLUTFactory::create(microGMTParamsHelper->fwdNegSingleMatchQualLUT(), cancel_t::emtf_emtf_neg, fwVersion);
 
     m_lutDict[tftype::omtf_neg+tftype::bmtf*10] = m_boNegMatchQualLUT;
     m_lutDict[tftype::omtf_pos+tftype::bmtf*10] = m_boPosMatchQualLUT;
@@ -160,9 +160,9 @@ MicroGMTCancelOutUnit::getCoordinateCancelBits(std::vector<std::shared_ptr<GMTIn
       dPhi = std::abs(dPhi);
       int dEta = std::abs((*mu_w1)->hwEta() - (*mu_w2)->hwEta());
       // check first if the delta is within the LSBs that the LUT takes, otherwise the distance
-      // is greater than what we want to cancel -> 15(int) is max => 15*0.01 = 0.15 (rad)
-      // LUT takes 4 LSB for dEta and 3 LSB for dPhi
-      if (dEta < 16 && dPhi < 8) {
+      // is greater than what we want to cancel -> e.g. 15(int) is max => 15*0.01 = 0.15 (rad)
+      // LUT takes 5 LSB for dEta and 3 LSB for dPhi
+      if (dEta <= dEtaMask && dPhi <= dPhiMask) {
         int match = matchLUT->lookup(dEta & dEtaMask, dPhi & dPhiMask);
         if (match == 1) {
           if((*mu_w1)->hwQual() > (*mu_w2)->hwQual()) {
