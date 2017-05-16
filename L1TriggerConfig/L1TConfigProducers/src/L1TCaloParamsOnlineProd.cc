@@ -111,19 +111,19 @@ readCaloLayer2OnlineSettings(l1t::CaloParamsHelper& paramsHelper, std::map<std::
   paramsHelper.setEgHOverEcutEndcap(conf["egammaHOverECut_iEtaGTEq15"].getValue<int>());
 
 
-  // Currently not used // paramsHelper.setEgPileupTowerThresh((conf["pileUpTowerThreshold"].getValue<int>())); 
-  // Currently not used // paramsHelper.setTauPileupTowerThresh((conf["pileUpTowerThreshold"].getValue<int>())); 
+  // Currently not used // paramsHelper.setEgPileupTowerThresh((conf["pileUpTowerThreshold"].getValue<int>()));
+  // Currently not used // paramsHelper.setTauPileupTowerThresh((conf["pileUpTowerThreshold"].getValue<int>()));
   // Currently not used // paramsHelper.setJetMaxEta((conf["jetMaxEta"].getValue<int>()));
-  
+
   std::vector<int> etSumEtaMax;
   std::vector<int> etSumEtThresh;
-  
+
   etSumEtaMax.push_back(conf["ETMET_maxTowerEta"].getValue<int>());
   etSumEtaMax.push_back(conf["HTMHT_maxJetEta"].getValue<int>());
   etSumEtaMax.push_back(conf["ETMET_maxTowerEta"].getValue<int>());
   etSumEtaMax.push_back(conf["HTMHT_maxJetEta"].getValue<int>());
   etSumEtaMax.push_back(conf["towerCountMaxEta"].getValue<int>());
-  
+
   etSumEtThresh.push_back(conf["ET_towerThreshold"].getValue<int>()/2); // ETT tower threshold
   etSumEtThresh.push_back(conf["HT_jetThreshold"].getValue<int>()/2);
   etSumEtThresh.push_back(conf["MET_towerThreshold"].getValue<int>()/2); // ETM tower threshold
@@ -142,6 +142,7 @@ readCaloLayer2OnlineSettings(l1t::CaloParamsHelper& paramsHelper, std::map<std::
   paramsHelper.setEtSumEttCalibrationLUT    ( l1t::convertToLUT( conf["ET_energyCalibLUT"].getVector<int>() ) );
   paramsHelper.setEtSumEcalSumCalibrationLUT( l1t::convertToLUT( conf["ecalET_energyCalibLUT"].getVector<int>() ) );
   paramsHelper.setEtSumXCalibrationLUT      ( l1t::convertToLUT( conf["METX_energyCalibLUT"].getVector<int>() ) );
+
   paramsHelper.setEgMaxPtHOverE((conf["egammaRelaxationThreshold"].getValue<int>())/2.);
   paramsHelper.setEgEtaCut((conf["egammaMaxEta"].getValue<int>()));
   paramsHelper.setEgCalibrationLUT  ( l1t::convertToLUT( conf["egammaEnergyCalibLUT"].getVector<int>() ) );
@@ -228,7 +229,7 @@ std::shared_ptr<l1t::CaloParams> L1TCaloParamsOnlineProd::newObject(const std::s
                                            );
 
         for(auto &key : calol2_algo_keys)
-            calol2_algo_payloads[ key.second ] = 
+            calol2_algo_payloads[ key.second ] =
                 l1t::OnlineDBqueryHelper::fetch( {"CONF"},
                                                  "CALOL2_CLOBS",
                                                  key.second,
@@ -241,17 +242,17 @@ std::shared_ptr<l1t::CaloParams> L1TCaloParamsOnlineProd::newObject(const std::s
     }
 
     // for debugging purposes dump the configs to local files
-    for(auto &conf : calol2_algo_payloads){ 
+    for(auto &conf : calol2_algo_payloads){
         std::ofstream output(std::string("/tmp/").append(conf.first.substr(0,conf.first.find("/"))).append(".xml"));
         output<<conf.second;
         output.close();
     }
-    { 
+    {
         std::ofstream output(std::string("/tmp/").append(calol2_hw_key.substr(0,calol2_hw_key.find("/"))).append(".xml"));
         output << calol2_hw_payload;
         output.close();
     }
-    { 
+    {
         std::ofstream output(std::string("/tmp/").append(calol1_algo_key.substr(0,calol1_algo_key.find("/"))).append(".xml"));
         output << calol1_algo_payload;
         output.close();
@@ -276,7 +277,7 @@ std::shared_ptr<l1t::CaloParams> L1TCaloParamsOnlineProd::newObject(const std::s
     xmlReader2.readDOMFromString( calol2_hw_payload );
     xmlReader2.readRootElement( calol2, "calol2" );
 
-    for(auto &conf : calol2_algo_payloads){ 
+    for(auto &conf : calol2_algo_payloads){
         xmlReader2.readDOMFromString( conf.second );
         xmlReader2.readRootElement( calol2, "calol2" );
     }
@@ -287,7 +288,7 @@ std::shared_ptr<l1t::CaloParams> L1TCaloParamsOnlineProd::newObject(const std::s
     // Perhaps layer 2 has to look at settings for demux and mp separately? // => No demux settings required
     std::map<std::string, l1t::Parameter> calol2_conf = calol2.getParameters("MP1");
     std::map<std::string, l1t::Mask>      calol2_rs   ;//= calol2.getMasks   ("processors");
-    
+
     l1t::CaloParamsHelper m_params_helper( *(baseSettings.product()) );
 
     if( !readCaloLayer1OnlineSettings(m_params_helper, calol1_conf, calol1_rs) )
@@ -301,4 +302,3 @@ std::shared_ptr<l1t::CaloParams> L1TCaloParamsOnlineProd::newObject(const std::s
 
 //define this as a plug-in
 DEFINE_FWK_EVENTSETUP_MODULE(L1TCaloParamsOnlineProd);
-
