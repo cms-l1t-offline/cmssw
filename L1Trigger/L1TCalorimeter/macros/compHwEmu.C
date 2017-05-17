@@ -343,6 +343,13 @@ void compHwEmu (
   TH1D* hwEgPhi = (TH1D*)inFileHw->Get("l1tCaloStage2HwHistos/eg/phi");
   TH1D* emEgPhi = (TH1D*)inFileEm->Get("l1tStage2CaloAnalyzer/eg/phi");
 
+  // EG iso
+  TH1D* hwMPEgIso = (TH1D*)inFileHw->Get("l1tCaloStage2HwHistos/mpeg/iso");
+  TH1D* emMPEgIso = (TH1D*)inFileEm->Get("l1tStage2CaloAnalyzer/mpeg/iso");
+  TH1D* hwEgIso = (TH1D*)inFileHw->Get("l1tCaloStage2HwHistos/eg/iso");
+  TH1D* emEgIso = (TH1D*)inFileEm->Get("l1tStage2CaloAnalyzer/eg/iso");
+  
+
   // Tau Et
   TH1D* hwMPTauEt = (TH1D*)inFileHw->Get("l1tCaloStage2HwHistos/mptau/et");
   TH1D* emMPTauEt = (TH1D*)inFileEm->Get("l1tStage2CaloAnalyzer/mptau/et");
@@ -866,6 +873,16 @@ void compHwEmu (
     runNo, dataset, "e/#gamma i#phi", "Egs/EgPhi.pdf"
     );
 
+
+  // plot MP e/g iso
+  create_plot(
+    hwMPEgIso,
+    emMPEgIso,
+    runNo, dataset, "e/#gamma i#iso", "Egs/EgIso.pdf"
+    );
+
+
+
 // plot demux e/g Et
   create_plot(
     hwEgEt,
@@ -886,6 +903,15 @@ void compHwEmu (
     emEgPhi,
     runNo, dataset, "e/#gamma i#phi", "DemuxEgs/EgPhi.pdf"
     );
+
+  // plot demux e/g iso
+  create_plot(
+    hwEgIso,
+    emEgIso,
+    runNo, dataset, "e/#gamma i#iso", "DemuxEgs/EgIso.pdf"
+    );
+
+
 // ======================== e/gamma end ========================
 
 // ========================= tau start =========================
