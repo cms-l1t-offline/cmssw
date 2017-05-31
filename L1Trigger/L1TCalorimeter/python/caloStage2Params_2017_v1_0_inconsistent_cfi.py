@@ -59,6 +59,7 @@ caloStage2Params.tauIsoLUTFile                 = cms.FileInPath("L1Trigger/L1TCa
 caloStage2Params.tauIsoLUTFile2                = cms.FileInPath("L1Trigger/L1TCalorimeter/data/Tau_Iso_LUT_Option_22_NewLayer1Calibration_SK1616_noCompressionBlock_FW_v6.2.0.txt")
 caloStage2Params.tauCalibrationLUTFile         = cms.FileInPath("L1Trigger/L1TCalorimeter/data/Tau_Calibration_LUT_NewLayer1Calibration_SK1616_FW_v11.0.0.txt")
 caloStage2Params.tauCompressLUTFile            = cms.FileInPath("L1Trigger/L1TCalorimeter/data/tauCompressAllLUT_12bit_v3.txt")
+caloStage2Params.tauTrimmingShapeVetoLUTFile   = cms.FileInPath("L1Trigger/L1TCalorimeter/data/Tau_TrimmingShapeVeto_LUT_v1.0.0.txt")
 caloStage2Params.tauPUSParams                  = cms.vdouble(1,4,32)
 
 # jets

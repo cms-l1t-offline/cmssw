@@ -49,7 +49,8 @@ namespace l1t {
 	   etSumEcalSumPUS=37,
 	   etSumBypassEcalSumPUSFlag=38,
 	   layer1HOverE=39,
-	   NUM_CALOPARAMNODES=40
+	   tauTrimmingShapeVeto=40,
+	   NUM_CALOPARAMNODES=41
     };
 
     CaloParamsHelper() { pnode_.resize(NUM_CALOPARAMNODES); }
@@ -229,6 +230,8 @@ namespace l1t {
     l1t::LUT* tauIsolationLUT() { return &pnode_[tauIsolation].LUT_; }
     l1t::LUT* tauIsolationLUT2() { return &pnode_[tauIsolation2].LUT_; }
 
+    l1t::LUT* tauTrimmingShapeVetoLUT() {return &pnode_[tauTrimmingShapeVeto].LUT_; }
+
     std::string tauCalibrationType() const { return pnode_[tauCalibration].type_; }
     std::vector<double> tauCalibrationParams() { return pnode_[tauCalibration].dparams_; }
     l1t::LUT* tauCalibrationLUT() { return &pnode_[tauCalibration].LUT_; }
@@ -256,6 +259,7 @@ namespace l1t {
     void setTauPUSType(std::string type) { pnode_[tauPUS].type_ = type; }
     void setTauIsolationLUT(const l1t::LUT & lut) { pnode_[tauIsolation].LUT_ = lut; }
     void setTauIsolationLUT2(const l1t::LUT & lut) { pnode_[tauIsolation2].LUT_ = lut; }
+    void setTauTrimmingShapeVetoLUT(const l1t::LUT & lut) { pnode_[tauTrimmingShapeVeto].LUT_ = lut; }
 
     void setTauCalibrationType(std::string type) { pnode_[tauCalibration].type_ = type; }
     void setTauIsoAreaNrTowersEta(unsigned iTauIsoAreaNrTowersEta){taup_.isoAreaNrTowersEta_=iTauIsoAreaNrTowersEta;}
