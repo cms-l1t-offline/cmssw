@@ -176,6 +176,13 @@ def L1NtupleRAWEMUGEN_MC(process):
 
     return process
 
+def L1NtupleEMUGEN_MC(process):
+
+    L1NtupleEMU(process)
+    L1NtupleGEN(process)
+
+    return process
+
 def L1NtupleAODEMUGEN_MC(process):
 
     L1NtupleEMU(process)
