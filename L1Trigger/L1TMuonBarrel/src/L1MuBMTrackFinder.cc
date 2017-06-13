@@ -211,9 +211,9 @@ void L1MuBMTrackFinder::run(const edm::Event& e, const edm::EventSetup& c) {
 
             l1t::RegionalMuonCand rmc;
 
-            if(cand->hwEta()>-117 || cand->hwEta()<117 )
+            if(cand->hwEta()>-107 || cand->hwEta()<107 )//some upper and lower values for eta
                 rmc.setHwEta(cand->hwEta());
-	      //rmc.setHwEta(eta_map[cand->hwEta()]);
+	    
             else
                 rmc.setHwEta(-1000);
 
@@ -283,8 +283,8 @@ void L1MuBMTrackFinder::run(const edm::Event& e, const edm::EventSetup& c) {
         rmc.setHwHF((*iter)->hwHF());
 
         rmc.setHwPhi((*iter)->hwPhi());
-        if((*iter)->hwEta()>-117 || (*iter)->hwEta()<117 )
-	  //  rmc.setHwEta(eta_map[(*iter)->hwEta()]);
+        if((*iter)->hwEta()>-107 || (*iter)->hwEta()<107 )//some upper and lower values for eta
+	
            rmc.setHwEta((*iter)->hwEta());
         else
             rmc.setHwEta(-1000);

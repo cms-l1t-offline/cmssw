@@ -33,6 +33,7 @@
 //------------------------------------
 
 #include "CondFormats/L1TObjects/interface/L1MuDTEtaPattern.h"
+#include "CondFormats/L1TObjects/interface/L1TriggerLutFile.h"
 
 //              ---------------------
 //              -- Class Interface --
@@ -60,6 +61,7 @@ class L1MuBMTEtaPatternLut {
 
     /// print pattern look-up table
     void print() const;
+    int getIgnoredLines(L1TriggerLutFile file) const;
 
     /// get pattern with a given ID
     L1MuDTEtaPattern getPattern(int id) const;
@@ -72,6 +74,7 @@ class L1MuBMTEtaPatternLut {
 
     /// return iterator which points to the one-past-last entry of the LUT
     inline ETFLut_iter end() const { return m_lut.end(); }
+   
 
   public:
 

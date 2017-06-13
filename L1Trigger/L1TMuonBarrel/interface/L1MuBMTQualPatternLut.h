@@ -11,7 +11,8 @@
  *   $Revision: 1.1 $
  *
  *   N. Neumeister            CERN EP
- */
+ *   G Karathanasis           U Athens
+ */  
 //
 //--------------------------------------------------
 #ifndef L1MUBMT_QUALPATTERN_LUT_H
@@ -25,6 +26,7 @@
 
 #include <vector>
 #include <map>
+#include "CondFormats/L1TObjects/interface/L1TriggerLutFile.h"
 
 //----------------------
 // Base Class Headers --
@@ -63,7 +65,7 @@ class L1MuBMTQualPatternLut {
 
     /// print look-up tables
     void print() const;
-
+    
     /// get coarse eta value for a given sector processor [1-6] and address [1-22]
     int getCoarseEta(int sp, int adr) const;
  

@@ -11,7 +11,7 @@
 //   Author :
 //   N. Neumeister            CERN EP
 //   J. Troconiz              UAM Madrid
-//
+//   Modificattions:      George Karathanasis U Athens
 //--------------------------------------------------
 
 //-----------------------
@@ -34,6 +34,7 @@
 
 #include "FWCore/ParameterSet/interface/FileInPath.h"
 #include "CondFormats/L1TObjects/interface/L1TriggerLutFile.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 using namespace std;
 
@@ -87,9 +88,9 @@ void L1MuBMTEtaPatternLut::reset() {
 int L1MuBMTEtaPatternLut::load() {
 
   // get directory name
-  string defaultPath = "L1Trigger/";//L1TriggerConfig/DTTrackFinder/parameters/";
-  string eau_dir = "L1TMuon/data/bmtf_luts/LUTs_Ass/";//L1TriggerData/DTTrackFinder/Eau/
-cout<<"skata"<<endl;
+  string defaultPath = "L1Trigger/";
+  string eau_dir = "L1TMuon/data/bmtf_luts/LUTs_Ass/";
+
   // assemble file name
   edm::FileInPath lut_f = edm::FileInPath(string(defaultPath + eau_dir + "ETFPatternList.lut"));
   string etf_file = lut_f.fullPath();
@@ -101,11 +102,14 @@ cout<<"skata"<<endl;
   //                                       << file.getName() << endl; 
 
   // ignore comment lines 
-  file.ignoreLines(16);
  
+  int skip2=getIgnoredLines(file);
+  // cout<<" lines to skip2 "<<skip2<<endl;
+    file.ignoreLines(skip2);
+
   // read patterns
   while ( file.good() ) {
-
+   
     int id     = file.readInteger();
     if ( !file.good() ) break;
     string pat = file.readString();
@@ -161,9 +165,25 @@ L1MuDTEtaPattern L1MuBMTEtaPatternLut::getPattern(int id) const {
 
   LUT::const_iterator it = m_lut.find(id);
   if ( it == m_lut.end() ) {
-    cerr << "Error: L1MuDTEtaPatternLut: pattern not found : " << id << endl;
+    edm::LogError ("L1MuBMTEtaPatternLut: fine eta not found") << "Error: L1MuBMTEtaPatternLut: pattern not found : " << id << endl;
     //    return 0;
   }
   return (*it).second;  
 
+}
+
+
+int L1MuBMTEtaPatternLut::getIgnoredLines(L1TriggerLutFile file) const{
+    if ( file.open() != 0 ) return -1;
+  int skip=0;
+  while ( file.good() ) {
+     string str=file.readString();
+     if (str.find("#")==0) skip+=1;
+     //cout<<"here "<<str<<" found "<<str.find("#")<<endl;
+        if ( !file.good() ) { file.close(); break; }
+    
+  }
+  //cout<<"fine eta lines to skip3 "<<skip<<endl;
+  file.close();
+  return skip;
 }
