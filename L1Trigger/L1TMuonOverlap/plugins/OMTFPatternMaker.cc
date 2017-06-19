@@ -188,20 +188,20 @@ void OMTFPatternMaker::writeMergedGPs(){
     GoldenPattern *aGP4 = dummy;
 
     ++aKey.thePtCode;
-    while(myGPmap.find(aKey)==myGPmap.end() && aKey.thePtCode<=401) ++aKey.thePtCode;    
-    if(aKey.thePtCode<=401 && myGPmap.find(aKey)!=myGPmap.end()) aGP2 =  myGPmap.find(aKey)->second;
+    while(myGPmap.find(aKey)==myGPmap.end() && aKey.thePtCode<=511) ++aKey.thePtCode;    
+    if(aKey.thePtCode<=511 && myGPmap.find(aKey)!=myGPmap.end()) aGP2 =  myGPmap.find(aKey)->second;
 
     if(aKey.thePtCode>71){
       ++aKey.thePtCode;
-      while(myGPmap.find(aKey)==myGPmap.end() && aKey.thePtCode<=401) ++aKey.thePtCode;    
-      if(aKey.thePtCode<=401 && myGPmap.find(aKey)!=myGPmap.end()) aGP3 =  myGPmap.find(aKey)->second;
+      while(myGPmap.find(aKey)==myGPmap.end() && aKey.thePtCode<=511) ++aKey.thePtCode;    
+      if(aKey.thePtCode<=511 && myGPmap.find(aKey)!=myGPmap.end()) aGP3 =  myGPmap.find(aKey)->second;
 
       ++aKey.thePtCode;
-      while(myGPmap.find(aKey)==myGPmap.end() && aKey.thePtCode<=401) ++aKey.thePtCode;    
-      if(aKey.thePtCode<=401 && myGPmap.find(aKey)!=myGPmap.end()) aGP4 =  myGPmap.find(aKey)->second;
+      while(myGPmap.find(aKey)==myGPmap.end() && aKey.thePtCode<=511) ++aKey.thePtCode;    
+      if(aKey.thePtCode<=511 && myGPmap.find(aKey)!=myGPmap.end()) aGP4 =  myGPmap.find(aKey)->second;
     }
     ++aKey.thePtCode;
-    while(myGPmap.find(aKey)==myGPmap.end() && aKey.thePtCode<=401) ++aKey.thePtCode;    
+    while(myGPmap.find(aKey)==myGPmap.end() && aKey.thePtCode<=511) ++aKey.thePtCode;    
     myWriter->writeGPData(*aGP1,*aGP2, *aGP3, *aGP4);
 
     ///Write the opposite charge.

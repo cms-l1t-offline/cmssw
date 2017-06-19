@@ -127,17 +127,17 @@ void  OMTFProcessor::averagePatterns(int charge){
     GoldenPattern *aGP4 = aGP1;
 
     ++aKey.thePtCode;
-    while(theGPs.find(aKey)==theGPs.end() && aKey.thePtCode<=401) ++aKey.thePtCode;    
-    if(aKey.thePtCode<=401 && theGPs.find(aKey)!=theGPs.end()) aGP2 =  theGPs.find(aKey)->second;
+    while(theGPs.find(aKey)==theGPs.end() && aKey.thePtCode<=511) ++aKey.thePtCode;    
+    if(aKey.thePtCode<=511 && theGPs.find(aKey)!=theGPs.end()) aGP2 =  theGPs.find(aKey)->second;
     
     if(aKey.thePtCode>71){
       ++aKey.thePtCode;
-      while(theGPs.find(aKey)==theGPs.end() && aKey.thePtCode<=401) ++aKey.thePtCode;    
-      if(aKey.thePtCode<=401 && theGPs.find(aKey)!=theGPs.end()) aGP3 =  theGPs.find(aKey)->second;
+      while(theGPs.find(aKey)==theGPs.end() && aKey.thePtCode<=511) ++aKey.thePtCode;    
+      if(aKey.thePtCode<=511 && theGPs.find(aKey)!=theGPs.end()) aGP3 =  theGPs.find(aKey)->second;
 
       ++aKey.thePtCode;
-      while(theGPs.find(aKey)==theGPs.end() && aKey.thePtCode<=401) ++aKey.thePtCode;    
-      if(aKey.thePtCode<=401 && theGPs.find(aKey)!=theGPs.end()) aGP4 =  theGPs.find(aKey)->second;
+      while(theGPs.find(aKey)==theGPs.end() && aKey.thePtCode<=511) ++aKey.thePtCode;    
+      if(aKey.thePtCode<=511 && theGPs.find(aKey)!=theGPs.end()) aGP4 =  theGPs.find(aKey)->second;
     }
     else{
       aGP3 = aGP1;
@@ -146,7 +146,7 @@ void  OMTFProcessor::averagePatterns(int charge){
     //HACK. Have to clean this up.
     ///Previously pt codes were going by steps of 1, now this is not the case
     ++aKey.thePtCode;
-    while(theGPs.find(aKey)==theGPs.end() && aKey.thePtCode<=401) ++aKey.thePtCode;    
+    while(theGPs.find(aKey)==theGPs.end() && aKey.thePtCode<=511) ++aKey.thePtCode;    
     ///////////////////////////////
     
     
@@ -287,7 +287,7 @@ void OMTFProcessor::fillCounts(unsigned int iProcessor,
   ///Stupid conersion. Have to go through PAC pt scale, as we later
   ///shift resulting pt code by +1
   iPt+=1;
-  if(iPt>31) iPt=200*2+1;
+  if(iPt>31) iPt=511;
   else iPt = RPCConst::ptFromIpt(iPt)*2.0+1;//MicroGMT has 0.5 GeV step size, with lower bin edge  (uGMT_pt_code - 1)*step_size
   //////
 
