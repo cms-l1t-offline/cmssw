@@ -54,6 +54,9 @@ namespace l1t {
     static const int kSatEcal = 510;
     static const int kSatTower = 511;
 
+    // Jet saturation value
+    static const int kSatJet = 65535;
+
   public:
     enum SubDet{ECAL=0x1,HCAL=0x2,CALO=0x3}; //CALO is a short cut for ECAL|HCAL
 

@@ -57,7 +57,7 @@ void l1t::Stage2Layer2JetAlgorithmFirmwareImp1::processEvent(const std::vector<l
   create(towers, jets, alljets, params_->jetPUSType());
 
   // calibrate all jets
-  calibrate(alljets, 0); // pass all jets and the hw threshold above which to calibrate
+  calibrate(alljets, 0, true); // pass all jets and the hw threshold above which to calibrate
 
   // jets accumulated sort
   accuSort(jets);
@@ -172,7 +172,7 @@ void l1t::Stage2Layer2JetAlgorithmFirmwareImp1::create(const std::vector<l1t::Ca
 	    if (iEt<=0) continue;
 
 	    // if tower Et is saturated, saturate jet Et
-	    if (seedEt == CaloTools::kSatHcal || seedEt == CaloTools::kSatEcal || seedEt == CaloTools::kSatTower) iEt = 65535;
+	    if (seedEt == CaloTools::kSatHcal || seedEt == CaloTools::kSatEcal || seedEt == CaloTools::kSatTower) iEt = CaloTools::kSatJet;
 
 	    jet.setHwPt(iEt);
 	    jet.setRawEt( (short int) rawEt);
@@ -190,7 +190,7 @@ void l1t::Stage2Layer2JetAlgorithmFirmwareImp1::create(const std::vector<l1t::Ca
 	}
 
 	 // jet energy corrections
-	calibrate(jetsRing, 0); // pass the jet collection and the hw threshold above which to calibrate
+	calibrate(jetsRing, 0, false); // pass the jet collection and the hw threshold above which to calibrate
 
 	// sort these jets and keep top 6
 	start_ = jetsRing.begin();  
@@ -431,7 +431,7 @@ int l1t::Stage2Layer2JetAlgorithmFirmwareImp1::chunkyDonutPUEstimate(l1t::Jet & 
 
 
 
-void l1t::Stage2Layer2JetAlgorithmFirmwareImp1::calibrate(std::vector<l1t::Jet> & jets, int calibThreshold) {
+void l1t::Stage2Layer2JetAlgorithmFirmwareImp1::calibrate(std::vector<l1t::Jet> & jets, int calibThreshold, bool isAllJets) {
 
   if( params_->jetCalibrationType() == "function6PtParams22EtaBins" ){ //One eta bin per region
 
@@ -550,6 +550,9 @@ void l1t::Stage2Layer2JetAlgorithmFirmwareImp1::calibrate(std::vector<l1t::Jet> 
 
       //Check jet is above the calibration threshold, if not do nothing
       if(jet->hwPt() < calibThreshold) continue;
+      
+      //don't calibrate saturated jets for HT
+      if( isAllJets && (jet->hwPt() == CaloTools::kSatJet) ) continue;
 
       // In the firmware, we take bits 1 to 8 of the hwPt.
       // To avoid getting nonsense by only taking smaller bits,

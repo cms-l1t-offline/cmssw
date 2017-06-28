@@ -34,7 +34,7 @@ void l1t::Stage2Layer2DemuxSumsAlgoFirmwareImp1::processEvent(const std::vector<
   uint32_t mbp0(0), mbm0(0), mbp1(0), mbm1(0);
   uint32_t ntow(0);
 
-  bool metSat(0), metHFSat(0);
+  bool metSat(0), metHFSat(0), mhtSat(0), mhtHFSat(0);
 
   // Add up the x, y and scalar components
   for (std::vector<l1t::EtSum>::const_iterator eSum = inputSums.begin() ; eSum != inputSums.end() ; ++eSum )
@@ -64,11 +64,13 @@ void l1t::Stage2Layer2DemuxSumsAlgoFirmwareImp1::processEvent(const std::vector<
         break;
 
       case l1t::EtSum::EtSumType::kTotalHtx:
-        mhtx += eSum->hwPt();
+	if(eSum->hwPt()==0x7fffffff) mhtSat=true;
+        else mhtx += eSum->hwPt();
 	break;
 
       case l1t::EtSum::EtSumType::kTotalHty:
-	mhty += eSum->hwPt();
+	if(eSum->hwPt()==0x7fffffff) mhtSat=true;
+	else mhty += eSum->hwPt();
         break;
 	
       case l1t::EtSum::EtSumType::kTotalEtxHF:
@@ -82,11 +84,13 @@ void l1t::Stage2Layer2DemuxSumsAlgoFirmwareImp1::processEvent(const std::vector<
         break;
 
       case l1t::EtSum::EtSumType::kTotalHtxHF:
-	mhtxHF += eSum->hwPt();
+	if(eSum->hwPt()==0x7fffffff) mhtHFSat=true;
+	else mhtxHF += eSum->hwPt();
         break;
 	
       case l1t::EtSum::EtSumType::kTotalHtyHF:
-	mhtyHF += eSum->hwPt();
+	if(eSum->hwPt()==0x7fffffff) mhtHFSat=true;
+	else mhtyHF += eSum->hwPt();
         break;
 
       case l1t::EtSum::EtSumType::kMinBiasHFP0:
@@ -138,19 +142,19 @@ void l1t::Stage2Layer2DemuxSumsAlgoFirmwareImp1::processEvent(const std::vector<
 
 
   // Final MHT calculation
-  if ( mhtx != 0 || mhty != 0 ) cordic_( mhtx , mhty , mhtPhi , mht );
+  if ( (mhtx != 0 || mhty != 0) && !mhtSat ) cordic_( mhtx , mhty , mhtPhi , mht );
   // sets the mht scale back to the original range for output into GT, the other 4
   // bits are brought back just before the accumulation of ring sum in MP jet sum algorithm
   mht >>= 6; 
 
-  if ( mhtxHF != 0 || mhtyHF != 0 ) cordic_( mhtxHF , mhtyHF , mhtPhiHF , mhtHF );
+  if ( (mhtxHF != 0 || mhtyHF != 0) && !mhtHFSat ) cordic_( mhtxHF , mhtyHF , mhtPhiHF , mhtHF );
   mhtHF >>= 6; 
 
 
   if(metSat) met=0xFFF;
   if(metHFSat) metHF=0xFFF;
-  if(mht>0xFFF) mht=0xFFF;
-  if(mhtHF>0xFFF) mhtHF=0xFFF;
+  if(mhtSat) mht=0xFFF;
+  if(mhtHFSat) mhtHF=0xFFF;
 
   // Make final collection
   math::XYZTLorentzVector p4;

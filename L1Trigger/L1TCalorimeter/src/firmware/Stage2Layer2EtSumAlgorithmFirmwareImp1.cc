@@ -143,7 +143,7 @@ void l1t::Stage2Layer2EtSumAlgorithmFirmwareImp1::processEvent(const std::vector
 	
         // scalar sum (EM)
         if (tower.hwPt()>towEtEcalSumThresh_ && CaloTools::mpEta(abs(tower.hwEta()))<=CaloTools::mpEta(ettEtaMax_) && !ecalEtSat){
-	  if(tower.hwPt() == CaloTools::kSatEcal) ecalEtSat=true;
+	  if(tower.hwPt() == CaloTools::kSatEcal || tower.hwPt() == CaloTools::kSatTower) ecalEtSat=true;
           ringEtEm += tower.hwEtEm();
 	}
 
