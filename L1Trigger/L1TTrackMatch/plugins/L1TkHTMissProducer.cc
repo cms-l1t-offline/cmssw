@@ -55,9 +55,6 @@ private:
   //virtual void beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
   //virtual void endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
   
-
-  // ---------- member data ---------------------------
-  
   float JET_PTMIN;                // [GeV]
   float JET_ETAMAX;               // [rad]
 
@@ -73,7 +70,7 @@ private:
 // constructor
 L1TkHTMissProducer::L1TkHTMissProducer(const edm::ParameterSet& iConfig) :
   tkpvToken(consumes<L1TkPrimaryVertexCollection>(iConfig.getParameter<edm::InputTag>("L1VertexInputTag"))),
-  tkjetToken(consumes<L1TkJetParticleCollection>(iConfig.getParameter<edm::InputTag>("L1JetInputTag")))
+  tkjetToken(consumes<L1TkJetParticleCollection>(iConfig.getParameter<edm::InputTag>("L1TkJetInputTag")))
 {
   
   JET_PTMIN  = (float)iConfig.getParameter<double>("JET_PTMIN");
