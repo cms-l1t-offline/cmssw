@@ -81,7 +81,7 @@ int PtAssignmentEngineAux::getGMTQuality(int mode, int theta) const {
     default:  quality = 4;  break;
     }
   }
-  quality |= (mode & 3);
+  quality += (mode & 3);
   return quality;
 }
 
