@@ -39,7 +39,7 @@ public:
       PtAssignmentEngine** pt_assign_engine,
       int verbose, int endcap, int sector,
       int minBX, int maxBX, int bxWindow, int bxShiftCSC, int bxShiftRPC, int bxShiftGEM,
-      const std::vector<int>& zoneBoundaries, int zoneOverlap, int zoneOverlapRPC,
+      const std::vector<int>& zoneBoundaries, int zoneOverlap,
       bool includeNeighbor, bool duplicateTheta, bool fixZonePhi, bool useNewZones, bool fixME11Edges,
       const std::vector<std::string>& pattDefinitions, const std::vector<std::string>& symPattDefinitions, bool useSymPatterns,
       int thetaWindow, int thetaWindowRPC, bool useSingleHits, bool bugSt2PhDiff, bool bugME11Dupes,
@@ -87,7 +87,7 @@ private:
 
   // For primitive conversion
   std::vector<int> zoneBoundaries_;
-  int zoneOverlap_, zoneOverlapRPC_;
+  int zoneOverlap_;
   bool includeNeighbor_, duplicateTheta_, fixZonePhi_, useNewZones_, fixME11Edges_;
 
   // For pattern recognition

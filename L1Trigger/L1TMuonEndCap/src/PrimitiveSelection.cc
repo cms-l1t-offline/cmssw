@@ -378,15 +378,22 @@ void PrimitiveSelection::merge(
     if (!found) {
       // No CSC hits, insert all RPC hits
       selected_prim_map[selected_rpc] = rpc_primitives;
+    } else {
+      TriggerPrimitiveCollection& tmp_primitives = selected_prim_map[selected_rpc];  // pass by reference
 
-    } // else { // Initial FW in 2017; was disabled on June 7
-    //   // If only one CSC hit, insert the first RPC hit
-    //   TriggerPrimitiveCollection& tmp_primitives = selected_prim_map[selected_rpc];  // pass by reference
+      // As of June 7th, no longer use RPC hits in track-building if there is a CSC LCT in the corresponding chamber
+      tmp_primitives.push_back(rpc_primitives.front());
+      RPCData tmp1 = tmp_primitives.back().getRPCData();
+      tmp1.valid = 0;  // Before June 7th 2017, comment this line out to allow one RPC hit even with one CSC LCT
+      tmp_primitives.back().setRPCData(tmp1);
 
-    //   if (tmp_primitives.size() < 2) {
-    //     tmp_primitives.push_back(rpc_primitives.front());
-    //   }
-    // }
+      if (rpc_primitives.size() == 2) {
+	tmp_primitives.push_back(rpc_primitives.back());
+	RPCData tmp2 = tmp_primitives.back().getRPCData();
+	tmp2.valid = 0;
+	tmp_primitives.back().setRPCData(tmp2);
+      }
+    }
   }
 
   // Third, insert GEM stubs if there is no CSC/RPC hits

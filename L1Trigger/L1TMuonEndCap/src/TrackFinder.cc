@@ -34,7 +34,6 @@ TrackFinder::TrackFinder(const edm::ParameterSet& iConfig, edm::ConsumesCollecto
   const auto& spPCParams16 = config_.getParameter<edm::ParameterSet>("spPCParams16");
   auto zoneBoundaries     = spPCParams16.getParameter<std::vector<int> >("ZoneBoundaries");
   auto zoneOverlap        = spPCParams16.getParameter<int>("ZoneOverlap");
-  auto zoneOverlapRPC     = spPCParams16.getParameter<int>("ZoneOverlapRPC");
   auto includeNeighbor    = spPCParams16.getParameter<bool>("IncludeNeighbor");
   auto duplicateTheta     = spPCParams16.getParameter<bool>("DuplicateTheta");
   auto fixZonePhi         = spPCParams16.getParameter<bool>("FixZonePhi");
@@ -85,7 +84,7 @@ TrackFinder::TrackFinder(const edm::ParameterSet& iConfig, edm::ConsumesCollecto
             &pt_assign_engine_,
             verbose_, endcap, sector,
             minBX, maxBX, bxWindow, bxShiftCSC, bxShiftRPC, bxShiftGEM,
-            zoneBoundaries, zoneOverlap, zoneOverlapRPC,
+            zoneBoundaries, zoneOverlap,
             includeNeighbor, duplicateTheta, fixZonePhi, useNewZones, fixME11Edges,
             pattDefinitions, symPattDefinitions, useSymPatterns,
             thetaWindow, thetaWindowRPC, useSingleHits, bugSt2PhDiff, bugME11Dupes,
@@ -117,8 +116,37 @@ void TrackFinder::process(
   // Get the geometry for TP conversions
   geometry_translator_.checkAndUpdateGeometry(iSetup);
 
-  // Get the conditions, primarily the firmware version and the BDT forests
+  // ___________________________________________________________________________
+  // Get the conditions: firmware version, PC LUT version, pT BDT forests
   bool new_conditions = condition_helper_.checkAndUpdateConditions(iEvent, iSetup);
+
+  if (new_conditions) {
+
+    fw_version_ = condition_helper_.get_fw_version();
+    // No RPC or GEM hits in 2016
+    if (fw_version_ != 0 && fw_version_ < 50000) {
+      useRPC_ = 0;
+      useGEM_ = 0;
+    }
+
+    pt_lut_version_ = condition_helper_.get_pt_lut_version();
+    pc_lut_version_ = condition_helper_.get_pc_lut_version();
+
+    // Reload primitive conversion LUTs if necessary
+    // std::cout << "Configured with pc_lut_version_ = " << pc_lut_version_ << std::endl;
+    sector_processor_lut_.read( pc_lut_version_ );
+
+    // std::cout << "Configured with pt_lut_version_ = " << pt_lut_version_ << std::endl;
+    if ( pt_lut_version_ <= 5 ) {
+      pt_assign_engine_ = pt_assign_engine_2016_.get();
+      pt_assign_engine_->set_ptLUTVersion( pt_lut_version_ );
+    } else {
+      pt_assign_engine_ = pt_assign_engine_2017_.get();
+      pt_assign_engine_->set_ptLUTVersion( pt_lut_version_ );
+    }
+    // Reload pT LUT if necessary
+    pt_assign_engine_->load( &(condition_helper_.getForest()) );
+  }
 
   // ___________________________________________________________________________
   // Extract all trigger primitives
@@ -144,24 +172,6 @@ void TrackFinder::process(
   // ___________________________________________________________________________
   // Run each sector processor
 
-  if (new_conditions) {
-    // Reload primitive conversion LUTs if necessary
-    // std::cout << "Configured with condition_helper_.get_pc_lut_version() = " << condition_helper_.get_pc_lut_version() << std::endl;
-    sector_processor_lut_.read(condition_helper_.get_pc_lut_version());
-
-    // std::cout << "Configured with condition_helper_.get_pt_lut_version() = " << condition_helper_.get_pt_lut_version() << std::endl;
-    if ( condition_helper_.get_pt_lut_version() <= 5 ) {
-      pt_assign_engine_ = pt_assign_engine_2016_.get();
-      pt_assign_engine_->set_ptLUTVersion( condition_helper_.get_pt_lut_version() );
-    } else {
-      pt_assign_engine_ = pt_assign_engine_2017_.get();
-      pt_assign_engine_->set_ptLUTVersion( condition_helper_.get_pt_lut_version() );
-    }
-
-    // Reload pT LUT if necessary
-    pt_assign_engine_->load(&(condition_helper_.getForest()));
-  }
-
   // MIN/MAX ENDCAP and TRIGSECTOR set in interface/Common.h
   for (int endcap = MIN_ENDCAP; endcap <= MAX_ENDCAP; ++endcap) {
     for (int sector = MIN_TRIGSECTOR; sector <= MAX_TRIGSECTOR; ++sector) {
@@ -170,9 +180,9 @@ void TrackFinder::process(
       // Run-dependent configure. This overwrites many of the configurables passed by the python config file.
       if (new_conditions) {
 	if (iEvent.isRealData()) {
-	  sector_processors_.at(es).configure_by_fw_version(condition_helper_.get_fw_version());
+	  sector_processors_.at(es).configure_by_fw_version( fw_version_ );
 	}
-	sector_processors_.at(es).set_pt_lut_version( condition_helper_.get_pt_lut_version() );
+	sector_processors_.at(es).set_pt_lut_version( pt_lut_version_ );
       }
 
       // Process

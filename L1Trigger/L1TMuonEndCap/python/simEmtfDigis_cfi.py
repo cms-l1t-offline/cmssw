@@ -37,7 +37,6 @@ simEmtfDigisMC = cms.EDProducer("L1TMuonEndCapTrackProducer",
         ZoneBoundaries  = cms.vint32(0,41,49,87,127),  # 5 boundaries for 4 zones
         # ZoneBoundaries  = cms.vint32(0,36,54,96,127), # new proposed zone boundaries
         ZoneOverlap     = cms.int32(2),
-        ZoneOverlapRPC  = cms.int32(8),
         IncludeNeighbor = cms.bool(True),
         DuplicateTheta  = cms.bool(True),
         FixZonePhi      = cms.bool(True),
