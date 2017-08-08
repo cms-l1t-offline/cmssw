@@ -84,8 +84,8 @@ void PrimitiveMatching::process(
     for (; conv_hits_it != conv_hits_end; ++conv_hits_it) {
 
       // Can we do this at some later stage? Check RPC vs. track timing ... - AWB 18.11.16
-      //if (conv_hits_it->Subsystem() == TriggerPrimitive::kRPC && bx_ != conv_hits_it->BX())
-      //  continue;  // Only use RPC clusters in the same BX as the track
+      // if (conv_hits_it->Subsystem() == TriggerPrimitive::kRPC && bx_ != conv_hits_it->BX())
+      // 	continue;  // Only use RPC clusters in the same BX as the track
 
       int istation = conv_hits_it->Station()-1;
       int zone_code = conv_hits_it->Zone_code();  // decide based on original zone code

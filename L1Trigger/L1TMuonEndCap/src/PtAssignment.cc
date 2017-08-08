@@ -8,7 +8,7 @@ void PtAssignment::configure(
     int verbose, int endcap, int sector, int bx,
     int ptLUTVersion, bool readPtLUTFile, bool fixMode15HighPt,
     bool bug9BitDPhi, bool bugMode7CLCT, bool bugNegPt,
-    bool bugGMTPhi
+    bool bugGMTPhi, bool promoteMode7
 ) {
   assert(pt_assign_engine != nullptr);
 
@@ -26,6 +26,7 @@ void PtAssignment::configure(
   );
 
   bugGMTPhi_ = bugGMTPhi;
+  promoteMode7_ = promoteMode7;
 }
 
 void PtAssignment::process(
@@ -84,7 +85,7 @@ void PtAssignment::process(
     if (track.NumHits() == 1)
       gmt_quality = log2( track.Mode() );  // 8 --> 3, 4 --> 2, 2 --> 1, 1 --> 0
     else
-      gmt_quality = aux().getGMTQuality(track.Mode(), track.Theta_fp());
+      gmt_quality = aux().getGMTQuality(track.Mode(), track.Theta_fp(), promoteMode7_);
 
     std::pair<int, int> gmt_charge = std::make_pair(0, 0);
     if (track.NumHits() == 1) {

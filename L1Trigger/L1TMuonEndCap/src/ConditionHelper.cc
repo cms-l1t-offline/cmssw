@@ -48,8 +48,8 @@ bool ConditionHelper::checkAndUpdateConditions(const edm::Event& iEvent, const e
     new_forests = true;
   }
 
-  // Debug
-  //std::cout << "Run number: " << iEvent.id().run() << " fw_version: " << get_fw_version()
+  // // Debug
+  // std::cout << "Run number: " << iEvent.id().run() << " fw_version: " << get_fw_version()
   //    << " pt_lut_version: " << get_pt_lut_version() << " pc_lut_version: " << get_pc_lut_version()
   //    << std::endl;
 
@@ -57,18 +57,23 @@ bool ConditionHelper::checkAndUpdateConditions(const edm::Event& iEvent, const e
 }
 
 unsigned int ConditionHelper::get_fw_version() const {
-  // std::cout << "Getting firmware version from ConditionHelper" << std::endl;
+  // std::cout << "    - Getting firmware version from ConditionHelper: version = " << params_->firmwareVersion_ << std::endl;
   return params_->firmwareVersion_;
 }
 
 unsigned int ConditionHelper::get_pt_lut_version() const {
-  // std::cout << "Getting pT LUT version from ConditionHelper" << std::endl;
+  // std::cout << "    - Getting pT LUT version from ConditionHelper: version = " << (params_->PtAssignVersion_ & 0xff);
+  // std::cout << " (lowest bits of " << params_->PtAssignVersion_ << ")" << std::endl;
   return (params_->PtAssignVersion_ & 0xff);  // Version indicated by first two bytes
 }
 
 unsigned int ConditionHelper::get_pc_lut_version() const {
   // "PhiMatchWindowSt1" arbitrarily re-mapped to Primitive conversion (PC LUT) version
   // because of rigid CondFormats naming conventions - AWB 02.06.17
-  // std::cout << "Getting PC LUT version from ConditionHelper" << std::endl;
-  return params_->PhiMatchWindowSt1_;  
+  // std::cout << "    - Getting PC LUT version from ConditionHelper: version = " << params_->PhiMatchWindowSt1_ << std::endl;
+  // return params_->PhiMatchWindowSt1_;
+
+  // Hack until we figure out why the database is returning "0" for 2017 data - AWB 04.08.17
+  // std::cout << "    - Getting PC LUT version from ConditionHelper: version = " << (params_->firmwareVersion_ >= 50000) << std::endl;
+  return (params_->firmwareVersion_ >= 50000);
 }

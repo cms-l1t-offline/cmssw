@@ -58,7 +58,7 @@ int PtAssignmentEngineAux::getGMTEta(int theta, int endcap) const {  // [-1,+1]
   return eta;
 }
 
-int PtAssignmentEngineAux::getGMTQuality(int mode, int theta) const {
+int PtAssignmentEngineAux::getGMTQuality(int mode, int theta, bool promoteMode7) const {
   int quality = 0;
   if (theta > 87) {  // if (eta < 1.2)
     switch (mode) {
@@ -82,6 +82,11 @@ int PtAssignmentEngineAux::getGMTQuality(int mode, int theta) const {
     }
   }
   quality |= (mode & 3);
+
+  // Fix for missing CSC LCTs in ME1/1, including dead "water-leak" chambers ME1/1/34 and 35
+  if (promoteMode7 && mode == 7 && theta <= 50)
+    quality = 12;
+
   return quality;
 }
 

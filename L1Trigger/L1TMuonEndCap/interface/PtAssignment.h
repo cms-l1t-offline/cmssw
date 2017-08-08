@@ -14,7 +14,7 @@ public:
       int verbose, int endcap, int sector, int bx,
       int ptLUTVersion, bool readPtLUTFile, bool fixMode15HighPt,
       bool bug9BitDPhi, bool bugMode7CLCT, bool bugNegPt,
-      bool bugGMTPhi
+      bool bugGMTPhi, bool promoteMode7
   );
 
   void process(
@@ -28,7 +28,7 @@ private:
 
   int verbose_, endcap_, sector_, bx_;
 
-  bool bugGMTPhi_;
+  bool bugGMTPhi_, promoteMode7_;
 };
 
 #endif

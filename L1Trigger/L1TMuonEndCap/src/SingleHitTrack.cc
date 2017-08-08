@@ -117,7 +117,7 @@ void SingleHitTrack::process(
     EMTFTrack new_trk;
     new_trk.push_Hit ( *conv_hits_it );
 
-    EMTFPtLUT empty_LUT{};
+    EMTFPtLUT empty_LUT = {};
     new_trk.set_PtLUT ( empty_LUT );
 
     new_trk.set_endcap       ( conv_hits_it->Endcap()     );

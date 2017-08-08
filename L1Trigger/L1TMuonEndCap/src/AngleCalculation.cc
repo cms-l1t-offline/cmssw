@@ -352,7 +352,7 @@ void AngleCalculation::calculate_angles(EMTFTrack& track) const {
   };
 
   // Fill ptlut_data
-  EMTFPtLUT ptlut_data;
+  EMTFPtLUT ptlut_data = {};
   for (int i = 0; i < NUM_STATION_PAIRS; ++i) {
     ptlut_data.delta_ph[i] = best_dphi_arr.at(i);
     ptlut_data.sign_ph[i]  = best_dphi_sign_arr.at(i);
