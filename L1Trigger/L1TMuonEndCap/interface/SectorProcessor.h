@@ -39,12 +39,12 @@ public:
       PtAssignmentEngine** pt_assign_engine,
       int verbose, int endcap, int sector,
       int minBX, int maxBX, int bxWindow, int bxShiftCSC, int bxShiftRPC, int bxShiftGEM,
-      const std::vector<int>& zoneBoundaries, int zoneOverlap, int zoneOverlapRPC,
+      const std::vector<int>& zoneBoundaries, int zoneOverlap,
       bool includeNeighbor, bool duplicateTheta, bool fixZonePhi, bool useNewZones, bool fixME11Edges,
       const std::vector<std::string>& pattDefinitions, const std::vector<std::string>& symPattDefinitions, bool useSymPatterns,
       int thetaWindow, int thetaWindowRPC, bool useSingleHits, bool bugSt2PhDiff, bool bugME11Dupes,
       int maxRoadsPerZone, int maxTracks, bool useSecondEarliest, bool bugSameSectorPt0,
-      int ptLUTVersion, bool readPtLUTFile, bool fixMode15HighPt, bool bug9BitDPhi, bool bugMode7CLCT, bool bugNegPt, bool bugGMTPhi
+      int ptLUTVersion, bool readPtLUTFile, bool fixMode15HighPt, bool bug9BitDPhi, bool bugMode7CLCT, bool bugNegPt, bool bugGMTPhi, bool promoteMode7
   );
 
   void set_pt_lut_version(unsigned pt_lut_version);
@@ -87,7 +87,7 @@ private:
 
   // For primitive conversion
   std::vector<int> zoneBoundaries_;
-  int zoneOverlap_, zoneOverlapRPC_;
+  int zoneOverlap_;
   bool includeNeighbor_, duplicateTheta_, fixZonePhi_, useNewZones_, fixME11Edges_;
 
   // For pattern recognition
@@ -107,7 +107,7 @@ private:
   // For pt assignment
   int ptLUTVersion_;
   bool readPtLUTFile_, fixMode15HighPt_;
-  bool bug9BitDPhi_, bugMode7CLCT_, bugNegPt_, bugGMTPhi_;
+  bool bug9BitDPhi_, bugMode7CLCT_, bugNegPt_, bugGMTPhi_, promoteMode7_;
 };
 
 #endif

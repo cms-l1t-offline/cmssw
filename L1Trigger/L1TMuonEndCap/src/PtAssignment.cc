@@ -8,7 +8,7 @@ void PtAssignment::configure(
     int verbose, int endcap, int sector, int bx,
     int ptLUTVersion, bool readPtLUTFile, bool fixMode15HighPt,
     bool bug9BitDPhi, bool bugMode7CLCT, bool bugNegPt,
-    bool bugGMTPhi
+    bool bugGMTPhi, bool promoteMode7
 ) {
   assert(pt_assign_engine != nullptr);
 
@@ -26,6 +26,7 @@ void PtAssignment::configure(
   );
 
   bugGMTPhi_ = bugGMTPhi;
+  promoteMode7_ = promoteMode7;
 }
 
 void PtAssignment::process(
@@ -39,27 +40,7 @@ void PtAssignment::process(
   for (; best_tracks_it != best_tracks_end; ++best_tracks_it) {
     EMTFTrack& track = *best_tracks_it;  // pass by reference
 
-    address_t address = 0;
-    float     xmlpt   = 0.;
-    float     pt      = 0.;
-    if (track.NumHits() == 1) {
-      address = 0;
-      xmlpt   = 0;
-      pt      = 5.5 / std::cosh( std::abs(track.Eta()) );
-    } else {
-      address = pt_assign_engine_->calculate_address(track);
-      xmlpt   = pt_assign_engine_->calculate_pt(address);
-
-      // // Un-comment to check address packing / unpacking
-      // assert( fabs(xmlpt - pt_assign_engine_->calculate_pt(track)) < 0.001 );
-
-      pt  = (xmlpt < 0.) ? 1. : xmlpt;  // Matt used fabs(-1) when mode is invalid
-      pt *= pt_assign_engine_->scale_pt(pt, track.Mode());  // Multiply by some factor to achieve 90% efficiency at threshold
-    }
-
-    int gmt_pt = aux().getGMTPt(pt);            // Encode integer pT in GMT format
-    pt = (gmt_pt <= 0) ?  0 : (gmt_pt-1) * 0.5; // Decode integer pT (result is in 0.5 GeV step)
-
+    // Assign GMT eta and phi
     int gmt_phi = aux().getGMTPhi(track.Phi_fp());
 
     if (!bugGMTPhi_) {
@@ -80,28 +61,54 @@ void PtAssignment::process(
       gmt_eta = (gmt_eta < 0) ? ~(-gmt_eta) : gmt_eta;
     }
 
+    // Assign pT
+    address_t address = 0;
+    float     xmlpt   = 0.;
+    float     pt      = 0.;
+    int       gmt_pt  = 0;
+    if (track.Mode() != 1) {
+      address = pt_assign_engine_->calculate_address(track);
+      xmlpt   = pt_assign_engine_->calculate_pt(address);
+
+      // // Un-comment to check address packing / unpacking
+      // assert( fabs(xmlpt - pt_assign_engine_->calculate_pt(track)) < 0.001 );
+
+      pt  = (xmlpt < 0.) ? 1. : xmlpt;  // Matt used fabs(-1) when mode is invalid
+      pt *= pt_assign_engine_->scale_pt(pt, track.Mode());  // Multiply by some factor to achieve 90% efficiency at threshold
+
+      gmt_pt = aux().getGMTPt(pt);  // Encode integer pT in GMT format
+    } // End if (track.Mode() != 1)
+    else {
+      gmt_pt = 10 - (abs(gmt_eta) / 32);
+    }
+
+    pt = (gmt_pt <= 0) ?  0 : (gmt_pt-1) * 0.5; // Decode integer pT (result is in 0.5 GeV step)
+
     int gmt_quality = 0;
-    if (track.NumHits() == 1)
-      gmt_quality = log2( track.Mode() );  // 8 --> 3, 4 --> 2, 2 --> 1, 1 --> 0
-    else
-      gmt_quality = aux().getGMTQuality(track.Mode(), track.Theta_fp());
+    if (track.Mode() != 1) {
+      gmt_quality = aux().getGMTQuality(track.Mode(), track.Theta_fp(), promoteMode7_);
+    }
+    else { // Special quality for single-hit tracks from ME1/1
+      gmt_quality = track.Hits().front().Pattern() / 4;
+    }
 
     std::pair<int, int> gmt_charge = std::make_pair(0, 0);
-    if (track.NumHits() == 1) {
-      int CLCT = track.Hits().at(0).Pattern();
-      if (CLCT != 10) {
-        if (endcap_ == 1)
-          gmt_charge = std::make_pair( (CLCT % 2) == 0 ? 0 : 1, 1);
-        else
-          gmt_charge = std::make_pair( (CLCT % 2) == 0 ? 1 : 0, 1);
-      }
-    } else {
+    if (track.Mode() != 1) {
       std::vector<int> phidiffs;
       for (int i = 0; i < NUM_STATION_PAIRS; ++i) {
         int phidiff = (track.PtLUT().sign_ph[i] == 1) ? track.PtLUT().delta_ph[i] : -track.PtLUT().delta_ph[i];
         phidiffs.push_back(phidiff);
       }
       gmt_charge = aux().getGMTCharge(track.Mode(), phidiffs);
+    }
+    else { // Special charge assignment for single-hit tracks from ME1/1
+      int CLCT = track.Hits().front().Pattern();
+      if (CLCT != 10) {
+        if (endcap_ == 1)
+          gmt_charge = std::make_pair( (CLCT % 2) == 0 ? 0 : 1, 1);
+        else
+          gmt_charge = std::make_pair( (CLCT % 2) == 0 ? 1 : 0, 1);
+      }
     }
 
     // _________________________________________________________________________

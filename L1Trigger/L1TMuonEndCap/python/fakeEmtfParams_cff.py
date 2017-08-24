@@ -1,5 +1,11 @@
 import FWCore.ParameterSet.Config as cms
 
+## Fills CondFormats from the database
+from CondCore.CondDB.CondDB_cfi import CondDB
+CondDB.connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
+
+
+## Fills firmware, pT LUT, and PC LUT versions manually
 emtfParamsSource = cms.ESSource(
     "EmptyESSource",
     recordName = cms.string('L1TMuonEndcapParamsRcd'),
@@ -7,12 +13,11 @@ emtfParamsSource = cms.ESSource(
     firstValid = cms.vuint32(1)
     )
 
-## EMTF ESProducer. Fills CondFormats from XML files.
 emtfParams = cms.ESProducer(
     "L1TMuonEndCapParamsESProducer",
     ## Version 5 was used for all of 2016
     ## Version 6 is the first version used in 2017
-    ## Version 7 should be deployed ~June 5 - AWB 02.06.17
+    ## Version 7 was deployed June 8, 2017
     PtAssignVersion = cms.int32(7),
     ## 123456 is default (most up-to-date) firmware version
     ## Versions < 50000 correspond to 2016 (labeled according to Alex's FW version number)
@@ -24,23 +29,13 @@ emtfParams = cms.ESProducer(
     )
 
 
+## Fills pT LUT XMLs ("forests") from the database
 emtfForestsSource = cms.ESSource(
     "EmptyESSource",
     recordName = cms.string('L1TMuonEndCapForestRcd'),
     iovIsRunNotTime = cms.bool(True),
     firstValid = cms.vuint32(1)
     )
-
-# ## EMTF ESProducer. Fills CondFormats from local XML files.
-# emtfForests = cms.ESProducer(
-#     "L1TMuonEndCapForestESProducer",
-#     PtAssignVersion = cms.int32(7),
-#     bdtXMLDir = cms.string("2017_v7")
-#     )
-
-## Fills CondFormats from the database.
-from CondCore.CondDB.CondDB_cfi import CondDB
-CondDB.connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
 
 emtfForestsDB = cms.ESSource(
     "PoolDBESSource",
@@ -59,3 +54,10 @@ emtfForestsDB = cms.ESSource(
             )
         )
     )
+
+# ## EMTF ESProducer. Fills CondFormats from local XML files instead of database.
+# emtfForests = cms.ESProducer(
+#     "L1TMuonEndCapForestESProducer",
+#     PtAssignVersion = cms.int32(7),
+#     bdtXMLDir = cms.string("2017_v7")
+#     )

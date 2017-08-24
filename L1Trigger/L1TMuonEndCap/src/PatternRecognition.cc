@@ -287,6 +287,8 @@ bool PatternRecognition::is_zone_empty(
     EMTFHitCollection::const_iterator conv_hits_end = ext_conv_hits_it->end();
 
     for (; conv_hits_it != conv_hits_end; ++conv_hits_it) {
+      assert(conv_hits_it->PC_segment() <= 4);  // With 2 unique LCTs per chamber, 4 possible strip/wire combinations
+      
       if (conv_hits_it->Subsystem() == TriggerPrimitive::kRPC)
         continue;  // Don't use RPC hits for pattern formation
 

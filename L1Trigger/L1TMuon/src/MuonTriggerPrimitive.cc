@@ -129,6 +129,7 @@ TriggerPrimitive::TriggerPrimitive(const RPCDetId& detid,
   _rpc.strip_hi = strip;
   _rpc.layer = layer;
   _rpc.bx = bx;
+  _rpc.valid = 1;
 }
 
 // constructor from GEM data
@@ -205,6 +206,7 @@ bool TriggerPrimitive::operator==(const TriggerPrimitive& tp) const {
            this->_rpc.strip_hi == tp._rpc.strip_hi &&
            this->_rpc.layer == tp._rpc.layer &&
            this->_rpc.bx == tp._rpc.bx &&
+           this->_rpc.valid == tp._rpc.valid &&
            this->_gem.pad == tp._gem.pad &&
            this->_gem.pad_low == tp._gem.pad_low &&
            this->_gem.pad_hi == tp._gem.pad_hi &&
@@ -356,6 +358,7 @@ void TriggerPrimitive::print(std::ostream& out) const {
     out << "Strip Low     : " << _rpc.strip_low << std::endl;
     out << "Strip High    : " << _rpc.strip_hi << std::endl;
     out << "Layer         : " << _rpc.layer << std::endl;
+    out << "Valid         : " << _rpc.valid << std::endl;
     break;
   case kGEM:
     out << detId<GEMDetId>() << std::endl;

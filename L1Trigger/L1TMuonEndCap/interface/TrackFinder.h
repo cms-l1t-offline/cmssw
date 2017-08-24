@@ -31,6 +31,9 @@ private:
   GeometryTranslator geometry_translator_;
 
   ConditionHelper condition_helper_;
+  unsigned int fw_version_;
+  unsigned int pt_lut_version_;
+  unsigned int pc_lut_version_;
 
   SectorProcessorLUT sector_processor_lut_;
 

@@ -222,7 +222,7 @@ void BestTrackSelection::cancel_one_bx(
       winner[sum][i] = true; // assign positional winner codes
     }
 
-    if (bugSameSectorPt0_ && sum > 0) {
+    if (sum < maxTracks_ && bugSameSectorPt0_ && sum > 0) {
       // just keep the best track and kill the rest of them
       winner[sum][i] = false;
     }
@@ -436,7 +436,7 @@ void BestTrackSelection::cancel_multi_bx(
       winner[sum][i] = true; // assign positional winner codes
     }
 
-    if (bugSameSectorPt0_ && sum > 0) {
+    if (sum < maxTracks_ && bugSameSectorPt0_ && sum > 0) {
       // just keep the best track and kill the rest of them
       winner[sum][i] = false;
     }
