@@ -665,9 +665,9 @@ void L1TTwinMuxRawToDigi::processFed( int twinMuxFed,
        
       else if ( selector == 0x9 || selector == 0xE ) { //RPC word
           
-        edm::LogInfo("TwinMux_unpacker") << "RPC WORD [" << std::dec << tm7eventsize << "] : "
-                                         << std::hex << dataWordSub << std::dec
-                                         << " it pos " << int(DTTM7iterator - DTTM7itend);
+        //edm::LogInfo("TwinMux_unpacker") << "RPC WORD [" << std::dec << tm7eventsize << "] : "
+                                         //<< std::hex << dataWordSub << std::dec
+                                         //<< " it pos " << int(DTTM7iterator - DTTM7itend);
   
         if ( debug_ ) logfile << '[' << ++lcounter << "]\t" << std::hex 
                               << dataWordSub << std::dec
@@ -677,9 +677,9 @@ void L1TTwinMuxRawToDigi::processFed( int twinMuxFed,
  
       else if ( selector == 0x6 ) { //HO word
           
-        edm::LogInfo("TwinMux_unpacker") << "HO WORD [" << std::dec << tm7eventsize << "] : "
-                                         << std::hex << dataWordSub << std::dec
-                                         << " it pos " << int(DTTM7iterator - DTTM7itend);
+        //edm::LogInfo("TwinMux_unpacker") << "HO WORD [" << std::dec << tm7eventsize << "] : "
+                                         //<< std::hex << dataWordSub << std::dec
+                                         //<< " it pos " << int(DTTM7iterator - DTTM7itend);
   
         if ( debug_ ) logfile << '[' << ++lcounter << "]\t" << std::hex 
                               << dataWordSub << std::dec
@@ -689,9 +689,9 @@ void L1TTwinMuxRawToDigi::processFed( int twinMuxFed,
  
       else if ( selector == 0xF ) { //ERROR word
 
-        edm::LogInfo("TwinMux_unpacker") << "ERROR WORD [" << std::dec << tm7eventsize << "] : "
-                                         << std::hex << dataWordSub << std::dec
-                                         << " it pos " << int(DTTM7iterator - DTTM7itend);
+        //edm::LogInfo("TwinMux_unpacker") << "ERROR WORD [" << std::dec << tm7eventsize << "] : "
+                                         //<< std::hex << dataWordSub << std::dec
+                                         //<< " it pos " << int(DTTM7iterator - DTTM7itend);
   
         if ( debug_ ) logfile << '[' << ++lcounter << "]\t" << std::hex 
                               << dataWordSub << std::dec

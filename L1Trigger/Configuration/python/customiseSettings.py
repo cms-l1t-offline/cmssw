@@ -1,6 +1,18 @@
 import os.path
 import FWCore.ParameterSet.Config as cms
 
+def L1TSettingsToCaloStage2Params_2017_v1_9_inconsistent_newHF_v6MET(process):
+    process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_9_inconsistent_newHF_v6MET_cfi")
+    return process
+
+def L1TSettingsToCaloStage2Params_2017_v1_9_inconsistent_mean_newHF(process):
+    process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_9_inconsistent_mean_newHF_cfi")
+    return process
+
+def L1TSettingsToCaloStage2Params_2017_v1_9_inconsistent_newHF(process):
+    process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_9_inconsistent_newHF_cfi")
+    return process
+
 def L1TSettingsToCaloStage2Params_2017_v1_9_inconsistent(process):
     process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_9_inconsistent_cfi")
     return process
@@ -21,6 +33,31 @@ def L1TSettingsToCaloStage2Params_2017_v1_8_excl30(process):
     process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_8_excl30_cfi")
     return process
 
+def L1TSettingsToCaloStage2Params_2017_v1_8_2_updateHFSF(process):
+    process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_8_2_updateHFSF_cfi")
+    return process
+
+def L1TSettingsToCaloStage2Params_2017_v1_8_2_updateHFSF_v7MET(process):
+    process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_8_2_updateHFSF_v7MET_cfi")
+    return process
+
+
+def L1TSettingsToCaloStage2Params_2017_v1_8_2_updateHFSF_v6MET(process):
+    process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_8_2_updateHFSF_v6MET_cfi")
+    return process
+
+def L1TSettingsToCaloStage2Params_2017_v1_8_updateHFSF_v6MET(process):
+    process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_8_updateHFSF_v6MET_cfi")
+    return process
+
+def L1TSettingsToCaloStage2Params_2017_v1_8_updateHFSF(process):
+    process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_8_updateHFSF_cfi")
+    return process
+
+def L1TSettingsToCaloStage2Params_2017_v1_8_v6MET(process):
+    process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_8_v6MET_cfi")
+    return process
+
 def L1TSettingsToCaloStage2Params_2017_v1_8(process):
     process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_8_cfi")
     return process
@@ -31,6 +68,15 @@ def L1TSettingsToCaloStage2Params_2017_v1_7_2(process):
 
 def L1TSettingsToCaloStage2Params_2017_v1_7_excl30(process):
     process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_7_excl30_cfi")
+    return process
+
+def L1TSettingsToCaloStage2Params_2017_v1_7_v6MET_egiso2(process):
+    process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_7_v6MET_egiso2_cfi")
+    return process
+
+
+def L1TSettingsToCaloStage2Params_2017_v1_7_v6MET(process):
+    process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_7_v6MET_cfi")
     return process
 
 def L1TSettingsToCaloStage2Params_2017_v1_7(process):
@@ -123,11 +169,11 @@ def L1TSettingsToCaloStage2Params_v2_0(process):
 
 
 def L1TSettingsToCaloStage2Params_UserDefine(process):
-    print "Loading configuration for calorimeter parameters in user defined file ./caloStage2Params_UserDefine_cfi.py"
+    print "# Loading configuration for calorimeter parameters in user defined file ./caloStage2Params_UserDefine_cfi.py"
     if not (os.path.exists("./caloStage2Params_UserDefine_cfi.py")):
-        print "WARNING:"
-        print "   Please create file ./caloStage2Params_UserDefine_cfi.py if you want to use the flag: "
-        print "   --customise=L1Trigger/Configuration/customiseSettings.L1TSettingsToCaloParams_UserDefine"
+        print "# WARNING:"
+        print "#   Please create file ./caloStage2Params_UserDefine_cfi.py if you want to use the flag: "
+        print "#   --customise=L1Trigger/Configuration/customiseSettings.L1TSettingsToCaloParams_UserDefine"
 
     else:
         process.load("./caloStage2Params_UserDefine_cfi")
