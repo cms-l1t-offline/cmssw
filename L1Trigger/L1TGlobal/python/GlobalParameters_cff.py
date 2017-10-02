@@ -11,13 +11,13 @@ GlobalParametersRcdSource = cms.ESSource("EmptyESSource",
     firstValid = cms.vuint32(1)
 )
 
-#GlobalParameters = cms.ESProducer("L1TGlobalParamsESProducer", 
-GlobalParameters = cms.ESProducer("StableParametersTrivialProducer", 
+#GlobalParameters = cms.ESProducer("L1TGlobalParamsESProducer",
+GlobalParameters = cms.ESProducer("StableParametersTrivialProducer",
     # bx in event
     #NumberBxInEvent = cms.int32(5),
 
     # trigger decision
-    
+
     # number of physics trigger algorithms
     NumberPhysTriggers = cms.uint32(512),
 
@@ -26,7 +26,7 @@ GlobalParameters = cms.ESProducer("StableParametersTrivialProducer",
 
     # muons
     NumberL1Muon = cms.uint32(8),
-    
+
     # e/gamma and isolated e/gamma objects
     NumberL1EGamma = cms.uint32(12),
 
@@ -48,5 +48,3 @@ GlobalParameters = cms.ESProducer("StableParametersTrivialProducer",
     # e.g.: chip 2: 0 - 95;  chip 1: 96 - 128 (191)
     OrderOfChip = cms.vint32(1),
 )
-
-

@@ -13,7 +13,7 @@ public:
       const SectorProcessorLUT* lut,
       int verbose, int endcap, int sector, int bx,
       int bxShiftCSC, int bxShiftRPC, int bxShiftGEM,
-      const std::vector<int>& zoneBoundaries, int zoneOverlap, int zoneOverlapRPC,
+      const std::vector<int>& zoneBoundaries, int zoneOverlap,
       bool duplicateTheta, bool fixZonePhi, bool useNewZones, bool fixME11Edges,
       bool bugME11Dupes
   );
@@ -76,7 +76,7 @@ private:
   int bxShiftCSC_, bxShiftRPC_, bxShiftGEM_;
 
   std::vector<int> zoneBoundaries_;
-  int zoneOverlap_, zoneOverlapRPC_;
+  int zoneOverlap_;
   bool duplicateTheta_, fixZonePhi_, useNewZones_, fixME11Edges_;
   bool bugME11Dupes_;
 };

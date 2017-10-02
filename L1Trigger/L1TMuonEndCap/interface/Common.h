@@ -11,6 +11,8 @@
 
 #include "L1Trigger/L1TMuonEndCap/interface/EMTFSubsystemTag.h"
 
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+
 
 // Resolve namespaces
 

@@ -37,6 +37,14 @@ def L1TSettingsToCaloStage2Params_2017_v1_8_2_updateHFSF(process):
     process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_8_2_updateHFSF_cfi")
     return process
 
+def L1TSettingsToCaloStage2Params_2017_v1_8_2_updateHFSF_v7MET(process):
+    process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_8_2_updateHFSF_v7MET_cfi")
+    return process
+
+def L1TSettingsToCaloStage2Params_2017_v1_8_2_updateHFSF_v6MET_no28(process):
+    process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_8_2_updateHFSF_v6MET_no28_cfi")
+    return process
+
 def L1TSettingsToCaloStage2Params_2017_v1_8_2_updateHFSF_v6MET(process):
     process.load("L1Trigger.L1TCalorimeter.caloStage2Params_2017_v1_8_2_updateHFSF_v6MET_cfi")
     return process
@@ -164,11 +172,11 @@ def L1TSettingsToCaloStage2Params_v2_0(process):
 
 
 def L1TSettingsToCaloStage2Params_UserDefine(process):
-    print "Loading configuration for calorimeter parameters in user defined file ./caloStage2Params_UserDefine_cfi.py"
+    print "# Loading configuration for calorimeter parameters in user defined file ./caloStage2Params_UserDefine_cfi.py"
     if not (os.path.exists("./caloStage2Params_UserDefine_cfi.py")):
-        print "WARNING:"
-        print "   Please create file ./caloStage2Params_UserDefine_cfi.py if you want to use the flag: "
-        print "   --customise=L1Trigger/Configuration/customiseSettings.L1TSettingsToCaloParams_UserDefine"
+        print "# WARNING:"
+        print "#   Please create file ./caloStage2Params_UserDefine_cfi.py if you want to use the flag: "
+        print "#   --customise=L1Trigger/Configuration/customiseSettings.L1TSettingsToCaloParams_UserDefine"
 
     else:
         process.load("./caloStage2Params_UserDefine_cfi")
