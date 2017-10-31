@@ -78,8 +78,11 @@ class L1EGCrystalClusterProducer : public edm::EDProducer {
    private:
       virtual void produce(edm::Event&, const edm::EventSetup&);
       bool cluster_passes_base_cuts(const l1slhc::L1EGCrystalCluster& cluster) const;
+      bool cluster_passes_stage2_eff_cuts(float &cluster_pt, float &cluster_eta, float &iso, float &e2x5, float &e5x5, float &hover) const;
+      bool cluster_passes_electronWP90(float &cluster_pt, float &cluster_eta, float &iso, float &e2x5, float &e5x5, float &hover) const;
       bool cluster_passes_photonWP80(float &cluster_pt, float &cluster_eta, float &iso, float &e2x5, float &e5x5, float &e2x2) const;
       bool cluster_passes_electronWP98(float &cluster_pt, float &cluster_eta, float &iso, float &e2x5, float &e5x5) const;
+      bool cluster_passes_looseL1TkMatchWP(float &cluster_pt, float &cluster_eta, float &iso, float &e2x5, float &e5x5) const;
 
       double EtminForStore;
       double EcalTpEtMin;
@@ -391,7 +394,10 @@ void L1EGCrystalClusterProducer::produce(edm::Event& iEvent, const edm::EventSet
       float e5x5 = 0.;
       float e3x5 = 0.;
       bool electronWP98;
+      bool looseL1TkMatchWP;
       bool photonWP80;
+      bool electronWP90;
+      bool passesStage2Eff;
       std::vector<float> crystalPt;
       std::map<int, float> phiStrip;
       //std::cout << " -- iPhi: " << ehit.id.iphi() << std::endl;
@@ -485,6 +491,7 @@ void L1EGCrystalClusterProducer::produce(edm::Event& iEvent, const edm::EventSet
          {
             e2x2_4 += hit.energy;
          }
+
          e2x2 = TMath::Max( e2x2_1, e2x2_2 );
          e2x2 = TMath::Max( e2x2, e2x2_3 );
          e2x2 = TMath::Max( e2x2, e2x2_4 );
@@ -648,13 +655,16 @@ void L1EGCrystalClusterProducer::produce(edm::Event& iEvent, const edm::EventSet
       // Check if cluster passes electron or photon WPs
       float cluster_eta = weightedPosition.eta();
       electronWP98 = cluster_passes_electronWP98( correctedTotalPt, cluster_eta, ECalIsolation, e2x5, e5x5);
+      looseL1TkMatchWP = cluster_passes_looseL1TkMatchWP( correctedTotalPt, cluster_eta, ECalIsolation, e2x5, e5x5);
       photonWP80 = cluster_passes_photonWP80( correctedTotalPt, cluster_eta, ECalIsolation, e2x5, e5x5, e2x2);
+      electronWP90 = cluster_passes_electronWP90( correctedTotalPt, cluster_eta, ECalIsolation, e2x5, e5x5, hovere);
+      passesStage2Eff = cluster_passes_stage2_eff_cuts( correctedTotalPt, cluster_eta, ECalIsolation, e2x5, e5x5, hovere);
 
       
       // Form a l1slhc::L1EGCrystalCluster
       reco::Candidate::PolarLorentzVector p4(correctedTotalPt, weightedPosition.eta(), weightedPosition.phi(), 0.);
       l1slhc::L1EGCrystalCluster cluster(p4, hovere, ECalIsolation, centerhit.id, totalPtPUcorr, bremStrength,
-            e2x2, e2x5, e3x5, e5x5, electronWP98, photonWP80);
+            e2x2, e2x5, e3x5, e5x5, electronWP98, photonWP80, electronWP90, looseL1TkMatchWP, passesStage2Eff);
       // Save pt array
       cluster.SetCrystalPtInfo(crystalPt);
       params["crystalCount"] = crystalPt.size();
@@ -684,12 +694,18 @@ L1EGCrystalClusterProducer::cluster_passes_photonWP80(float &cluster_pt, float &
    // These cuts have been optimized based on 92X
    // This cut reaches an 80% efficiency for photons
    // for offline pt > 30 GeV
+   // 19 Aug 2017 - added flat line extension for isolation cut
 
    if ( fabs(cluster_eta) < 1.479 )
    {
       if ( !( 0.94 + 0.052 * TMath::Exp( -0.044 * cluster_pt ) < (e2x5 / e5x5)) ) return false;
-      if ( !(( 0.85 + -0.0080 * cluster_pt ) > iso ) ) return false;
-      if ( ( e2x2 / e2x5) < 0.95 ) return false;
+      if ( cluster_pt < 80 ) {
+         if ( !(( 0.85 + -0.0080 * cluster_pt ) > iso ) ) return false;
+      }
+      if ( cluster_pt >= 80 ) { // do flat line extension of isolation cut
+         if ( iso > 0.21 ) return false;
+      }
+      if ( ( e2x2 / e2x5) < 0.96 - 0.0003 * cluster_pt ) return false;
 
       // Passes cuts
       return true;
@@ -704,12 +720,64 @@ L1EGCrystalClusterProducer::cluster_passes_electronWP98(float &cluster_pt, float
    if ( fabs(cluster_eta) < 1.479 )
    {
       if ( !( 0.94 + 0.052 * TMath::Exp( -0.044 * cluster_pt ) < (e2x5 / e5x5)) ) return false;
-      if ( !(( 0.85 + -0.0080 * cluster_pt ) > iso ) ) return false;
+      if ( cluster_pt < 80 ) {
+         if ( !(( 0.85 + -0.0080 * cluster_pt ) > iso ) ) return false;
+      }
+      if ( cluster_pt >= 80 ) { // do flat line extension of isolation cut
+         if ( iso > 0.21 ) return false;
+      }
 
       // Passes cuts
       return true;
    }
    return false; // out of eta range
+}
+
+
+bool
+L1EGCrystalClusterProducer::cluster_passes_electronWP90(float &cluster_pt, float &cluster_eta, float &iso, float &e2x5, float &e5x5, float &hovere) const {
+   if ( fabs(cluster_eta) < 1.479 )
+   {
+      bool passIso = false;
+      bool passShowerShape = false;
+      bool passHoverE = false;
+
+      // 90% plateau
+      if ( ( 0.95 + 0.043 * TMath::Exp( -0.055 * cluster_pt ) < (e2x5 / e5x5)) ) {
+	     passShowerShape = true; }
+      if ( ( 0.067 + 1.6 * TMath::Exp( -0.055 * cluster_pt ) > iso ) ) {
+	     passIso = true; }
+      if ( ( 0.26 + 4.4 * TMath::Exp( -0.089 * cluster_pt ) > hovere ) ) {
+	     passHoverE = true; }
+
+      if ( passShowerShape && passIso && passHoverE ) {
+	      return true; }
+   }
+   return false;
+}
+
+
+bool
+L1EGCrystalClusterProducer::cluster_passes_stage2_eff_cuts(float &cluster_pt, float &cluster_eta, float &iso, float &e2x5, float &e5x5, float &hovere) const {
+   if ( fabs(cluster_eta) < 1.479 )
+   {
+      bool passIso = false;
+      bool passShowerShape = false;
+      bool passHoverE = false;
+
+      // Stage-2 Matching
+      
+      if ( ( 0.94 + 0.04 * TMath::Exp( -0.02 * cluster_pt ) < (e2x5 / e5x5)) ) {
+	     passShowerShape = true; }
+      if ( ( 0.22 + 1.4 * TMath::Exp( -0.08 * cluster_pt ) > iso ) ) {
+	     passIso = true; }
+      if ( ( 0.27 + 2.7 * TMath::Exp( -0.07 * cluster_pt ) > hovere ) ) {
+	     passHoverE = true; }
+
+      if ( passShowerShape && passIso && passHoverE ) {
+	      return true; }
+   }
+   return false;
 }
 
 
@@ -732,11 +800,36 @@ L1EGCrystalClusterProducer::cluster_passes_base_cuts(const l1slhc::L1EGCrystalCl
      
       if ( !( 0.94 + 0.052 * TMath::Exp( -0.044 * cluster_pt ) < (clusterE2x5 / clusterE5x5)) )
          return false;
-      if ( !(( 0.85 + -0.0080 * cluster_pt ) > cluster_iso ) )
-         return false;
+      if ( cluster_pt < 80 ) {
+         if ( !(( 0.85 + -0.0080 * cluster_pt ) > cluster_iso ) ) return false;
+      }
+      if ( cluster_pt >= 80 ) { // do flat line extension of isolation cut
+         if ( cluster_iso > 0.21 ) return false;
+      }
       return true; // cluster passes all cuts
    }
    return false; // out of eta range
 }
+
+
+bool
+L1EGCrystalClusterProducer::cluster_passes_looseL1TkMatchWP(float &cluster_pt, float &cluster_eta, float &iso, float &e2x5, float &e5x5) const {
+   if ( fabs(cluster_eta) < 1.479 )
+   {
+      bool passIso = false;
+      bool passShowerShape = false;
+
+      if ( ( 0.944 + -0.65 * TMath::Exp( -0.4 * cluster_pt ) < (e2x5 / e5x5)) ) {
+	     passShowerShape = true; }
+      if ( ( 0.38 + 1.9 * TMath::Exp( -0.05 * cluster_pt ) > iso ) ) {
+	     passIso = true; }
+
+      if ( passShowerShape && passIso ) {
+	      return true; }
+
+   }
+   return false;
+}
+
 
 DEFINE_FWK_MODULE(L1EGCrystalClusterProducer);
