@@ -4,7 +4,7 @@ simDisplacedGmtStage2Digis = cms.EDProducer(
     "L1TDisplacedMuonProducer",
     muonTag = cms.InputTag("simGmtStage2Digis"),
     emtfTag = cms.InputTag("simEmtfDigis"),
-    bmtfTag = cms.InputTag("simBmtfDigis"),
+    bmtfTag = cms.InputTag("simBmtfDigis","BMTF"),
     cscLctTag = cms.InputTag("simCscTriggerPrimitiveDigis","MPCSORTED"),
     me0TriggerTag = cms.InputTag("me0TriggerDigis"),
     me0SegmentTag = cms.InputTag("me0TriggerPseudoDigis"),

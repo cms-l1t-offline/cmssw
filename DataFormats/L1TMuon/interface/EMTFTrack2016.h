@@ -6,7 +6,7 @@
 
 #include <vector>
 #include <boost/cstdint.hpp>
- 
+
 #include "DataFormats/GeometryVector/interface/Pi.h"
 #include "DataFormats/L1TMuon/interface/EMTFHit2016.h"
 #include "DataFormats/L1TMuon/interface/EMTF/SP.h"
@@ -15,18 +15,18 @@
 namespace l1t {
   class EMTFTrack2016 {
   public:
-    
+
   EMTFTrack2016() :
     // Using -999 instead of -99 b/c this seems most common in the emulator.  Unfortunate. - AWB 17.03.16
     endcap(-999), sector(-999), sector_GMT(-999), sector_index(-999), mode(-999), mode_LUT(-999), quality(-999), bx(-999),
-      pt(-999), pt_GMT(-999), pt_LUT_addr(0), eta(-999), eta_GMT(-999), eta_LUT(-999), phi_loc_int(-999), 
-      phi_loc_deg(-999), phi_loc_rad(-999), phi_GMT(-999), phi_glob_deg(-999), phi_glob_rad(-999), 
-      charge(-999), charge_GMT(-999), charge_valid(-999), dPhi_12(-999), dPhi_13(-999), dPhi_14(-999), 
-      dPhi_23(-999), dPhi_24(-999), dPhi_34(-999), dTheta_12(-999), dTheta_13(-999), dTheta_14(-999), 
-      dTheta_23(-999), dTheta_24(-999), dTheta_34(-999), clct_1(-999), clct_2(-999), clct_3(-999), clct_4(-999), 
+      pt(-999), pt_GMT(-999), pt_LUT_addr(0), eta(-999), eta_GMT(-999), eta_LUT(-999), phi_loc_int(-999),
+      phi_loc_deg(-999), phi_loc_rad(-999), phi_GMT(-999), phi_glob_deg(-999), phi_glob_rad(-999),
+      charge(-999), charge_GMT(-999), charge_valid(-999), dPhi_12(-999), dPhi_13(-999), dPhi_14(-999),
+      dPhi_23(-999), dPhi_24(-999), dPhi_34(-999), dTheta_12(-999), dTheta_13(-999), dTheta_14(-999),
+      dTheta_23(-999), dTheta_24(-999), dTheta_34(-999), clct_1(-999), clct_2(-999), clct_3(-999), clct_4(-999),
       fr_1(-999), fr_2(-999), fr_3(-999), fr_4(-999), track_num(-999), has_neighbor(-999), all_neighbor(-999), numHits(0)
       {};
-    
+
     virtual ~EMTFTrack2016() {};
 
     // float pi = 3.141592653589793238;
@@ -40,11 +40,11 @@ namespace l1t {
     void push_HitIndex(unsigned int bits)               { _HitIndices.push_back(bits); numHits = _HitIndices.size(); }
 
     int NumHits()            const { return numHits; }
-    EMTFHit2016Collection Hits()       { return _Hits; }
+    EMTFHit2016Collection Hits() const { return _Hits; }
     std::vector<unsigned int> HitIndices() { return _HitIndices; }
     const EMTFHit2016Collection * PtrHits()       const { return &_Hits; }
     const std::vector<unsigned int> * PtrHitIndices() const { return &_HitIndices; }
-    
+
     void set_endcap        (int  bits) { endcap       = bits; }
     void set_sector        (int  bits) { sector       = bits; }
     void set_sector_GMT    (int  bits) { sector_GMT   = bits; }
@@ -92,7 +92,7 @@ namespace l1t {
     void set_has_neighbor  (int  bits) { has_neighbor = bits; }
     void set_all_neighbor  (int  bits) { all_neighbor = bits; }
 
-    
+
     int   Endcap()        const { return  endcap;       }
     int   Sector()        const { return  sector;       }
     int   Sector_GMT()    const { return  sector_GMT;   }
@@ -140,20 +140,20 @@ namespace l1t {
     int   Has_neighbor()  const { return has_neighbor;  }
     int   All_neighbor()  const { return all_neighbor;  }
 
-    
+
   private:
-    
+
     EMTFHit2016Collection _Hits;
     std::vector<unsigned int>  _HitIndices;
 
-    int   endcap;       // -1 or 1.  Filled in emulator from hit. 
+    int   endcap;       // -1 or 1.  Filled in emulator from hit.
     int   sector;       //  1 -  6.  Filled in emulator from hit.
     int   sector_GMT;   //  0 -  5.  Filled in emulator from hit.
     int   sector_index; //  0 - 11.  Filled in emulator from hit.
     int   mode;         //  0 - 15.  Filled in emulator.
     int   mode_LUT;     //  0 - 15.  Filled in emulator.
     int   quality;      //  0 - 15.  Filled in emultaor.
-    int   bx;           //  
+    int   bx;           //
     float pt;           //  ? -  ?.  Filled in emulator.
     int   pt_GMT;       //  ? -  ?.  Filled in emulator.
     float pt_XML;       //  ? -  ?.  Filled in emulator.
@@ -194,12 +194,12 @@ namespace l1t {
     int   has_neighbor;
     int   all_neighbor;
     int   numHits;
-    
+
   }; // End of class EMTFTrack2016
-  
+
   // Define a vector of EMTFTrack2016
   typedef std::vector<EMTFTrack2016> EMTFTrack2016Collection;
-  
+
 } // End of namespace l1t
 
 #endif /* define DataFormats_L1TMuon_EMTFTrack2016_h */

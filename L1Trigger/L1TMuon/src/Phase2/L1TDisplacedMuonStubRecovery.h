@@ -14,7 +14,7 @@
 
 #include "DataFormats/L1Trigger/interface/Muon.h"
 #include "DataFormats/GEMRecHit/interface/ME0SegmentCollection.h"
-#include "DataFormats/L1TMuon/interface/EMTFTrack.h"
+#include "DataFormats/L1TMuon/interface/EMTFTrack2016.h"
 #include "DataFormats/CSCDigi/interface/CSCCorrelatedLCTDigiCollection.h"
 #include "L1Trigger/L1TMuon/src/Phase2/GeometryHelpers.h"
 
@@ -39,15 +39,15 @@ namespace L1TMuon {
     void setME0Geometry(const ME0Geometry *g) { me0_g = g; }
 
     // recover missing CSC stubs
-    void recoverCSCLCT(const l1t::EMTFTrack&,
-                       const l1t::EMTFTrackCollection* emtfTracks,
+    void recoverCSCLCT(const l1t::EMTFTrack2016&,
+                       const l1t::EMTFTrack2016Collection* emtfTracks,
                        const CSCCorrelatedLCTDigiCollection* lcts,
                        int station,
                        CSCCorrelatedLCTDigiId& bestLCT) const;
 
     // is a stub already part of a track?
-    bool stubInEMTFTracks(const CSCCorrelatedLCTDigi& stub,
-                          const l1t::EMTFTrackCollection& l1Tracks) const;
+    bool stubInEMTFTrack2016s(const CSCCorrelatedLCTDigi& stub,
+                          const l1t::EMTFTrack2016Collection& l1Tracks) const;
 
     // match L1Mu to ME0 segment
     void getBestMatchedME0(const l1t::Muon& l1mu,
