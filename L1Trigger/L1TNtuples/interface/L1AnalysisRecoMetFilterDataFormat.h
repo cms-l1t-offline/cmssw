@@ -23,22 +23,29 @@ namespace L1Analysis
       hbheNoiseFilter         = 0;
       hbheNoiseIsoFilter      = 0;
       cscTightHalo2015Filter  = 0;
+      globalSuperTightHalo2016Filter  = 0;
       ecalDeadCellTPFilter    = 0;
       goodVerticesFilter      = 0;
       eeBadScFilter           = 0;
       chHadTrackResFilter     = 0;
       muonBadTrackFilter      = 0;
-
+      badPFMuonFilter         = 0;
+      badChCandFilter         = 0;
+      
     }
     
     bool hbheNoiseFilter;        
     bool hbheNoiseIsoFilter;     
     bool cscTightHalo2015Filter; 
+    bool globalSuperTightHalo2016Filter; 
     bool ecalDeadCellTPFilter;
     bool goodVerticesFilter;  
     bool eeBadScFilter;    
     bool chHadTrackResFilter;   
     bool muonBadTrackFilter;   
+    bool badPFMuonFilter;
+    bool badChCandFilter;
+
     
   }; 
 }

@@ -48,14 +48,17 @@ SimL1Emulator = cms.Sequence( SimL1EmulatorCore )
 
 # 
 # Emulators are configured from DB (GlobalTags)
-#
+# but in the integration branch conffigure from static hackConditions
+from L1Trigger.L1TCalorimeter.hackConditions_cff import *
+from L1Trigger.L1TMuon.hackConditions_cff import *
+from L1Trigger.L1TGlobal.hackConditions_cff import *
 
 from L1Trigger.L1TGlobal.GlobalParameters_cff import *
 
 # 2017 EMTF and TwinMux emulator use payloads from DB, not yet in GT,
 # soon to be removed when availble in GTs
-from L1Trigger.L1TMuonEndCap.fakeEmtfParams_2017_MC_cff import *
-from L1Trigger.L1TTwinMux.fakeTwinMuxParams_cff import *
+#from L1Trigger.L1TMuonEndCap.fakeEmtfParams_2017_MC_cff import *
+#from L1Trigger.L1TTwinMux.fakeTwinMuxParams_cff import *
 
 # Customisation for the phase2_hgcal era. Includes the HGCAL L1 trigger
 #from  L1Trigger.L1THGCal.hgcalTriggerPrimitives_cff import *
