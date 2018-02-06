@@ -68,9 +68,9 @@ void L1TDisplacedMuonStubRecovery::recoverCSCLCT(const l1t::EMTFTrack2016& track
       }
       if (bestLCT.second.isValid()) {
         // stub position
-        const auto& gp = L1TMuon::GeometryHelpers::globalPositionOfCSCLCT(csc_g,
-                                                                          bestLCT.second,
-                                                                          bestLCT.first);
+        // const auto& gp = L1TMuon::GeometryHelpers::globalPositionOfCSCLCT(csc_g,
+        //                                                                   bestLCT.second,
+        //                                                                   bestLCT.first);
 
         // // extra selection - stub not too far from track
         // if (reco::deltaR(float(gp.eta()), normalizedPhi(float(gp.phi())),
@@ -87,7 +87,7 @@ void L1TDisplacedMuonStubRecovery::getBestMatchedME0(const l1t::Muon& l1mu,
                                                      ME0Segment& seg) const
 {
   const std::string functionName("L1TDisplacedMuonStubRecovery::getBestMatchedME0");
-  float minDR_L1Mu_ME0 = 999;
+  // float minDR_L1Mu_ME0 = 999;
 
   if(verbose_) cout << functionName << " -- Find best match:" << endl;
 

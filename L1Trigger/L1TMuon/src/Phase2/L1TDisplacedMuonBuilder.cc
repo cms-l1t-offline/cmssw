@@ -49,7 +49,7 @@ void L1TDisplacedMuonBuilder::build(const CSCComparatorDigiCollection* comparato
       const l1t::Muon& l1muon = inMuons.at(ibx,j);
       const float muon_eta = l1muon.eta();
       const float muon_phi = normalizedPhi(l1muon.phi());
-      const float muon_sign = muon_eta < 0 ? -1 : +1;
+      //const int muon_sign = muon_eta < 0 ? -1 : +1;
       std::cout << "Candidate " << muon_eta << " " << muon_phi << std::endl;
       /*
        * Step 1: Check the type of the muon in the DisplacedL1MuBuilder.
@@ -93,10 +93,10 @@ void L1TDisplacedMuonBuilder::build(const CSCComparatorDigiCollection* comparato
 
 
       // add the CSC stubs to the collection
-      if ((muon_type = L1TDisplacedMuonBuilder::Overlap) or
+      if ((muon_type == L1TDisplacedMuonBuilder::Overlap) or
           (muon_type == L1TDisplacedMuonBuilder::EndcapLow) or
-          (muon_type == L1TDisplacedMuonBuilder::EndcapHigh)){
-        for (const auto& p : bestCSCTrack.Hits()){
+          (muon_type == L1TDisplacedMuonBuilder::EndcapHigh)) {
+        for (const auto& p : bestCSCTrack.Hits()) {
           if (p.Is_CSC_hit()) {
             lcts_.emplace_back(p.CSC_DetId(),p.CSC_LCTDigi());
             const int station = p.CSC_DetId().station();
@@ -105,15 +105,14 @@ void L1TDisplacedMuonBuilder::build(const CSCComparatorDigiCollection* comparato
         }
       }
 
-      if (muon_type = L1TDisplacedMuonBuilder::Barrel){
-        for (const auto& p : bestCSCTrack.Hits()){
+      if (muon_type == L1TDisplacedMuonBuilder::Barrel) {
+        for (const auto& p : bestCSCTrack.Hits()) {
           if (p.Is_CSC_hit()) {
             lcts_.emplace_back(p.CSC_DetId(),p.CSC_LCTDigi());
             const int station = p.CSC_DetId().station();
             hasCSC_[station-1] = true;
           }
         }
-
       }
 
       // // add GEM pads to the collection
