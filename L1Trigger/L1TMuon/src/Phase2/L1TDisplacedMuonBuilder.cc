@@ -33,7 +33,7 @@ void L1TDisplacedMuonBuilder::build(const CSCComparatorDigiCollection* comparato
                                     const GEMPadDigiCollection* pads,
                                     const GEMCoPadDigiCollection* copads,
                                     const ME0SegmentCollection* segments,
-                                    const l1t::EMTFTrackCollection* emtfTracks,
+                                    const l1t::EMTFTrack2016Collection* emtfTracks,
                                     const L1MuBMTrackCollection* bmtfTracks,
                                     const edm::Handle<l1t::MuonBxCollection>& inMuonsH,
                                     std::unique_ptr<l1t::MuonBxCollection>& outMuons)
@@ -49,7 +49,7 @@ void L1TDisplacedMuonBuilder::build(const CSCComparatorDigiCollection* comparato
       const l1t::Muon& l1muon = inMuons.at(ibx,j);
       const float muon_eta = l1muon.eta();
       const float muon_phi = normalizedPhi(l1muon.phi());
-      const float muon_sign = muon_eta < 0 ? -1 : +1;
+      //const int muon_sign = muon_eta < 0 ? -1 : +1;
       std::cout << "Candidate " << muon_eta << " " << muon_phi << std::endl;
       /*
        * Step 1: Check the type of the muon in the DisplacedL1MuBuilder.
@@ -78,30 +78,26 @@ void L1TDisplacedMuonBuilder::build(const CSCComparatorDigiCollection* comparato
 
       // Step 3: The DisplacedL1MuMatcher checks for stubs that are already
       // available through the BMTF, OMTF or EMTF tracks.
-      /*
-      l1t::EMTFTrack bestTrack;
+      l1t::EMTFTrack2016 bestCSCTrack;
       float mindR = 999;
       for (const auto& track : *emtfTracks){
         float emtf_eta = track.Eta();
-        float emtf_phi = normalizedPhi(track.Phi_glob());
+        float emtf_phi = normalizedPhi(track.Phi_GMT());
         float dr = reco::deltaR(emtf_eta, emtf_phi, muon_eta, muon_phi);
         if (dr<mindR){
           mindR = dr;
-          bestTrack = track;
+          bestCSCTrack = track;
         }
       }
-      */
 
-      // for now...
-      // continue;
 
-      /*
+
       // add the CSC stubs to the collection
-      if ((muon_type = L1TDisplacedMuonBuilder::Overlap) or
+      if ((muon_type == L1TDisplacedMuonBuilder::Overlap) or
           (muon_type == L1TDisplacedMuonBuilder::EndcapLow) or
-          (muon_type == L1TDisplacedMuonBuilder::EndcapHigh)){
-        for (const auto& p : bestTrack.Hits()){
-          if (p.Is_GEM()) {
+          (muon_type == L1TDisplacedMuonBuilder::EndcapHigh)) {
+        for (const auto& p : bestCSCTrack.Hits()) {
+          if (p.Is_CSC_hit()) {
             lcts_.emplace_back(p.CSC_DetId(),p.CSC_LCTDigi());
             const int station = p.CSC_DetId().station();
             hasCSC_[station-1] = true;
@@ -109,19 +105,28 @@ void L1TDisplacedMuonBuilder::build(const CSCComparatorDigiCollection* comparato
         }
       }
 
-      // add GEM pads to the collection
-      if (muon_type == L1TDisplacedMuonBuilder::EndcapHigh){
-        for (const auto& p : bestTrack.Hits()){
-          if (p.Is_GEM()) {
-            pads_.emplace_back(p.GEM_DetId(),p.GEM_PadDigi());
-            const int station = p.GEM_DetId().station();
-            const int layer = p.GEM_DetId().layer();
-            const int index(2*(station-1) + layer);
-            hasGEM_[layer] = true;
+      if (muon_type == L1TDisplacedMuonBuilder::Barrel) {
+        for (const auto& p : bestCSCTrack.Hits()) {
+          if (p.Is_CSC_hit()) {
+            lcts_.emplace_back(p.CSC_DetId(),p.CSC_LCTDigi());
+            const int station = p.CSC_DetId().station();
+            hasCSC_[station-1] = true;
           }
         }
       }
-      */
+
+      // // add GEM pads to the collection
+      // if (muon_type == L1TDisplacedMuonBuilder::EndcapHigh){
+      //   for (const auto& p : bestTrack.Hits()){
+      //     if (p.Is_GEM()) {
+      //       pads_.emplace_back(p.GEM_DetId(),p.GEM_PadDigi());
+      //       const int station = p.GEM_DetId().station();
+      //       const int layer = p.GEM_DetId().layer();
+      //       const int index(2*(station-1) + layer);
+      //       hasGEM_[layer] = true;
+      //     }
+      //   }
+      // }
       // match the ME0 stub to the muon
       recovery_->setME0Geometry(me0Geometry_);
       ME0Segment bestSegment;

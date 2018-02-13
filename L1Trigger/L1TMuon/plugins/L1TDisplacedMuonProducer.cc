@@ -61,7 +61,7 @@ private:
   edm::EDGetTokenT<GEMCoPadDigiCollection> copadToken_;
   edm::EDGetTokenT<ME0TriggerDigiCollection> me0triggerToken_;
   edm::EDGetTokenT<ME0SegmentCollection> segmentToken_;
-  edm::EDGetTokenT<l1t::EMTFTrackCollection> emtfToken_;
+  edm::EDGetTokenT<l1t::EMTFTrack2016Collection> emtfToken_;
   edm::EDGetTokenT<L1MuBMTrackCollection> bmtfToken_;
   edm::EDGetTokenT<l1t::MuonBxCollection> muonToken_;
 
@@ -98,7 +98,7 @@ L1TDisplacedMuonProducer::L1TDisplacedMuonProducer(const edm::ParameterSet& iCon
   copadToken_ = consumes<GEMCoPadDigiCollection>(copadTag_);
   me0triggerToken_ = consumes<ME0TriggerDigiCollection>(me0TriggerTag_);
   segmentToken_ = consumes<ME0SegmentCollection>(me0SegmentTag_);
-  emtfToken_ = consumes<l1t::EMTFTrackCollection>(emtfTag_);
+  emtfToken_ = consumes<l1t::EMTFTrack2016Collection>(emtfTag_);
   bmtfToken_ = consumes<L1MuBMTrackCollection>(bmtfTag_);
   muonToken_ = consumes<l1t::MuonBxCollection>(muonTag_);
 
@@ -167,7 +167,7 @@ L1TDisplacedMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
   edm::Handle<l1t::MuonBxCollection> inMuonsPhase2;
   iEvent.getByToken(muonToken_, inMuonsPhase2);
 
-  edm::Handle<l1t::EMTFTrackCollection> emtfTracks;
+  edm::Handle<l1t::EMTFTrack2016Collection> emtfTracks;
   iEvent.getByToken(emtfToken_, emtfTracks);
 
   edm::Handle<L1MuBMTrackCollection> bmtfTracks;

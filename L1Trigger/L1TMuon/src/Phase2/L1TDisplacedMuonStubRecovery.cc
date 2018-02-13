@@ -20,8 +20,8 @@ L1TDisplacedMuonStubRecovery::~L1TDisplacedMuonStubRecovery()
 {
 }
 
-void L1TDisplacedMuonStubRecovery::recoverCSCLCT(const l1t::EMTFTrack& track,
-                                                 const l1t::EMTFTrackCollection* emtfTracks,
+void L1TDisplacedMuonStubRecovery::recoverCSCLCT(const l1t::EMTFTrack2016& track,
+                                                 const l1t::EMTFTrack2016Collection* emtfTracks,
                                                  const CSCCorrelatedLCTDigiCollection* lcts,
                                                  int station, CSCCorrelatedLCTDigiId& bestLCT) const
 {
@@ -61,16 +61,16 @@ void L1TDisplacedMuonStubRecovery::recoverCSCLCT(const l1t::EMTFTrack& track,
         if (deltaBX > 1) continue;
 
         // check that this stub is not already part of a CSC TF track
-        if (stubInEMTFTracks(stub, *emtfTracks)) continue;
+        if (stubInEMTFTrack2016s(stub, *emtfTracks)) continue;
 
         // bestLCT = pickBestMatchingStub(allxs[ch_id.station()-1], allys[ch_id.station()-1],
         //                                         bestLCT, std::make_pair(ch_id, stub), 6);
       }
       if (bestLCT.second.isValid()) {
         // stub position
-        const auto& gp = L1TMuon::GeometryHelpers::globalPositionOfCSCLCT(csc_g,
-                                                                          bestLCT.second,
-                                                                          bestLCT.first);
+        // const auto& gp = L1TMuon::GeometryHelpers::globalPositionOfCSCLCT(csc_g,
+        //                                                                   bestLCT.second,
+        //                                                                   bestLCT.first);
 
         // // extra selection - stub not too far from track
         // if (reco::deltaR(float(gp.eta()), normalizedPhi(float(gp.phi())),
@@ -87,7 +87,7 @@ void L1TDisplacedMuonStubRecovery::getBestMatchedME0(const l1t::Muon& l1mu,
                                                      ME0Segment& seg) const
 {
   const std::string functionName("L1TDisplacedMuonStubRecovery::getBestMatchedME0");
-  float minDR_L1Mu_ME0 = 999;
+  // float minDR_L1Mu_ME0 = 999;
 
   if(verbose_) cout << functionName << " -- Find best match:" << endl;
 
@@ -151,8 +151,8 @@ void L1TDisplacedMuonStubRecovery::getBestMatchedME0(const l1t::Muon& l1mu,
   */
 }
 
-bool L1TDisplacedMuonStubRecovery::stubInEMTFTracks(const CSCCorrelatedLCTDigi& stub,
-                                                    const l1t::EMTFTrackCollection& l1Tracks) const
+bool L1TDisplacedMuonStubRecovery::stubInEMTFTrack2016s(const CSCCorrelatedLCTDigi& stub,
+                                                    const l1t::EMTFTrack2016Collection& l1Tracks) const
 {
   // check all tracks
   for (const auto& tftrack: l1Tracks){
@@ -161,7 +161,7 @@ bool L1TDisplacedMuonStubRecovery::stubInEMTFTracks(const CSCCorrelatedLCTDigi& 
     for (const auto& hit : tftrack.Hits()){
 
       // check only CSC stubs
-      if (not hit.Is_CSC()) continue;
+      if (not hit.Is_CSC_hit()) continue;
 
       // does this stub match?
       if (stub == hit.CSC_LCTDigi()) return true;

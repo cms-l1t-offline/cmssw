@@ -29,7 +29,7 @@
 #include "DataFormats/GEMRecHit/interface/ME0SegmentCollection.h"
 
 // tracks
-#include "DataFormats/L1TMuon/interface/EMTFTrack.h"
+#include "DataFormats/L1TMuon/interface/EMTFTrack2016.h"
 #include "DataFormats/L1Trigger/interface/Muon.h"
 #include "DataFormats/L1TMuon/interface/L1MuBMTrack.h"
 
@@ -68,7 +68,7 @@ namespace L1TMuon {
                const GEMPadDigiCollection*,
                const GEMCoPadDigiCollection*,
                const ME0SegmentCollection*,
-               const l1t::EMTFTrackCollection*,
+               const l1t::EMTFTrack2016Collection*,
                const L1MuBMTrackCollection*,
                const edm::Handle<l1t::MuonBxCollection>&,
                std::unique_ptr<l1t::MuonBxCollection>&);
