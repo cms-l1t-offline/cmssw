@@ -37,21 +37,6 @@ def L1NtupleAOD(process):
 
     return process
 
-def L1NtupleAODCalo(process):
-
-    L1NtupleTFileOut(process)
-    L1NtupleCustomReco(process)
-
-    process.load('L1Trigger.L1TNtuples.L1NtupleAODCalo_cff')
-    process.l1ntupleaodcalo = cms.Path(
-        process.L1NtupleAODCalo
-    )
-
-    process.schedule.append(process.l1ntupleaodcalo)
-
-    return process
-
-
 def L1NtupleAOD_MC(process):
     
     L1NtupleAOD(process)
@@ -185,7 +170,7 @@ def L1NtupleAODRAW(process):
 def L1NtupleAODRAWCalo(process):
 
     L1NtupleRAWCalo(process)
-    L1NtupleAODCalo(process)
+    L1NtupleAOD(process)
 
     return process
 
@@ -211,7 +196,7 @@ def L1NtupleAODRAWEMUCalo(process):
 
     L1NtupleRAWCalo(process)
     L1NtupleEMUCalo(process)
-    L1NtupleAODCalo(process)
+    L1NtupleAOD(process)
 
     return process
 
@@ -225,7 +210,7 @@ def L1NtupleAODEMU(process):
 def L1NtupleAODEMUCalo(process):
 
     L1NtupleEMUCalo(process)
-    L1NtupleAODCalo(process)
+    L1NtupleAOD(process)
 
     return process
 
