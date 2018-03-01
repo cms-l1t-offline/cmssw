@@ -37,7 +37,6 @@ def L1NtupleAOD(process):
 
     return process
 
-
 def L1NtupleAOD_MC(process):
     
     L1NtupleAOD(process)
@@ -68,6 +67,18 @@ def L1NtupleRAW(process):
 
     return process
 
+def L1NtupleRAWCalo(process):
+
+    L1NtupleTFileOut(process)
+
+    process.load('L1Trigger.L1TNtuples.L1NtupleRAWCalo_cff')
+    process.l1ntuplerawcalo = cms.Path(
+        process.L1NtupleRAWCalo
+    )
+
+    process.schedule.append(process.l1ntuplerawcalo)
+
+    return process
 
 
 def L1NtupleEMU(process):
@@ -82,6 +93,20 @@ def L1NtupleEMU(process):
     process.schedule.append(process.l1ntupleemu)
 
     return process
+
+def L1NtupleEMUCalo(process):
+
+    L1NtupleTFileOut(process)
+
+    process.load('L1Trigger.L1TNtuples.L1NtupleEMUCalo_cff')
+    process.l1ntupleemucalo = cms.Path(
+        process.L1NtupleEMUCalo
+    )
+
+    process.schedule.append(process.l1ntupleemucalo)
+
+    return process
+
 
 def L1NtupleEMULegacy(process):
 
@@ -118,6 +143,14 @@ def L1NtupleRAWEMU(process):
 
     return process
 
+def L1NtupleRAWEMUCalo(process):
+
+    L1NtupleRAWCalo(process)
+    L1NtupleEMUCalo(process)
+
+    return process
+
+
 def L1NtupleRAWEMULegacy(process):
 
     L1NtupleRAW(process)
@@ -127,10 +160,16 @@ def L1NtupleRAWEMULegacy(process):
     return process
 
 
-
 def L1NtupleAODRAW(process):
 
     L1NtupleRAW(process)
+    L1NtupleAOD(process)
+
+    return process
+
+def L1NtupleAODRAWCalo(process):
+
+    L1NtupleRAWCalo(process)
     L1NtupleAOD(process)
 
     return process
@@ -153,12 +192,28 @@ def L1NtupleAODRAWEMU(process):
 
     return process
 
+def L1NtupleAODRAWEMUCalo(process):
+
+    L1NtupleRAWCalo(process)
+    L1NtupleEMUCalo(process)
+    L1NtupleAOD(process)
+
+    return process
+
 def L1NtupleAODEMU(process):
 
     L1NtupleEMU(process)
     L1NtupleAOD(process)
 
     return process
+
+def L1NtupleAODEMUCalo(process):
+
+    L1NtupleEMUCalo(process)
+    L1NtupleAOD(process)
+
+    return process
+
 
 def L1NtupleAODEMU_MC(process):
 
