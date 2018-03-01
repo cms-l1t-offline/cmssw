@@ -42,7 +42,16 @@ namespace l1t
          { return trkPtr_ ; }
 
       const edm::Ref< MuonBxCollection >& getMuRef() const
-	{ return muRef_ ; }
+ 	{ return muRef_ ; }
+
+      const double l1RefEta() const
+        { return muRef_->eta() ; }
+
+      const double l1RefPhi() const
+        { return muRef_->phi() ; }
+
+      const double l1RefEt() const
+       { return muRef_->et() ; }
     
       float getTrkIsol() const { return theIsolation; }
       float getTrkzVtx() const { return TrkzVtx_ ; }

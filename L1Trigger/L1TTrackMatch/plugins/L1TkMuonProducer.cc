@@ -79,7 +79,7 @@ private:
   float ZMAX_;             // |z_track| < ZMAX in cm
   float CHI2MAX_;
   float PTMINTRA_;
-  //  float DRmax_;
+  float DRCutoff_;
   int nStubsmin_ ;         // minimum number of stubs   
   //  bool closest_ ;
   bool correctGMTPropForTkZ_;
@@ -104,7 +104,7 @@ L1TkMuonProducer::L1TkMuonProducer(const edm::ParameterSet& iConfig) :
    ZMAX_ = (float)iConfig.getParameter<double>("ZMAX");
    CHI2MAX_ = (float)iConfig.getParameter<double>("CHI2MAX");
    PTMINTRA_ = (float)iConfig.getParameter<double>("PTMINTRA");
-   //   DRmax_ = (float)iConfig.getParameter<double>("DRmax");
+   DRCutoff_ = (float)iConfig.getParameter<double>("DRCutoff");
    nStubsmin_ = iConfig.getParameter<int>("nStubsmin");
    //   closest_ = iConfig.getParameter<bool>("closest");
 
@@ -198,16 +198,17 @@ L1TkMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     LogDebug("MYDEBUG")<<"matching index is "<<match_idx;
     if (match_idx >= 0){
       const L1TTTrackType& matchTk = l1tks[match_idx];
-      
-      float etaCut = 3.*sqrt(l1mu->hwDEtaExtra()*l1mu->hwDEtaExtra() + matchProp.sigmaEta*matchProp.sigmaEta);
-      float phiCut = 4.*sqrt(l1mu->hwDPhiExtra()*l1mu->hwDPhiExtra() + matchProp.sigmaPhi*matchProp.sigmaPhi);
+      /* Commenting out as  values etaCut and phiCut are not physical (SD)
+      //      float etaCut = 3.*sqrt(l1mu->hwDEtaExtra()*l1mu->hwDEtaExtra() + matchProp.sigmaEta*matchProp.sigmaEta);
+      //      float phiCut = 4.*sqrt(l1mu->hwDPhiExtra()*l1mu->hwDPhiExtra() + matchProp.sigmaPhi*matchProp.sigmaPhi);
 
-      float dEta = std::abs(matchProp.eta - l1mu->eta());
-      float dPhi = std::abs(deltaPhi(matchProp.phi, l1mu->phi()));
+      //      float dEta = std::abs(matchProp.eta - l1mu->eta());
+      //      float dPhi = std::abs(deltaPhi(matchProp.phi, l1mu->phi()));
 
-      LogDebug("MYDEBUG")<<"match details: prop "<<matchProp.pt<<" "<<matchProp.eta<<" "<<matchProp.phi
+      //      LogDebug("MYDEBUG")<<"match details: prop "<<matchProp.pt<<" "<<matchProp.eta<<" "<<matchProp.phi
 			 <<" mutk "<<l1mu->pt()<<" "<<l1mu->eta()<<" "<<l1mu->phi()<<" delta "<<dEta<<" "<<dPhi<<" cut "<<etaCut<<" "<<phiCut;
-      if (dEta < etaCut && dPhi < phiCut){
+      //      if ( dEta < etaCut && dPhi < phiCut){ */
+      if (drmin < DRCutoff_) {
 	edm::Ptr< L1TTTrackType > l1tkPtr(l1tksH, match_idx);
 
 	unsigned int nPars = 4;
