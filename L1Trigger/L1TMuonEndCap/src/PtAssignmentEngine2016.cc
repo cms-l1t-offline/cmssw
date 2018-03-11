@@ -649,10 +649,11 @@ float PtAssignmentEngine2016::calculate_pt_xml(const address_t& address) const {
     if (mv != -999) {
       int v = variables.at(mv);
       if (!(mode_inv == 13 && i == 3)) {  // somehow this uses CSCID1
-        if (not(v != -999))
-	  { edm::LogError("L1T") << "v = " << v; return -1; }
+        assert(v != -999);
       }
       tree_data.push_back(v);
+    } else {
+      tree_data.push_back(0);  // pad with zeroes, somehow BDT tries to access out of bounds
     }
   }
 
@@ -694,8 +695,7 @@ float PtAssignmentEngine2016::calculate_pt_xml(const address_t& address) const {
     pt = (tmp_pt == 0) ? tmp_pt : 1.0/tmp_pt;
   }
 
-  if (not(pt > 0))
-    { edm::LogError("L1T") << "pt = " << pt; return -1; }
+  assert(pt > 0);
   return pt;
 }
 
@@ -705,4 +705,4 @@ float PtAssignmentEngine2016::calculate_pt_xml(const EMTFTrack& track) const {
   float pt = 0.;
 
   return pt;
-} 
+}

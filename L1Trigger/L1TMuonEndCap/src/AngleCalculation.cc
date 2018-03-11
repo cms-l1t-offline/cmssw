@@ -14,7 +14,7 @@ namespace {
 void AngleCalculation::configure(
     int verbose, int endcap, int sector, int bx,
     int bxWindow,
-    int thetaWindow, int thetaWindowRPC,
+    int thetaWindow,
     bool bugME11Dupes
 ) {
   verbose_ = verbose;
@@ -24,7 +24,6 @@ void AngleCalculation::configure(
 
   bxWindow_        = bxWindow;
   thetaWindow_     = thetaWindow;
-  thetaWindowRPC_  = thetaWindowRPC;
   bugME11Dupes_    = bugME11Dupes;
 }
 
@@ -90,16 +89,12 @@ void AngleCalculation::calculate_angles(EMTFTrack& track) const {
       }
     }
 
-    if (bugME11Dupes_) {
-      if (not (st_conv_hits.at(istation).size() <= 4)) // ambiguity in theta is max 4
-	{ edm::LogError("L1T") << "st_conv_hits.at(istation).size() = " << st_conv_hits.at(istation).size(); return; }
-    } else {
-      if (not (st_conv_hits.at(istation).size() <= 2))  // ambiguity in theta is max 2
-	{ edm::LogError("L1T") << "st_conv_hits.at(istation).size() = " << st_conv_hits.at(istation).size(); return; }
-    }
+    if (bugME11Dupes_)
+      assert(st_conv_hits.at(istation).size() <= 4);  // ambiguity in theta is max 4
+    else
+      assert(st_conv_hits.at(istation).size() <= 2);  // ambiguity in theta is max 2
   }
-  if (not (st_conv_hits.size() == emtf::NUM_STATIONS))
-    { edm::LogError("L1T") << "st_conv_hits.size() = " << st_conv_hits.size() << ", emtf::NUM_STATIONS = " << emtf::NUM_STATIONS; return; }
+  assert(st_conv_hits.size() == emtf::NUM_STATIONS);
 
 
   // Best theta deltas and phi deltas
@@ -150,10 +145,8 @@ void AngleCalculation::calculate_angles(EMTFTrack& track) const {
           int thB = conv_hitB.Theta_fp();
           int dth = abs_diff(thA, thB);
           int dth_sign = (thA <= thB);  // sign
-          if (not(thA != 0 && thB != 0))
-	    { edm::LogError("L1T") << "thA = " << thA << ", thB = " << thB; return; }
-          if (not(dth < invalid_dtheta))
-	    { edm::LogError("L1T") << "dth = " << dth << ", invalid_dtheta = " << invalid_dtheta; return; }
+          assert(thA != 0 && thB != 0);
+          assert(dth < invalid_dtheta);
 
           if (best_dtheta_arr.at(ipair) >= dth) {
             best_dtheta_arr.at(ipair) = dth;
@@ -186,8 +179,7 @@ void AngleCalculation::calculate_angles(EMTFTrack& track) const {
       ++ipair;
     }  // end loop over station B
   }  // end loop over station A
-  if (not(ipair == emtf::NUM_STATION_PAIRS))
-    { edm::LogError("L1T") << "ipair = " << ipair << ", emtf::NUM_STATION_PAIRS = " << emtf::NUM_STATION_PAIRS; return; }
+  assert(ipair == emtf::NUM_STATION_PAIRS);
 
 
   // Apply cuts on dtheta
@@ -198,10 +190,7 @@ void AngleCalculation::calculate_angles(EMTFTrack& track) const {
   std::array<bool, emtf::NUM_STATION_PAIRS> best_dtheta_valid_arr_1;
 
   for (int ipair = 0; ipair < emtf::NUM_STATION_PAIRS; ++ipair) {
-    if (best_has_rpc_arr.at(ipair))
-      best_dtheta_valid_arr_1.at(ipair) = best_dtheta_valid_arr.at(ipair) && (best_dtheta_arr.at(ipair) <= thetaWindowRPC_);
-    else
-      best_dtheta_valid_arr_1.at(ipair) = best_dtheta_valid_arr.at(ipair) && (best_dtheta_arr.at(ipair) <= thetaWindow_);
+    best_dtheta_valid_arr_1.at(ipair) = best_dtheta_valid_arr.at(ipair) && (best_dtheta_arr.at(ipair) <= thetaWindow_);
   }
 
   // Find valid segments
@@ -241,6 +230,50 @@ void AngleCalculation::calculate_angles(EMTFTrack& track) const {
     vstat |= vmask2;
   if ((vstat & vmask3) != 0 || vstat == 0)
     vstat |= vmask3;
+
+
+  // FIXME: describe changes, add configuration parameter
+  bool use_truth_table = false;
+
+  static const int trk_bld[64] = {
+    0b1111, 0b0111, 0b0111, 0b0111, 0b1011, 0b0011, 0b1110, 0b0011,
+    0b0111, 0b0111, 0b0111, 0b0111, 0b1011, 0b0011, 0b0011, 0b0011,
+    0b1011, 0b1101, 0b0011, 0b0011, 0b1011, 0b0011, 0b0011, 0b0011,
+    0b1011, 0b0011, 0b0011, 0b0011, 0b1011, 0b0011, 0b0011, 0b0011,
+    0b1101, 0b1101, 0b1110, 0b0101, 0b1110, 0b1001, 0b1110, 0b0110,
+    0b0101, 0b0101, 0b0101, 0b0101, 0b1001, 0b1001, 0b0110, 0b0110,
+    0b1101, 0b1101, 0b0101, 0b0101, 0b1001, 0b1001, 0b1010, 0b1100,
+    0b0101, 0b0101, 0b0101, 0b0101, 0b1001, 0b1001, 0b1010, 0b0000
+  };
+
+  if (use_truth_table) {
+    // construct bad delta word
+    // dth_bad = {12,23,34,13,14,24}
+    unsigned dth_bad = 0b111111;  // "1" is bad. if valid, change to "0" (good)
+    if (best_dtheta_valid_arr_1.at(0)) {
+      dth_bad &= (~(1 << 5));  // 12
+    }
+    if (best_dtheta_valid_arr_1.at(1)) {
+      dth_bad &= (~(1 << 2));  // 13
+    }
+    if (best_dtheta_valid_arr_1.at(2)) {
+      dth_bad &= (~(1 << 1));  // 14
+    }
+    if (best_dtheta_valid_arr_1.at(3)) {
+      dth_bad &= (~(1 << 4));  // 23
+    }
+    if (best_dtheta_valid_arr_1.at(4)) {
+      dth_bad &= (~(1 << 0));  // 24
+    }
+    if (best_dtheta_valid_arr_1.at(5)) {
+      dth_bad &= (~(1 << 3));  // 34
+    }
+    assert(dth_bad < 64);
+
+    // extract station mask from LUT
+    vstat = trk_bld[dth_bad];
+  }
+
 
   // remove valid flag for station if hit does not pass the dTheta mask
   for (int istation = 0; istation < emtf::NUM_STATIONS; ++istation) {
@@ -284,8 +317,7 @@ void AngleCalculation::calculate_angles(EMTFTrack& track) const {
   if (best_pair != -1) {
     phi_fp   = best_phi_arr.at(best_pair);
     theta_fp = best_theta_arr.at(best_pair);
-    if (not(theta_fp != 0))
-      { edm::LogError("L1T") << "theta_fp = " << theta_fp; return; }
+    assert(theta_fp != 0);
 
     // In firmware, the track is associated to LCTs by the segment number, which
     // identifies the best strip, but does not resolve the ambiguity in theta.
@@ -339,7 +371,7 @@ void AngleCalculation::calculate_angles(EMTFTrack& track) const {
     // if (subsystem == TriggerPrimitive::kRPC)
     //   return (station == 2);
 
-    // In EMTF firmware, RPC hits are treated as if they came from the corresponding 
+    // In EMTF firmware, RPC hits are treated as if they came from the corresponding
     // CSC chamber, so the FR bit assignment is the same as for CSCs - AWB 06.06.17
 
     // GEMs are in front of the CSCs
@@ -372,7 +404,7 @@ void AngleCalculation::calculate_angles(EMTFTrack& track) const {
     const auto& v = st_conv_hits.at(i);
     ptlut_data.cpattern[i] = v.empty() ? 0 : v.front().Pattern();  // Automatically set to 0 for RPCs
     ptlut_data.fr[i]       = v.empty() ? 0 : isFront(v.front().Station(), v.front().Ring(), v.front().Chamber(), v.front().Subsystem());
-    if (i == 0) 
+    if (i == 0)
       ptlut_data.st1_ring2 = v.empty() ? 0 : (v.front().Station() == 1 && (v.front().Ring() == 2 || v.front().Ring() == 3));
   }
 
@@ -387,8 +419,7 @@ void AngleCalculation::calculate_angles(EMTFTrack& track) const {
     const auto& v = st_conv_hits.at(i);
     if (!v.empty()) {
       int bt_station = v.front().BT_station();
-      if (not(0 <= bt_station && bt_station <= 4))
-	{ edm::LogError("L1T") << "bt_station = " << bt_station; return; }
+      assert(0 <= bt_station && bt_station <= 4);
 
       int bt_segment = v.front().BT_segment();
       ptlut_data.bt_vi[bt_station] = 1;
@@ -424,8 +455,7 @@ void AngleCalculation::calculate_angles(EMTFTrack& track) const {
 
 void AngleCalculation::calculate_bx(EMTFTrack& track) const {
   const int delayBX = bxWindow_ - 1;
-  if (not(delayBX >= 0))
-    { edm::LogError("L1T") << "delayBX = " << delayBX; return; }
+  assert(delayBX >= 0);
   std::vector<int> counter(delayBX+1, 0);
 
   for (const auto& conv_hit : track.Hits()) {
@@ -443,8 +473,7 @@ void AngleCalculation::calculate_bx(EMTFTrack& track) const {
       break;
     }
   }
-  if (not(second_bx != 99))
-    { edm::LogError("L1T") << "second_bx = " << second_bx; return; }
+  assert(second_bx != 99);
 
   // ___________________________________________________________________________
   // Output
@@ -466,9 +495,7 @@ void AngleCalculation::erase_tracks(EMTFTrackCollection& tracks) const {
   tracks.erase(std::remove_if(tracks.begin(), tracks.end(), rank_zero_pred), tracks.end());
 
   for (const auto& track : tracks) {
-    if (not(!track.Hits().empty()))
-      { edm::LogError("L1T") << "track.Hits().empty() = " << track.Hits().empty(); return; }
-    if (not(track.Hits().size() <= emtf::NUM_STATIONS))
-      { edm::LogError("L1T") << "track.Hits().size() = " << track.Hits().size() << ", emtf::NUM_STATIONS= " << emtf::NUM_STATIONS; return; }
+    assert(!track.Hits().empty());
+    assert(track.Hits().size() <= emtf::NUM_STATIONS);
   }
 }

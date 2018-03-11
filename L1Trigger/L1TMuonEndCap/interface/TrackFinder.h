@@ -30,26 +30,23 @@ public:
 private:
   GeometryTranslator geometry_translator_;
 
+  TTGeometryTranslator ttgeometry_translator_;
+
   ConditionHelper condition_helper_;
-  unsigned int fw_version_;
-  unsigned int pt_lut_version_;
-  unsigned int pc_lut_version_;
 
   SectorProcessorLUT sector_processor_lut_;
 
-  PtAssignmentEngine* pt_assign_engine_;
-  std::unique_ptr<PtAssignmentEngine> pt_assign_engine_2016_;
-  std::unique_ptr<PtAssignmentEngine> pt_assign_engine_2017_;
+  std::unique_ptr<PtAssignmentEngine> pt_assign_engine_;
 
   emtf::sector_array<SectorProcessor> sector_processors_;
 
   const edm::ParameterSet config_;
 
-  const edm::EDGetToken tokenCSC_, tokenRPC_, tokenGEM_;
+  const edm::EDGetToken tokenCSC_, tokenRPC_, tokenGEM_, tokenIRPC_, tokenME0_, tokenTT_;
 
   int verbose_;
 
-  bool useCSC_, useRPC_, useGEM_;
+  bool useCSC_, useRPC_, useGEM_, useIRPC_, useME0_, useTT_;
 
   std::string era_;
 };

@@ -9,7 +9,7 @@ public:
   void configure(
       int verbose, int endcap, int sector, int bx,
       int bxWindow,
-      int thetaWindow, int thetaWindowRPC,
+      int thetaWindow,
       bool bugME11Dupes
   );
 
@@ -27,7 +27,7 @@ private:
   int verbose_, endcap_, sector_, bx_;
 
   int bxWindow_;
-  int thetaWindow_, thetaWindowRPC_;
+  int thetaWindow_;
   bool bugME11Dupes_;
 };
 

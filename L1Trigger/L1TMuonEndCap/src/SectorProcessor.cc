@@ -11,36 +11,31 @@ SectorProcessor::~SectorProcessor() {
 
 void SectorProcessor::configure(
     const GeometryTranslator* tp_geom,
+    const TTGeometryTranslator* tp_ttgeom,
     const ConditionHelper* cond,
     const SectorProcessorLUT* lut,
-    PtAssignmentEngine** pt_assign_engine,
+    PtAssignmentEngine* pt_assign_engine,
     int verbose, int endcap, int sector,
     int minBX, int maxBX, int bxWindow, int bxShiftCSC, int bxShiftRPC, int bxShiftGEM,
+    std::string era,
     const std::vector<int>& zoneBoundaries, int zoneOverlap,
     bool includeNeighbor, bool duplicateTheta, bool fixZonePhi, bool useNewZones, bool fixME11Edges,
     const std::vector<std::string>& pattDefinitions, const std::vector<std::string>& symPattDefinitions, bool useSymPatterns,
-    int thetaWindow, int thetaWindowRPC, bool useSingleHits, bool bugSt2PhDiff, bool bugME11Dupes,
+    int thetaWindow, bool useSingleHits, bool bugSt2PhDiff, bool bugME11Dupes,
     int maxRoadsPerZone, int maxTracks, bool useSecondEarliest, bool bugSameSectorPt0,
-    int ptLUTVersion, bool readPtLUTFile, bool fixMode15HighPt, bool bug9BitDPhi, bool bugMode7CLCT, bool bugNegPt, bool bugGMTPhi, bool promoteMode7
+    bool readPtLUTFile, bool fixMode15HighPt, bool bug9BitDPhi, bool bugMode7CLCT, bool bugNegPt, bool bugGMTPhi, bool promoteMode7
 ) {
-  if (not(emtf::MIN_ENDCAP <= endcap && endcap <= emtf::MAX_ENDCAP))
-    { edm::LogError("L1T") << "emtf::MIN_ENDCAP = " << emtf::MIN_ENDCAP 
-			   << ", emtf::MAX_ENDCAP = " << emtf::MAX_ENDCAP
-			   << ", endcap = " << endcap; return; }
-  if (not(emtf::MIN_TRIGSECTOR <= sector && sector <= emtf::MAX_TRIGSECTOR))
-    { edm::LogError("L1T") << "emtf::MIN_TRIGSECTOR = " << emtf::MIN_TRIGSECTOR 
-			   << ", emtf::MAX_TRIGSECTOR = " << emtf::MAX_TRIGSECTOR
-			   << ", endcap = " << sector; return; }
-  if (not(tp_geom != nullptr))
-    { edm::LogError("L1T") << "tp_geom = nullptr"; return; }
-  if (not(cond != nullptr))
-    { edm::LogError("L1T") << "cond = nullptr"; return; }
-  if (not(lut != nullptr))
-    { edm::LogError("L1T") << "lut = nullptr"; return; }
-  if (not(pt_assign_engine != nullptr))
-    { edm::LogError("L1T") << "pt_assign_engine = nullptr"; return; }
+  assert(emtf::MIN_ENDCAP <= endcap && endcap <= emtf::MAX_ENDCAP);
+  assert(emtf::MIN_TRIGSECTOR <= sector && sector <= emtf::MAX_TRIGSECTOR);
+
+  assert(tp_geom != nullptr);
+  assert(tp_ttgeom != nullptr);
+  assert(cond != nullptr);
+  assert(lut != nullptr);
+  assert(pt_assign_engine != nullptr);
 
   tp_geom_          = tp_geom;
+  tp_ttgeom_        = tp_ttgeom;
   cond_             = cond;
   lut_              = lut;
   pt_assign_engine_ = pt_assign_engine;
@@ -56,6 +51,8 @@ void SectorProcessor::configure(
   bxShiftRPC_  = bxShiftRPC;
   bxShiftGEM_  = bxShiftGEM;
 
+  era_ = era;
+
   zoneBoundaries_     = zoneBoundaries;
   zoneOverlap_        = zoneOverlap;
   includeNeighbor_    = includeNeighbor;
@@ -69,7 +66,6 @@ void SectorProcessor::configure(
   useSymPatterns_     = useSymPatterns;
 
   thetaWindow_        = thetaWindow;
-  thetaWindowRPC_     = thetaWindowRPC;
   useSingleHits_      = useSingleHits;
   bugSt2PhDiff_       = bugSt2PhDiff;
   bugME11Dupes_       = bugME11Dupes;
@@ -79,7 +75,6 @@ void SectorProcessor::configure(
   useSecondEarliest_  = useSecondEarliest;
   bugSameSectorPt0_   = bugSameSectorPt0;
 
-  ptLUTVersion_       = ptLUTVersion;
   readPtLUTFile_      = readPtLUTFile;
   fixMode15HighPt_    = fixMode15HighPt;
   bug9BitDPhi_        = bug9BitDPhi;
@@ -89,15 +84,11 @@ void SectorProcessor::configure(
   promoteMode7_       = promoteMode7;
 }
 
-void SectorProcessor::set_pt_lut_version(unsigned pt_lut_version) {
-  ptLUTVersion_ = pt_lut_version;
-  // std::cout << "  * In endcap " << endcap_ << ", sector " << sector_ << ", set ptLUTVersion_ to " << ptLUTVersion_ << std::endl;
-}
-
 // Refer to docs/EMTF_FW_LUT_versions_2016_draft2.xlsx
 void SectorProcessor::configure_by_fw_version(unsigned fw_version) {
-
-  // std::cout << "Running configure_by_fw_version with version " << fw_version << std::endl;
+  if (verbose_ > 0) {
+    std::cout << "Configure SectorProcessor with fw_version: " << fw_version << std::endl;
+  }
 
   if (fw_version == 0 || fw_version == 123456)  // fw_version '123456' is from the fake conditions
     return;
@@ -111,7 +102,7 @@ void SectorProcessor::configure_by_fw_version(unsigned fw_version) {
 
     // ___________________________________________________________________________
     // Versions in 2017 - no full documentation, can refer to https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1KnownIssues
-    
+
     // Before July 9th (runs < 298653), all mode 7 tracks (station 2-3-4) assigned quality 11
     // July 9th - 29th (runs 298653 - 300087), mode 7 tracks with |eta| > 1.6 in sector -6 assigned quality 12
     // After July 29th (runs >= 300088), mode 7 track promotion applied in all sectors
@@ -140,20 +131,20 @@ void SectorProcessor::configure_by_fw_version(unsigned fw_version) {
     fixME11Edges_    = false;
 
     pattDefinitions_    = { "4,15:15,7:7,7:7,7:7",
-			    "3,16:16,7:7,7:6,7:6",
-			    "3,14:14,7:7,8:7,8:7",
-			    "2,18:17,7:7,7:5,7:5",  // Should be 7:4 in ME3,4 (FW bug)
-			    "2,13:12,7:7,10:7,10:7",
-			    "1,22:19,7:7,7:0,7:0",
-			    "1,11:8,7:7,14:7,14:7",
-			    "0,30:23,7:7,7:0,7:0",
-			    "0,7:0,7:7,14:7,14:7" };
+                            "3,16:16,7:7,7:6,7:6",
+                            "3,14:14,7:7,8:7,8:7",
+                            "2,18:17,7:7,7:5,7:5",  // Should be 7:4 in ME3,4 (FW bug)
+                            "2,13:12,7:7,10:7,10:7",
+                            "1,22:19,7:7,7:0,7:0",
+                            "1,11:8,7:7,14:7,14:7",
+                            "0,30:23,7:7,7:0,7:0",
+                            "0,7:0,7:7,14:7,14:7" };
     // Straightness, hits in ME1, hits in ME2, hits in ME3, hits in ME4
     symPattDefinitions_ = { "4,15:15:15:15,7:7:7:7,7:7:7:7,7:7:7:7",
-			    "3,16:16:14:14,7:7:7:7,8:7:7:6,8:7:7:6",
-			    "2,18:17:13:12,7:7:7:7,10:7:7:4,10:7:7:4",
-			    "1,22:19:11:8,7:7:7:7,14:7:7:0,14:7:7:0",
-			    "0,30:23:7:0,7:7:7:7,14:7:7:0,14:7:7:0" };
+                            "3,16:16:14:14,7:7:7:7,8:7:7:6,8:7:7:6",
+                            "2,18:17:13:12,7:7:7:7,10:7:7:4,10:7:7:4",
+                            "1,22:19:11:8,7:7:7:7,14:7:7:0,14:7:7:0",
+                            "0,30:23:7:0,7:7:7:7,14:7:7:0,14:7:7:0" };
 
     thetaWindow_   = 4;      // Maximum dTheta between primitives in the same track
     useSingleHits_ = false;  // Build "tracks" from single LCTs in ME1/1
@@ -164,7 +155,7 @@ void SectorProcessor::configure_by_fw_version(unsigned fw_version) {
     bugGMTPhi_ = true;
     promoteMode7_ = false;  // Assign station 2-3-4 tracks with |eta| > 1.6 SingleMu quality
   } // End default settings for 2016
-			    
+
 
   // ___________________________________________________________________________
   // Versions in 2016 - refer to docs/EMTF_FW_LUT_versions_2016_draft2.xlsx
@@ -256,6 +247,7 @@ void SectorProcessor::configure_by_fw_version(unsigned fw_version) {
 void SectorProcessor::process(
     EventNumber_t ievent,
     const TriggerPrimitiveCollection& muon_primitives,
+    const TTTriggerPrimitiveCollection& ttmuon_primitives,
     EMTFHitCollection& out_hits,
     EMTFTrackCollection& out_tracks
 ) const {
@@ -283,6 +275,7 @@ void SectorProcessor::process(
     process_single_bx(
         bx,
         muon_primitives,
+        ttmuon_primitives,
         out_hits,
         out_tracks,
         extended_conv_hits,
@@ -305,6 +298,7 @@ void SectorProcessor::process(
 void SectorProcessor::process_single_bx(
     int bx,
     const TriggerPrimitiveCollection& muon_primitives,
+    const TTTriggerPrimitiveCollection& ttmuon_primitives,
     EMTFHitCollection& out_hits,
     EMTFTrackCollection& out_tracks,
     std::deque<EMTFHitCollection>& extended_conv_hits,
@@ -333,6 +327,12 @@ void SectorProcessor::process_single_bx(
       bugME11Dupes_
   );
 
+  TTPrimitiveConversion ttprim_conv;
+  ttprim_conv.configure(
+      tp_ttgeom_, lut_,
+      verbose_, endcap_, sector_, bx
+  );
+
   PatternRecognition patt_recog;
   patt_recog.configure(
       verbose_, endcap_, sector_, bx,
@@ -352,7 +352,7 @@ void SectorProcessor::process_single_bx(
   angle_calc.configure(
       verbose_, endcap_, sector_, bx,
       bxWindow_,
-      thetaWindow_, thetaWindowRPC_,
+      thetaWindow_,
       bugME11Dupes_
   );
 
@@ -373,9 +373,9 @@ void SectorProcessor::process_single_bx(
 
   PtAssignment pt_assign;
   pt_assign.configure(
-      *pt_assign_engine_,
+      pt_assign_engine_,
       verbose_, endcap_, sector_, bx,
-      ptLUTVersion_, readPtLUTFile_, fixMode15HighPt_,
+      readPtLUTFile_, fixMode15HighPt_,
       bug9BitDPhi_, bugMode7CLCT_, bugNegPt_,
       bugGMTPhi_, promoteMode7_
   );
@@ -410,14 +410,35 @@ void SectorProcessor::process_single_bx(
   // Convert trigger primitives into "converted" hits
   // A converted hit consists of integer representations of phi, theta, and zones
   // From src/PrimitiveConversion.cc
+#ifdef PHASE_TWO_TRIGGER
+  prim_conv.process(selected_prim_map, conv_hits);
+  EMTFHitCollection tmp_conv_hits;
+  for (const auto& conv_hit : conv_hits) {
+    if (prim_conv.is_valid_for_run2(conv_hit)) {
+      tmp_conv_hits.push_back(conv_hit);
+    }
+  }
+  extended_conv_hits.push_back(tmp_conv_hits);
+#else
   prim_conv.process(selected_prim_map, conv_hits);
   extended_conv_hits.push_back(conv_hits);
+#endif
 
   {
     // Keep all the converted hits for the use of data-emulator comparisons.
     // They include the extra ones that are not used in track building and the subsequent steps.
     prim_sel.merge_no_truncate(selected_csc_map, selected_rpc_map, selected_gem_map, inclusive_selected_prim_map);
     prim_conv.process(inclusive_selected_prim_map, inclusive_conv_hits);
+
+    // Clear the input maps to save memory
+    selected_csc_map.clear();
+    selected_rpc_map.clear();
+    selected_gem_map.clear();
+
+#ifdef PHASE_TWO_TRIGGER
+    // Convert tracker trigger primitives into "converted" hits
+    ttprim_conv.process_no_prim_sel(ttmuon_primitives, inclusive_conv_hits);
+#endif
   }
 
   // Detect patterns in all zones, find 3 best roads in each zone
@@ -439,7 +460,11 @@ void SectorProcessor::process_single_bx(
 
   // Insert single LCTs from station 1 as tracks
   // From src/SingleHitTracks.cc
+#ifdef PHASE_TWO_TRIGGER
+  // Do not make single-hit tracks
+#else
   single_hit.process(conv_hits, best_tracks);
+#endif
 
   // Construct pT address, assign pT, calculate other GMT quantities
   // From src/PtAssignment.cc
