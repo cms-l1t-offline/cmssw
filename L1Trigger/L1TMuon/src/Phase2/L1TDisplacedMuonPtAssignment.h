@@ -45,10 +45,15 @@ namespace L1TMuon
     void setME0Geometry(const ME0Geometry *g) { me0_g = g; }
 
     // set inputs: muon and  trigger primitives
+    // lcts should be from L1Muon (or EMTF track) + recovered stubs??
     void setMuon(const l1t::Muon& muon) {muon_ = muon;}
     void setTriggerPrimitives(const std::vector<GEMPadDigiId>& pads) {pads_ = pads;}
     void setTriggerPrimitives(const std::vector<CSCCorrelatedLCTDigiId>& lcts) {lcts_ = lcts;}
     void setTriggerPrimitives(const ME0Segment& seg) {segment_ = seg;}
+
+    void convertStubsIntoGlobalpoints();
+    void convertGEMPadsIntoGlobalpoints();
+    void convertME0SegIntoGlobalpoints();
 
     // specify method
     void useGE11(bool useGE11) {useGE11_ = useGE11;}
@@ -67,7 +72,8 @@ namespace L1TMuon
 
     void calculateDirectionPtBarrel();
     void calculateDirectionPtOverlap();
-    void calculateDirectionPtEndcapLow();
+    //void calculateDirectionPtEndcap();
+    //void calculateDirectionPtEndcapLow();
     void calculateDirectionPtEndcapMedium();
     void calculateDirectionPtEndcapHigh();
 
@@ -98,6 +104,9 @@ namespace L1TMuon
     std::vector<CSCCorrelatedLCTDigiId> lcts_;
     ME0Segment segment_;
 
+    void initVariables();
+
+
     // Barrel members
     bool has_stub_mb1, has_stub_mb2, has_stub_mb3, has_stub_mb4;
     float phi_mb1, phi_mb2, phi_mb3, phi_mb4;
@@ -111,18 +120,26 @@ namespace L1TMuon
     bool hasRPC_[4] = {false, false, false, false};
     bool hasDT_[4] = {false, false, false, false};
     bool hasGEM_[4] = {false, false, false, false};
+    bool hasME0_ = false;
 
     EndcapTriggerPtAssignmentHelper::EvenOdd isEven[4] = {EndcapTriggerPtAssignmentHelper::EvenOdd::Odd,
                                                           EndcapTriggerPtAssignmentHelper::EvenOdd::Odd,
                                                           EndcapTriggerPtAssignmentHelper::EvenOdd::Odd,
                                                           EndcapTriggerPtAssignmentHelper::EvenOdd::Odd};
-    GlobalPoint gp_ME[4];
-    GlobalPoint gp_st_layer3[4];
+    //endcap member
+    GlobalPoint gp_ME[4]; //gp from stubs
+    GlobalPoint gp_GEM[2];//GE11, GE21
+    GlobalPoint gp_ME0; //ME0
+    GlobalPoint gp_st_layer3[4]; // gp from fitting comparator digis 
+    //float phi_me0, eta_me0;
+    int meRing ;
+    float ddY123, phiM_st1, phiM_st2, dPhi_dir_st1_st2;
 
     // pts
-    float positionPt_;
-    float directionPt_;
-    float hybridPt_;
+    // by defualt, 0 GeV
+    float positionPt_ = 0.0;
+    float directionPt_ = 0.0;
+    float hybridPt_ = 0.0;
   };
 }
 
