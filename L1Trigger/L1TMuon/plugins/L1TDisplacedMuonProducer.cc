@@ -35,14 +35,7 @@ public:
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
 private:
-  virtual void beginJob() ;
   virtual void produce(edm::Event&, const edm::EventSetup&);
-  virtual void endJob() ;
-
-  virtual void beginRun(edm::Run const&, edm::EventSetup const&);
-  virtual void endRun(edm::Run const&, edm::EventSetup const&);
-  virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
-  virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
   // ----------member data ---------------------------
   edm::InputTag cscCompTag_;
@@ -54,6 +47,9 @@ private:
   edm::InputTag emtfTag_;
   edm::InputTag bmtfTag_;
   edm::InputTag muonTag_;
+  edm::InputTag emtfMuonTag_;
+  edm::InputTag omtfMuonTag_;
+  edm::InputTag bmtfMuonTag_;
 
   edm::EDGetTokenT<CSCComparatorDigiCollection> comparatorToken_;
   edm::EDGetTokenT<CSCCorrelatedLCTDigiCollection> lctToken_;
@@ -63,23 +59,13 @@ private:
   edm::EDGetTokenT<ME0SegmentCollection> segmentToken_;
   edm::EDGetTokenT<l1t::EMTFTrackCollection> emtfToken_;
   edm::EDGetTokenT<L1MuBMTrackCollection> bmtfToken_;
-  edm::EDGetTokenT<l1t::MuonBxCollection> muonToken_;
+  edm::EDGetTokenT<l1t::RegionalMuonCandBxCollection> bmtfMuonToken_;
+  edm::EDGetTokenT<l1t::RegionalMuonCandBxCollection> omtfMuonToken_;
+  edm::EDGetTokenT<l1t::RegionalMuonCandBxCollection> emtfMuonToken_;
 
   edm::ParameterSet config_;
 };
 
-//
-// constants, enums and typedefs
-//
-
-
-//
-// static data member definitions
-//
-
-//
-// constructors and destructor
-//
 L1TDisplacedMuonProducer::L1TDisplacedMuonProducer(const edm::ParameterSet& iConfig)
 {
   cscCompTag_ = iConfig.getParameter<edm::InputTag>("cscCompTag");
@@ -90,8 +76,9 @@ L1TDisplacedMuonProducer::L1TDisplacedMuonProducer(const edm::ParameterSet& iCon
   me0SegmentTag_ = iConfig.getParameter<edm::InputTag>("me0SegmentTag");
   emtfTag_ = iConfig.getParameter<edm::InputTag>("emtfTag");
   bmtfTag_ = iConfig.getParameter<edm::InputTag>("bmtfTag");
-  muonTag_ = iConfig.getParameter<edm::InputTag>("muonTag");
-
+  emtfMuonTag_ = iConfig.getParameter<edm::InputTag>("emtfMuonTag");
+  bmtfMuonTag_ = iConfig.getParameter<edm::InputTag>("bmtfMuonTag");
+  bmtfMuonTag_ = iConfig.getParameter<edm::InputTag>("bmtfMuonTag");
   comparatorToken_ = consumes<CSCComparatorDigiCollection>(cscCompTag_);
   lctToken_ = consumes<CSCCorrelatedLCTDigiCollection>(cscLctTag_);
   padToken_ = consumes<GEMPadDigiCollection>(padTag_);
@@ -100,7 +87,9 @@ L1TDisplacedMuonProducer::L1TDisplacedMuonProducer(const edm::ParameterSet& iCon
   segmentToken_ = consumes<ME0SegmentCollection>(me0SegmentTag_);
   emtfToken_ = consumes<l1t::EMTFTrackCollection>(emtfTag_);
   bmtfToken_ = consumes<L1MuBMTrackCollection>(bmtfTag_);
-  muonToken_ = consumes<l1t::MuonBxCollection>(muonTag_);
+  bmtfMuonToken_ = consumes<l1t::RegionalMuonCandBxCollection>(bmtfMuonTag_);
+  omtfMuonToken_ = consumes<l1t::RegionalMuonCandBxCollection>(omtfMuonTag_);
+  emtfMuonToken_ = consumes<l1t::RegionalMuonCandBxCollection>(emtfMuonTag_);
 
   config_ = iConfig;
 
@@ -112,14 +101,6 @@ L1TDisplacedMuonProducer::~L1TDisplacedMuonProducer()
 {
 }
 
-
-//
-// member functions
-//
-
-
-
-// ------------ method called to produce the data  ------------
 void
 L1TDisplacedMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
@@ -164,17 +145,23 @@ L1TDisplacedMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
   edm::Handle<ME0SegmentCollection> segments;
   iEvent.getByToken(segmentToken_, segments);
 
-  edm::Handle<l1t::MuonBxCollection> inMuonsPhase2;
-  iEvent.getByToken(muonToken_, inMuonsPhase2);
-
   edm::Handle<l1t::EMTFTrackCollection> emtfTracks;
   iEvent.getByToken(emtfToken_, emtfTracks);
 
   edm::Handle<L1MuBMTrackCollection> bmtfTracks;
   iEvent.getByToken(bmtfToken_, bmtfTracks);
 
+  edm::Handle<l1t::RegionalMuonCandBxCollection> bmtfMuons;
+  iEvent.getByToken(bmtfMuonToken_, bmtfMuons);
+
+  edm::Handle<l1t::RegionalMuonCandBxCollection> omtfMuons;
+  iEvent.getByToken(omtfMuonToken_, omtfMuons);
+
+  edm::Handle<l1t::RegionalMuonCandBxCollection> emtfMuons;
+  iEvent.getByToken(emtfMuonToken_, emtfMuons);
+
   // new output collection
-  std::unique_ptr<l1t::MuonBxCollection> outMuonsPhase2 (new l1t::MuonBxCollection());
+  std::unique_ptr<l1t::MuonPhase2BxCollection> outMuonsPhase2 (new l1t::MuonPhase2BxCollection());
 
   // build the displaced muons
   builder->build(comparators.product(),
@@ -184,46 +171,13 @@ L1TDisplacedMuonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
                  segments.product(),
                  emtfTracks.product(),
                  bmtfTracks.product(),
-                 inMuonsPhase2,
+                 bmtfMuons,
+                 omtfMuons,
+                 emtfMuons,
                  outMuonsPhase2);
 
   // put output collection in event
   iEvent.put(std::move(outMuonsPhase2),"NoVtx");
-}
-
-// ------------ method called once each job just before starting event loop  ------------
-void
-L1TDisplacedMuonProducer::beginJob()
-{
-}
-
-// ------------ method called once each job just after ending the event loop  ------------
-void
-L1TDisplacedMuonProducer::endJob() {
-}
-
-// ------------ method called when starting to processes a run  ------------
-void
-L1TDisplacedMuonProducer::beginRun(edm::Run const& run, edm::EventSetup const& iSetup)
-{
-}
-
-// ------------ method called when ending the processing of a run  ------------
-void
-L1TDisplacedMuonProducer::endRun(edm::Run const&, edm::EventSetup const&)
-{
-}
-
-// ------------ method called when starting to processes a luminosity block  ------------
-void
-L1TDisplacedMuonProducer::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
-{
-}
-
-// ------------ method called when ending the processing of a luminosity block  ------------
-void
-L1TDisplacedMuonProducer::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
-{
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
