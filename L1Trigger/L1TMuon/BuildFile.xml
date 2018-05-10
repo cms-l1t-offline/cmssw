@@ -1,10 +1,10 @@
 <export>
-  <lib name="1"/>  
-  <use name="DataFormats/L1TMuon"/>   
-  <use name="root"/> 
+  <lib name="1"/>
+  <use name="DataFormats/L1TMuon"/>
+  <use name="root"/>
   <use name="xerces-c"/>
 </export>
-
+<flags ADD_SUBDIR="1"/>
 
 <use name="DataFormats/L1TMuon"/>
 <use name="DataFormats/ParticleFlowCandidate"/>
@@ -29,3 +29,5 @@
 
 <use name="MagneticField/Engine"/>
 <use name="MagneticField/Records"/>
+
+<use name="DataFormats/GEMDigi"/>
