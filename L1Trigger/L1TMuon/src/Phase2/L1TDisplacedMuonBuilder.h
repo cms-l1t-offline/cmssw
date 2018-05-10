@@ -31,7 +31,10 @@
 // tracks
 #include "DataFormats/L1TMuon/interface/EMTFTrack.h"
 #include "DataFormats/L1Trigger/interface/Muon.h"
+#include "DataFormats/L1Trigger/interface/MuonPhase2.h"
 #include "DataFormats/L1TMuon/interface/L1MuBMTrack.h"
+#include "DataFormats/L1TMuon/interface/RegionalMuonCand.h"
+#include "DataFormats/L1TMuon/interface/RegionalMuonCandFwd.h"
 
 #include "DataFormats/MuonDetId/interface/GEMDetId.h"
 #include "DataFormats/MuonDetId/interface/CSCDetId.h"
@@ -46,6 +49,25 @@ class GEMGeometry;
 class RPCGeometry;
 class DTGeometry;
 class ME0Geometry;
+
+namespace{
+
+float getRegionalMuonCandPt(const l1t::RegionalMuonCand& cand)
+{
+  return cand.hwPt() * 0.5; // GeV
+}
+
+float getRegionalMuonCandEta(const l1t::RegionalMuonCand& cand)
+{
+  return cand.hwPt() * 0.010875;
+}
+
+float getRegionalMuonCandPhi(const l1t::RegionalMuonCand& cand)
+{
+  return cand.hwPt() * 2*M_PI/576.;
+}
+
+}
 
 namespace L1TMuon {
 
@@ -70,15 +92,31 @@ namespace L1TMuon {
                const ME0SegmentCollection*,
                const l1t::EMTFTrackCollection*,
                const L1MuBMTrackCollection*,
-               const edm::Handle<l1t::MuonBxCollection>&,
-               std::unique_ptr<l1t::MuonBxCollection>&);
+               const edm::Handle<l1t::RegionalMuonCandBxCollection>&,
+               const edm::Handle<l1t::RegionalMuonCandBxCollection>&,
+               const edm::Handle<l1t::RegionalMuonCandBxCollection>&,
+               std::unique_ptr<l1t::MuonPhase2BxCollection>&);
+
+  private:
+
+    // specialized functions
+    void buildBMTFMuon(const L1MuBMTrackCollection*,
+                       const l1t::RegionalMuonCand&,
+                       l1t::MuonPhase2&);
+    void buildOMTFMuon(const l1t::RegionalMuonCand&,
+                       l1t::MuonPhase2&);
+    void buildEMTFMuon(const CSCComparatorDigiCollection*,
+                       const CSCCorrelatedLCTDigiCollection*,
+                       const GEMPadDigiCollection*,
+                       const GEMCoPadDigiCollection*,
+                       const l1t::EMTFTrackCollection*,
+                       const l1t::RegionalMuonCand&,
+                       l1t::MuonPhase2&);
 
     void fitComparatorDigis(bool fit) {fitComparatorDigis_ = fit;}
     void fitStubs(bool fit) {fitStubs_ = fit;}
     void useGE21(bool use) {useGE21_ = use;}
     void useME0(bool use) {useME0_ = use;}
-
-  private:
 
     bool doRPCStubRecovery_;
     bool doCSCStubRecovery_;
@@ -123,8 +161,6 @@ namespace L1TMuon {
     std::map<int, std::vector<float>> cscFitPhiLayers_;
     std::map<int, std::vector<float>> cscFitZLayers_;
     std::map<int, float> cscFitRLayers_;
-
-    enum MuonType{Barrel, Overlap, EndcapLow, EndcapMedium, EndcapHigh};
   };
 }
 
