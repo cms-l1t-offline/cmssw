@@ -14,6 +14,7 @@
 
 <use name="L1Trigger/L1TCommon"/>
 <use name="L1Trigger/CSCCommonTrigger"/>
+<use name="L1Trigger/CSCTriggerPrimitives"/>
 <use name="L1Trigger/CSCTrackFinder"/>
 <use name="L1Trigger/DTTrackFinder"/>
 <use name="L1Trigger/DTUtilities"/>
@@ -31,3 +32,6 @@
 <use name="MagneticField/Records"/>
 
 <use name="DataFormats/GEMDigi"/>
+<use name="DataFormats/L1DTTrackFinder"/>
+<use name="rootrflx"/>
+<use name="L1Trigger/CSCCommonTrigger"/>
