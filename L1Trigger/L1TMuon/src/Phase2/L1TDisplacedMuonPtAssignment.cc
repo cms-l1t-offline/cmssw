@@ -22,37 +22,37 @@ L1TDisplacedMuonPtAssignment::L1TDisplacedMuonPtAssignment(const edm::ParameterS
   //
   // FIXME
   // steps to finish pt assignment in endcap
-  // step1: parameter assignment from config
-  // step2: get stubs, GEMPads and ME0 segment
+  // step1: parameter assignment from config 
+  // step2: get stubs, GEMPads and ME0 segment 
   // step3: get optimized CSC positioin by fitting comparator digis ?? how to do that at firmware level as L1 firmware can not talk with CFEB?
   // step4: displaced pt assignment: low eta, 1.2-1.6, position only
   // high eta: 1.6-2.1: position, direction, hybrid, and GE11, GE21 are used
   // very high eta: 2.1-2.4: position, direction, hybrid, and ME0, GE21 are used
-
+  
   float muoneta = muon_.eta();
   if (fabs(muoneta) > 1.2)//Endcap
-    {
+  {
 
-      convertStubsIntoGlobalpoints();
-      if (fabs(muoneta) > 1.6)
-        convertGEMPadsIntoGlobalpoints();
-      if (fabs(muoneta) > 2.1)
-        convertME0SegIntoGlobalpoints();
+    convertStubsIntoGlobalpoints();
+    if (fabs(muoneta) > 1.6)
+	convertGEMPadsIntoGlobalpoints();
+    if (fabs(muoneta) > 2.1)
+	convertME0SegIntoGlobalpoints();
 
-      //pt assignment
-      //FIXME: how to make sure necessary segment available before pt assignment
-      if (hasCSC_[0] and hasCSC_[1] and hasCSC_[2]){
-        calculatePositionPtEndcap();
-        if (fabs(muoneta) > 1.6 and fabs(muoneta) < 2.1 and hasGEM_[0] and hasGEM_[1]){
-          calculateDirectionPtEndcapMedium();
-          calculateHybridPtEndcapMedium();
-        }else if (fabs(muoneta) >= 2.1 and hasGEM_[1] and hasME0_){
-          calculateDirectionPtEndcapHigh();
-          calculateHybridPtEndcapHigh();
-        }
-      }
-
+    //pt assignment 
+    //FIXME: how to make sure necessary segment available before pt assignment 
+    if (hasCSC_[0] and hasCSC_[1] and hasCSC_[2]){
+	calculatePositionPtEndcap();
+	if (fabs(muoneta) > 1.6 and fabs(muoneta) < 2.1 and hasGEM_[0] and hasGEM_[1]){
+	    calculateDirectionPtEndcapMedium();
+	    calculateHybridPtEndcapMedium();
+	}else if (fabs(muoneta) >= 2.1 and hasGEM_[1] and hasME0_){
+	    calculateDirectionPtEndcapHigh();
+	    calculateHybridPtEndcapHigh();
+	}
     }
+    
+  }
 }
 
 
@@ -174,7 +174,7 @@ void L1TDisplacedMuonPtAssignment::calculateDirectionPtBarrel()
 }
 
 void L1TDisplacedMuonPtAssignment::calculateDirectionPtOverlap(){}
-//Medium: 1.6<eta<2.1, GE11 and GE21 are used
+//Medium: 1.6<eta<2.1, GE11 and GE21 are used 
 //high: eta>2.1, GE11 and GE21, ME0 are usd
 void L1TDisplacedMuonPtAssignment::calculateDirectionPtEndcapMedium(){
     EvenOdd123 parity = EndcapTriggerPtAssignmentHelper::getParity(isEven[0], isEven[1],//only first two station matters
@@ -233,7 +233,7 @@ void L1TDisplacedMuonPtAssignment::calculateHybridPtBarrel(){}
 void L1TDisplacedMuonPtAssignment::calculateHybridPtOverlap(){}
 
 void L1TDisplacedMuonPtAssignment::calculateHybridPtEndcapLow() {}
-//Medium: eta<2.1, GE11 and GE21 are used
+//Medium: eta<2.1, GE11 and GE21 are used 
 void L1TDisplacedMuonPtAssignment::calculateHybridPtEndcapMedium(){
     int etaSector = EndcapTriggerPtAssignmentHelper::GetEtaPartition_hybrid( gp_ME[1].eta() );
     //ddY123, dPhi_dir_st1_st2 available, FIXME
@@ -249,14 +249,14 @@ void L1TDisplacedMuonPtAssignment::calculateHybridPtEndcapMedium(){
 						   EndcapTriggerPtAssignmentHelper::HybridLUT[i][etaSector][npar][1],
 						   EndcapTriggerPtAssignmentHelper::HybridLUT[i][etaSector][npar][2],
 						   EndcapTriggerPtAssignmentHelper::HybridLUT[i][etaSector][npar][3],
-						   EndcapTriggerPtAssignmentHelper::HybridLUT[i][etaSector][npar][4],
+						   EndcapTriggerPtAssignmentHelper::HybridLUT[i][etaSector][npar][4], 
 						   ddY123, dPhi_dir_st1_st2) <=1)
 	    hybridPt_ = EndcapTriggerPtAssignmentHelper::PtBins[i];
        /*else if(not(useGE21) and EndcapTriggerPtAssignmentHelper::ellipse(EndcapTriggerPtAssignmentHelper::HybridME21CSConly[i][etaSector][npar][0],
 				                            EndcapTriggerPtAssignmentHelper::HybridME21CSConly[i][etaSector][npar][1],
 				                            EndcapTriggerPtAssignmentHelper::HybridME21CSConly[i][etaSector][npar][2],
 				                            EndcapTriggerPtAssignmentHelper::HybridME21CSConly[i][etaSector][npar][3],
-				                            EndcapTriggerPtAssignmentHelper::HybridME21CSConly[i][etaSector][npar][4],
+				                            EndcapTriggerPtAssignmentHelper::HybridME21CSConly[i][etaSector][npar][4], 
 							    ddY123, dPhi_dir_st1_st2) <=1)
 	    hybrid_pt = EndcapTriggerPtAssignmentHelper::PtBins[i];
 	    */

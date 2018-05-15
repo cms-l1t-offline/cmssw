@@ -130,7 +130,7 @@ namespace L1TMuon
     GlobalPoint gp_ME[4]; //gp from stubs
     GlobalPoint gp_GEM[2];//GE11, GE21
     GlobalPoint gp_ME0; //ME0
-    GlobalPoint gp_st_layer3[4]; // gp from fitting comparator digis
+    GlobalPoint gp_st_layer3[4]; // gp from fitting comparator digis 
     //float phi_me0, eta_me0;
     int meRing ;
     float ddY123, phiM_st1, phiM_st2, dPhi_dir_st1_st2;
