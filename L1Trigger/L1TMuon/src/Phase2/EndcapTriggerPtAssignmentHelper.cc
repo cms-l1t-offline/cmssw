@@ -25,25 +25,6 @@ int EndcapTriggerPtAssignmentHelper::GetEtaPartition_direction(float eta){
 int EndcapTriggerPtAssignmentHelper::GetEtaPartition_hybrid(float eta){
     return EndcapTriggerPtAssignmentHelper::GetEtaPartition( EndcapTriggerPtAssignmentHelper::Etabins_hybrid, eta);
 }
-//int EndcapTriggerPtAssignmentHelper::GetEtaPartition(float eta)
-//{
-//  int neta=-1;
-//  if (fabs(eta)>=1.2 and fabs(eta)<1.4)
-//    neta=0;
-//  else if (fabs(eta)>=1.4 and fabs(eta)<1.6)
-//    neta=1;
-//  else if (fabs(eta)>=1.6 and fabs(eta)<1.8)
-//    neta=2;
-//  else if (fabs(eta)>=1.8 and fabs(eta)<2.0)
-//    neta=3;
-//  else if (fabs(eta)>=2.0 and fabs(eta)<2.2)
-//    neta=4;
-//  else if (fabs(eta)>=2.2 and fabs(eta)<2.4)
-//    neta=5;
-//
-//  return neta;
-//}
-
 
 float EndcapTriggerPtAssignmentHelper::ellipse(float a, float b, float alpha, float x0, float y0, float x, float y)
 {
@@ -99,18 +80,6 @@ float EndcapTriggerPtAssignmentHelper::deltadeltaYcalculation(const GlobalPoint&
   return deltaDeltaY123;
 }
 
-/*
-float EndcapTriggerPtAssignmentHelper::Ptassign_Direction(float bending_12, float eta, int par){
-  int neta = GetEtaPartition(eta);
-    if (par<0 or par>3 or neta==-1 or fabs(bending_12) > M_PI) return -1;
-
-    float pt=(1/fabs(bending_12)+DirectionEpLUT[par][neta][1])/DirectionEpLUT[par][neta][0];
-    //std::cout <<"Pt Direction, npar "<< par <<" neta "<<neta <<" slope "<< DirectionEpLUT[par][neta][0]<<" intercep "<< DirectionEpLUT[par][neta][1] << " bending_12 " << bending_12 <<" pt "<<pt <<std::endl;
-
-    return pt;
-}
-*/
-
 
 float EndcapTriggerPtAssignmentHelper::PhiMomentum(float dphi, float phi_position, int st, bool evenodd){
 
@@ -146,32 +115,6 @@ float EndcapTriggerPtAssignmentHelper::PhiMomentum_Radius(float dphi, float phi_
 
 }
 
-/*
-//dphi: local bending, phi_position: phi of GEM position, X: "x_factor"
-//X: st1, X=D(GEM,CSC)*x_factor, st2: D(GEM,CSC)*x_factor/(D(ME11,ME21)*x+1)
-float EndcapTriggerPtAssignmentHelper::phiMomentum_Xfactor(float dphi, float phi_position, float X)
-{
-
-     if (fabs(dphi) > M_PI or fabs(phi_position) > M_PI) return -9;
-     float y = 1.0-cos(dphi)- X;
-
-     float phi_diff = 0.0;
-     if (fabs(y) > 0.0) phi_diff = atan(sin(dphi)/y);
-     else phi_diff = M_PI/2.0;
-
-     if (phi_diff <= -M_PI) phi_diff = phi_diff+2*M_PI;
-     else if (phi_diff > M_PI) phi_diff = phi_diff-2*M_PI;
-
-     float phiM = phi_position-phi_diff;
-     if (phiM <= -M_PI) phiM = phiM+2*M_PI;
-     else if (phiM > M_PI) phiM = phiM-2*M_PI;
-
-     //std::cout <<"phiMomentum_Xfactor: dphi "<< dphi <<" phi_position "<< phi_position <<" X "<<X <<" phi_diff "<< phi_diff <<" phiM "<< phiM << std::endl;
-     return phiM;
-
-}*/
-
-
 
 float EndcapTriggerPtAssignmentHelper::phiMomentum_Xfactor(float phi_CSC, float phi_GEM, float X)
 {
@@ -192,8 +135,6 @@ float EndcapTriggerPtAssignmentHelper::phiMomentum_Xfactor(float phi_CSC, float 
      float phiM = phi_GEM-phi_diff;
      if (phiM <= -M_PI) phiM = phiM+2*M_PI;
      else if (phiM > M_PI) phiM = phiM-2*M_PI;
-
-     //std::cout <<"phiMomentum_Xfactor: dphi "<< dphi <<" phi_poistion1 "<< phi_GEM <<" phi_position2 "<< phi_CSC <<" Xfactor "<<X <<" phi_diff "<< phi_diff <<" phiM "<< phiM << std::endl;
 
      return phiM;
 

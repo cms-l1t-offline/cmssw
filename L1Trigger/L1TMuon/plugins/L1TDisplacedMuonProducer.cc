@@ -51,6 +51,7 @@ private:
   edm::InputTag omtfMuonTag_;
   edm::InputTag bmtfMuonTag_;
 
+
   edm::EDGetTokenT<CSCComparatorDigiCollection> comparatorToken_;
   edm::EDGetTokenT<CSCCorrelatedLCTDigiCollection> lctToken_;
   edm::EDGetTokenT<GEMPadDigiCollection> padToken_;
@@ -79,6 +80,7 @@ L1TDisplacedMuonProducer::L1TDisplacedMuonProducer(const edm::ParameterSet& iCon
   emtfMuonTag_ = iConfig.getParameter<edm::InputTag>("emtfMuonTag");
   bmtfMuonTag_ = iConfig.getParameter<edm::InputTag>("bmtfMuonTag");
   bmtfMuonTag_ = iConfig.getParameter<edm::InputTag>("bmtfMuonTag");
+
   comparatorToken_ = consumes<CSCComparatorDigiCollection>(cscCompTag_);
   lctToken_ = consumes<CSCCorrelatedLCTDigiCollection>(cscLctTag_);
   padToken_ = consumes<GEMPadDigiCollection>(padTag_);

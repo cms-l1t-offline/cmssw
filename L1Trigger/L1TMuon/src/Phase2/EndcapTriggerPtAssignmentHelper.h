@@ -20,6 +20,7 @@ namespace EndcapTriggerPtAssignmentHelper {
  //const float PtBins2[NPt2] = {2,3,4,5,6,7,8,10,12,15,20,30,40};
  const float PtBins[NPtbins] = { 5,   7,   10,   12,   15,   20};
 
+
 // parity cases when considering multiple station hits
  enum class EvenOdd{Odd=0, Even=1, Invalid=2};
  enum class EvenOdd12{OddEven, OddOdd, EvenEven, EvenOdd, Invalid};
@@ -53,7 +54,6 @@ float PhiMomentum(float dphi, float phi_position, int st, bool evenodd);
 float PhiMomentum_Radius(float dphi, float phi_position, float radius_csc, float radius_gem);
 //float phiMomentum_Xfactor(float dphi, float phi_position, float x);
 float phiMomentum_Xfactor(float phi_CSC, float phi_GEM, float x);
-
 
 void calculateAlphaBeta(const std::vector<float>& v,
                         const std::vector<float>& w,
@@ -102,41 +102,6 @@ const double PositionEpLUT[NParitybins][NEtabins_position][3] = {
     {0.310, 0.7625, 1.075},
   },
 };
-
-/*
-//updated the LUT, by Tao, 20160724
-const double DirectionEpLUT[NParitybins][NEtabins_Direction][2]={
-    	       {{2.907, 5.906},
-		{2.600, 5.191},
-		{4.405, 8.809},
-		{7.332, 14.478},
-		{8.747, 12.265},
-		//{11.02, 14.84},
-	       },
-	       {{2.409, 5.198},
-		{2.467, 4.397},
-		{4.411, 8.621},
-		{7.333, 14.552},
-		{8.955, 13.093},
-		//{10.34, 11.02},
-	       },
-	       {{2.301, 4.929},
-		{2.230, 3.111},
-		{5.288, 10.987},
-		{8.242, 16.698},
-		{9.213, 13.111},
-		//{11.23, 13.44},
-	       },
-	       {{2.401, 4.758},
-		{2.383, 3.782},
-		{5.222, 10.769},
-		{8.292, 16.955},
-		{9.074, 12.083},
-		//{11.83, 17.66},
-	       },
-	};
-
-}*/
 
 /***********************************************************************
  * Position based LUT
@@ -461,4 +426,5 @@ const double HybridLUT[NPtbins][NEtabins_hybrid][NParitybins][NHybridParas] = {
 	}; ///hybridLUT end
 
 };//namespace
+
 #endif

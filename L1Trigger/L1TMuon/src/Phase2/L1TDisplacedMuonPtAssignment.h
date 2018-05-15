@@ -46,6 +46,7 @@ namespace L1TMuon
 
     // set inputs: muon and  trigger primitives
     // lcts should be from L1Muon (or EMTF track) + recovered stubs??
+
     void setMuon(const l1t::Muon& muon) {muon_ = muon;}
     void setTriggerPrimitives(const std::vector<GEMPadDigiId>& pads) {pads_ = pads;}
     void setTriggerPrimitives(const std::vector<CSCCorrelatedLCTDigiId>& lcts) {lcts_ = lcts;}
@@ -105,7 +106,6 @@ namespace L1TMuon
     ME0Segment segment_;
 
     void initVariables();
-
 
     // Barrel members
     bool has_stub_mb1, has_stub_mb2, has_stub_mb3, has_stub_mb4;
