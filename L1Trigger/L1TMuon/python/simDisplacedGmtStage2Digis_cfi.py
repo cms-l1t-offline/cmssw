@@ -2,14 +2,15 @@ import FWCore.ParameterSet.Config as cms
 
 simDisplacedGmtStage2Digis = cms.EDProducer(
     "L1TDisplacedMuonProducer",
-    muonTag = cms.InputTag("simGmtStage2Digis"),
-    emtfTag = cms.InputTag("simEmtfDigis"),
-    bmtfTag = cms.InputTag("simGmtStage2Digis"),
-    omtfNegTag = cms.InputTag("simGmtStage2Digis"),
-    omtfPosTag = cms.InputTag("simGmtStage2Digis"),
-    emtfNegTag = cms.InputTag("simGmtStage2Digis"),
-    emtfPosTag = cms.InputTag("simGmtStage2Digis"),
-    cscLctTag = cms.InputTag("simCscTriggerPrimitiveDigis"),
+    bmtfTag = cms.InputTag("simBmtfDigis","BMTF"),
+    omtfTag = cms.InputTag("simOmtfDigis","OMTF"),
+    emtfTag = cms.InputTag("simEmtfDigis","EMTF"),
+
+    bmtfTrackTag = cms.InputTag("simBmtfDigis"),
+    omtfTrackTag = cms.InputTag("simOmtfDigis"),
+    emtfTrackTag = cms.InputTag("simEmtfDigis"),
+
+    cscLctTag = cms.InputTag("simCscTriggerPrimitiveDigis","MPCSORTED"),
     me0TriggerTag = cms.InputTag("me0TriggerDigis"),
     me0SegmentTag = cms.InputTag("me0TriggerPseudoDigis"),
     padTag = cms.InputTag("simMuonGEMPadDigis"),

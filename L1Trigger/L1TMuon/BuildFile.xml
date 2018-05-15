@@ -15,7 +15,6 @@
 
 <use name="L1Trigger/L1TCommon"/>
 <use name="Geometry/DTGeometry"/>
-<use name="DataFormats/L1DTTrackFinder"/>
 <use name="L1Trigger/DTTrackFinder"/>
 <use name="L1Trigger/DTUtilities"/>
 <use name="L1Trigger/RPCTrigger"/>
@@ -37,3 +36,8 @@
 
 <use name="MagneticField/Engine"/>
 <use name="MagneticField/Records"/>
+
+<use name="DataFormats/GEMDigi"/>
+<use name="DataFormats/L1DTTrackFinder"/>
+<use name="rootrflx"/>
+<use name="L1Trigger/CSCCommonTrigger"/>

@@ -105,9 +105,9 @@ namespace l1t {
 
     virtual bool operator==(const l1t::Muon& rhs) const;
     virtual inline bool operator!=(const l1t::Muon& rhs) const { return !(operator==(rhs)); };
- 
-  private:
-    
+
+  protected:
+
     // additional hardware quantities common to L1 global jet
     int hwCharge_;
     int hwChargeValid_;
