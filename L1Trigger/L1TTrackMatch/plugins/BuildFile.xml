@@ -4,6 +4,7 @@
   <use   name="FastSimulation/BaseParticlePropagator"/>
   <use   name="SimDataFormats/GeneratorProducts"/>
   <use   name="PhysicsTools/UtilAlgos"/>
+  <use   name="L1Trigger/L1TMuon"/>
   <use   name="CommonTools/UtilAlgos"/>
 <use name="DataFormats/JetReco"/>
 <use name="DataFormats/L1TrackTrigger"/>
