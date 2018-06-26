@@ -20,46 +20,43 @@
 using namespace l1t;
 
 class L1TkHTMissProducer : public edm::EDProducer {
-public:
+  public:
 
-  explicit L1TkHTMissProducer(const edm::ParameterSet&);
-  ~L1TkHTMissProducer();
+    explicit L1TkHTMissProducer(const edm::ParameterSet&);
+    ~L1TkHTMissProducer();
 
-  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+  private:
+    virtual void beginJob() ;
+    virtual void produce(edm::Event&, const edm::EventSetup&);
+    virtual void endJob() ;
 
-private:
-  virtual void beginJob() ;
-  virtual void produce(edm::Event&, const edm::EventSetup&);
-  virtual void endJob() ;
-  //virtual void beginRun(edm::Run&, edm::EventSetup const&);
-  //virtual void endRun(edm::Run&, edm::EventSetup const&);
-  //virtual void beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
-  //virtual void endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
-
-  // ----------member data ---------------------------
-  float jet_minPt;                // [GeV]
-  float jet_maxEta;               // [rad]
-  bool DoVtxConstrain;            // require vertex constraint
-  bool PrimaryVtxConstrain;       // use event primary vertex instead of leading jet (if DoVtxConstrain)
-  float DeltaZ;                   // for jets [cm] (if DoTvxConstrain)
-  const edm::EDGetTokenT< L1TkPrimaryVertexCollection > pvToken;
-  const edm::EDGetTokenT< L1TkJetParticleCollection > jetToken;
+    // ----------member data ---------------------------
+    float jet_minPt;                // [GeV]
+    float jet_maxEta;               // [rad]
+    bool DoVtxConstrain;            // require vertex constraint
+    bool PrimaryVtxConstrain;       // use event primary vertex instead of leading jet (if DoVtxConstrain)
+    bool UseMatchedJets;            // Determines whether or not matched jets are used
+    float DeltaZ;                   // for jets [cm] (if DoTvxConstrain)
+    const edm::EDGetTokenT< L1TkPrimaryVertexCollection > pvToken;
+    const edm::EDGetTokenT< L1TkJetParticleCollection > jetToken;
 };
 
 ///////////////
 //constructor//
 ///////////////
 L1TkHTMissProducer::L1TkHTMissProducer(const edm::ParameterSet& iConfig) :
-pvToken(consumes<L1TkPrimaryVertexCollection>(iConfig.getParameter<edm::InputTag>("L1VertexInputTag"))),
-jetToken(consumes<L1TkJetParticleCollection>(iConfig.getParameter<edm::InputTag>("L1TkJetInputTag")))
+  pvToken(consumes<L1TkPrimaryVertexCollection>(iConfig.getParameter<edm::InputTag>("L1VertexInputTag"))),
+  jetToken(consumes<L1TkJetParticleCollection>(iConfig.getParameter<edm::InputTag>("L1TkJetInputTag")))
 {
   jet_minPt  = (float)iConfig.getParameter<double>("jet_minPt");
   jet_maxEta = (float)iConfig.getParameter<double>("jet_maxEta");
   DoVtxConstrain      = iConfig.getParameter<bool>("DoVtxConstrain");
+  UseMatchedJets      = iConfig.getParameter<bool>("UseMatchedJets");
   PrimaryVtxConstrain = iConfig.getParameter<bool>("PrimaryVtxConstrain");
   DeltaZ              = (float)iConfig.getParameter<double>("DeltaZ");
 
-  produces<L1TkHTMissParticleCollection>();
+  if (UseMatchedJets) produces<L1TkHTMissParticleCollection>("L1TkMatchedHTMiss");
+  else produces<L1TkHTMissParticleCollection>("L1TkHTMiss");
 }
 
 //////////////
@@ -97,7 +94,7 @@ void L1TkHTMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
   float evt_zvtx = 999;
   bool found_vtx = false;
   edm::Ref< L1TkPrimaryVertexCollection > L1VtxRef; 	// null reference
-  if ( DoVtxConstrain && PrimaryVtxConstrain ) {
+  if ( DoVtxConstrain && PrimaryVtxConstrain && UseMatchedJets) {
     if( !L1VertexHandle.isValid() ) {
       LogError("L1TkHTMissProducer")<< "\nWarning: L1TkPrimaryVertexCollection not found in the event. Exit."<< std::endl;
       return ;
@@ -120,7 +117,7 @@ void L1TkHTMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
   float zvtx_jetpt = -1.0; //pt of jet determining the event vertex
   float JET_VTXMAX = 99.;  //find z position of leading jet that has a z vertex!
 
-  if ( DoVtxConstrain && !PrimaryVtxConstrain ) {
+  if ( DoVtxConstrain && !PrimaryVtxConstrain && UseMatchedJets) {
     for (jetIter = L1TkJetsHandle->begin(); jetIter != L1TkJetsHandle->end(); ++jetIter) {
       int ibx = jetIter->bx(); // only consider jets from the central BX
       if (ibx != 0) continue;
@@ -141,54 +138,86 @@ void L1TkHTMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     } //end loop over jets
   } //endif z position from leading jet
 
-  float sumPx = 0;
-  float sumPy = 0;
-  float HT = 0;
+  if (UseMatchedJets){
+    float sumPx_matched = 0;
+    float sumPy_matched = 0;
+    float HT_matched = 0;
 
-  if (DoVtxConstrain && !found_vtx) std::cout << "WARNING from L1TkHTMissProducer: didn't find any z vertex (based on jet vertices) for this event!" << std::endl;
+    if (DoVtxConstrain && !found_vtx) std::cout << "WARNING from L1TkHTMissProducer: didn't find any z vertex (based on jet vertices) for this event!" << std::endl;
 
-  // ----------------------------------------------------------------------------------------------
-  // loop over jets
-  // ----------------------------------------------------------------------------------------------
-  for (jetIter = L1TkJetsHandle->begin(); jetIter != L1TkJetsHandle->end(); ++jetIter) {
-    int ibx = jetIter->bx(); // only consider jets from the central BX
-    if (ibx != 0) continue;
+    // loop over jets
+    for (jetIter = L1TkJetsHandle->begin(); jetIter != L1TkJetsHandle->end(); ++jetIter) {
+      int ibx = jetIter->bx(); // only consider jets from the central BX
+      if (ibx != 0) continue;
 
-    float px = jetIter->px();
-    float py = jetIter->py();
-    float et = jetIter->et();
-    float tmp_jet_vtx = jetIter->getJetVtx();
-    float tmp_jet_pt  = jetIter->pt();
-    float tmp_jet_eta = jetIter->eta();
-    if (tmp_jet_pt < jet_minPt) continue;
-    if (fabs(tmp_jet_eta) > jet_maxEta) continue;
+      float px = jetIter->px();
+      float py = jetIter->py();
+      float et = jetIter->et();
+      float tmp_jet_vtx = jetIter->getJetVtx();
+      float tmp_jet_pt  = jetIter->pt();
+      float tmp_jet_eta = jetIter->eta();
+      if (tmp_jet_pt < jet_minPt) continue;
+      if (fabs(tmp_jet_eta) > jet_maxEta) continue;
 
-    // vertex consistency requirement
-    bool VtxRequirement = false;
-    if (found_vtx) VtxRequirement = fabs(tmp_jet_vtx - evt_zvtx) < DeltaZ;
+      // vertex consistency requirement
+      bool VtxRequirement = false;
+      if (found_vtx) VtxRequirement = fabs(tmp_jet_vtx - evt_zvtx) < DeltaZ;
 
-    if (!DoVtxConstrain || VtxRequirement) {
+      if (!DoVtxConstrain || VtxRequirement) {
+        sumPx_matched += px;
+        sumPy_matched += py;
+        HT_matched += et;
+      }
+    } //end loop over jets
+
+    // define missing HT
+    float et = sqrt(sumPx_matched*sumPx_matched + sumPy_matched*sumPy_matched);
+    math::XYZTLorentzVector missingEt(-sumPx_matched, -sumPy_matched, 0, et);
+    edm::RefProd<L1TkJetParticleCollection> jetCollRef(L1TkJetsHandle);
+    L1TkHTMissParticle tkHTM(missingEt, HT_matched, jetCollRef, L1VtxRef);
+
+    if (DoVtxConstrain && !PrimaryVtxConstrain) {
+      tkHTM.setVtx(evt_zvtx);
+    }
+
+    MHTCollection->push_back(tkHTM);
+    iEvent.put( std::move(MHTCollection), "L1TkMatchedHTMiss" );
+  }
+
+  // Using standalone jets
+  else {
+    float sumPx = 0;
+    float sumPy = 0;
+    float HT = 0;
+
+    // loop over jets
+    for (jetIter = L1TkJetsHandle->begin(); jetIter != L1TkJetsHandle->end(); ++jetIter) {
+      int ibx = jetIter->bx(); // only consider jets from the central BX
+      if (ibx != 0) continue;
+
+      float px = jetIter->px();
+      float py = jetIter->py();
+      float et = jetIter->et();
+      float tmp_jet_pt  = jetIter->pt();
+      float tmp_jet_eta = jetIter->eta();
+      if (tmp_jet_pt < jet_minPt) continue;
+      if (fabs(tmp_jet_eta) > jet_maxEta) continue;
+
       sumPx += px;
       sumPy += py;
       HT += et;
-    }
-  } //end loop over jets
+    } // end jet loop
 
-  // ----------------------------------------------------------------------------------------------
-  // define missing HT
-  // ----------------------------------------------------------------------------------------------
-  float et = sqrt(sumPx*sumPx + sumPy*sumPy);
-  math::XYZTLorentzVector missingEt(-sumPx, -sumPy, 0, et);
+    // define missing HT
+    float et = sqrt(sumPx*sumPx + sumPy*sumPy);
+    math::XYZTLorentzVector missingEt(-sumPx, -sumPy, 0, et);
+    edm::RefProd<L1TkJetParticleCollection> jetCollRef(L1TkJetsHandle);
+    L1TkHTMissParticle tkHTM(missingEt, HT, jetCollRef, L1VtxRef);
 
-  edm::RefProd<L1TkJetParticleCollection> jetCollRef(L1TkJetsHandle);
-  L1TkHTMissParticle tkHTM(missingEt, HT, jetCollRef, L1VtxRef);
-
-  if (DoVtxConstrain && !PrimaryVtxConstrain) {
-    tkHTM.setVtx(evt_zvtx);
+    MHTCollection->push_back(tkHTM);
+    iEvent.put( std::move(MHTCollection), "L1TkHTMiss" );
   }
 
-  MHTCollection->push_back(tkHTM);
-  iEvent.put( std::move(MHTCollection) );
 } //end producer
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -199,32 +228,5 @@ void L1TkHTMissProducer::beginJob() {
 void L1TkHTMissProducer::endJob() {
 }
 
-// ------------ method called when starting to processes a run  ------------
-/*
-void L1TkHTMissProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup) {
-}
-
-// ------------ method called when ending the processing of a run  ------------
-void L1TkHTMissProducer::endRun(edm::Run&, edm::EventSetup const&) {
-}
-
-// ------------ method called when starting to processes a luminosity block  ------------
-void L1TkHTMissProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&) {
-}
-
-// ------------ method called when ending the processing of a luminosity block  ------------
-void L1TkHTMissProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&) {
-}
-*/
-
-// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void
-L1TkHTMissProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
-  //The following says we do not know what parameters are allowed so do no validation
-  // Please change this to state exactly what you do use, even if it is no parameters
-  edm::ParameterSetDescription desc;
-  desc.setUnknown();
-  descriptions.addDefault(desc);
-}
 
 DEFINE_FWK_MODULE(L1TkHTMissProducer);

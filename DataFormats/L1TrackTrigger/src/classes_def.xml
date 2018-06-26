@@ -69,7 +69,6 @@
   <class name="edm::Wrapper<l1t::L1TkHTMissParticle>"/>
   <class name="edm::Wrapper<std::vector<l1t::L1TkHTMissParticle> >"/>
 
-
   <class name="l1t::L1TkMuonParticle" ClassVersion="13">
    <version ClassVersion="13" checksum="3532596056"/>
    <version ClassVersion="12" checksum="1571385768"/>
@@ -87,4 +86,3 @@
 
 
 </lcgdict>
-

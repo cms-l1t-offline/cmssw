@@ -26,45 +26,40 @@
 using namespace l1t;
 
 class L1TkEtMissProducer : public edm::EDProducer {
-public:
+  public:
 
-  typedef TTTrack< Ref_Phase2TrackerDigi_ >  L1TTTrackType;
-  typedef std::vector< L1TTTrackType > L1TTTrackCollectionType;
+    typedef TTTrack< Ref_Phase2TrackerDigi_ >  L1TTTrackType;
+    typedef std::vector< L1TTTrackType > L1TTTrackCollectionType;
 
-  explicit L1TkEtMissProducer(const edm::ParameterSet&);
-  ~L1TkEtMissProducer();
-  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+    explicit L1TkEtMissProducer(const edm::ParameterSet&);
+    ~L1TkEtMissProducer();
 
-private:
-  virtual void beginJob() ;
-  virtual void produce(edm::Event&, const edm::EventSetup&);
-  virtual void endJob() ;
-  //virtual void beginRun(edm::Run&, edm::EventSetup const&);
-  //virtual void endRun(edm::Run&, edm::EventSetup const&);
-  //virtual void beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
-  //virtual void endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
+  private:
+    virtual void beginJob() ;
+    virtual void produce(edm::Event&, const edm::EventSetup&);
+    virtual void endJob() ;
 
-  // ----------member data ---------------------------
-  float maxZ0;	    // in cm
-  float DeltaZ;	    // in cm
-  float chi2Max;
-  float minPt;	    // in GeV
-  int nStubsmin;
-  int nStubsPSmin;  // minimum number of stubs in PS modules
-  float maxPt;	    // in GeV
-  int HighPtTracks; // saturate or truncate
-  bool doPtComp;
-  bool doTightChi2;
-  const edm::EDGetTokenT< L1TkPrimaryVertexCollection > pvToken;
-  const edm::EDGetTokenT<std::vector<TTTrack< Ref_Phase2TrackerDigi_ > > > trackToken;
+    // ----------member data ---------------------------
+    float maxZ0;	    // in cm
+    float DeltaZ;	    // in cm
+    float chi2Max;
+    float minPt;	    // in GeV
+    int nStubsmin;
+    int nStubsPSmin;  // minimum number of stubs in PS modules
+    float maxPt;	    // in GeV
+    int HighPtTracks; // saturate or truncate
+    bool doPtComp;
+    bool doTightChi2;
+    const edm::EDGetTokenT< L1TkPrimaryVertexCollection > pvToken;
+    const edm::EDGetTokenT<std::vector<TTTrack< Ref_Phase2TrackerDigi_ > > > trackToken;
 };
 
 ///////////////
 //constructor//
 ///////////////
 L1TkEtMissProducer::L1TkEtMissProducer(const edm::ParameterSet& iConfig) :
-pvToken(consumes<L1TkPrimaryVertexCollection>(iConfig.getParameter<edm::InputTag>("L1VertexInputTag"))),
-trackToken(consumes< std::vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.getParameter<edm::InputTag>("L1TrackInputTag")))
+  pvToken(consumes<L1TkPrimaryVertexCollection>(iConfig.getParameter<edm::InputTag>("L1VertexInputTag"))),
+  trackToken(consumes< std::vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.getParameter<edm::InputTag>("L1TrackInputTag")))
 {
   maxZ0 = (float)iConfig.getParameter<double>("maxZ0");
   DeltaZ = (float)iConfig.getParameter<double>("DeltaZ");
@@ -180,12 +175,12 @@ void L1TkEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
         if(pt>10.0 && chi2dof>5.0 ) continue;
       }
 
-      if ( fabs(ztr - zVTX) <= DeltaZ) {   // eg DeltaZ = 1 mm
+      if ( fabs(ztr - zVTX) <= DeltaZ) {   // eg DeltaZ = 1 cm
         sumPx += trackIter->getMomentum().x() * pt_rescale ;
         sumPy += trackIter->getMomentum().y() * pt_rescale ;
         etTot += pt ;
       }
-      else   {	// PU sums
+      else {	// PU sums
         sumPx_PU += trackIter->getMomentum().x() * pt_rescale ;
         sumPy_PU += trackIter->getMomentum().y() * pt_rescale ;
         etTot_PU += pt ;
@@ -210,40 +205,12 @@ void L1TkEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
   iEvent.put( std::move(METCollection), "MET");
 } // end producer
 
-
 // ------------ method called once each job just before starting event loop  ------------
 void L1TkEtMissProducer::beginJob() {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void L1TkEtMissProducer::endJob() {
-}
-
-// ------------ method called when starting to processes a run  ------------
-/*
-void L1TkEtMissProducer::beginRun(edm::Run& iRun, edm::EventSetup const& iSetup) {
-}
-
-// ------------ method called when ending the processing of a run  ------------
-void L1TkEtMissProducer::endRun(edm::Run&, edm::EventSetup const&) {
-}
-
-// ------------ method called when starting to processes a luminosity block  ------------
-void L1TkEtMissProducer::beginLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&) {
-}
-
-// ------------ method called when ending the processing of a luminosity block  ------------
-void L1TkEtMissProducer::endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&) {
-}
-*/
-
-// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void L1TkEtMissProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
-  //The following says we do not know what parameters are allowed so do no validation
-  // Please change this to state exactly what you do use, even if it is no parameters
-  edm::ParameterSetDescription desc;
-  desc.setUnknown();
-  descriptions.addDefault(desc);
 }
 
 DEFINE_FWK_MODULE(L1TkEtMissProducer);
