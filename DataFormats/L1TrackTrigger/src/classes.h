@@ -1,5 +1,5 @@
 /*! \brief   Definition of all the relevant data types
- *  \details Herw we declare instances of all the relevant types. 
+ *  \details Herw we declare instances of all the relevant types.
  *
  *  \author Andrew W. Rose
  *  \author Nicola Pozzobon
@@ -41,7 +41,7 @@
 #include "DataFormats/Common/interface/RefVector.h"
 #include "DataFormats/Common/interface/RefProd.h"
 
-namespace 
+namespace
 {
   struct dictionary1 {
     /// Main template type
@@ -104,8 +104,8 @@ namespace
     l1t::L1TkPrimaryVertex trzvtx;
     edm::Wrapper<l1t::L1TkPrimaryVertexCollection> trzvtxColl;
     edm::Ref<l1t::L1TkPrimaryVertexCollection > trkvtxRef ;
-    
-    
+
+
     // L1TkEtMiss... following L1EtMiss...
     l1t::L1TkEtMissParticle TketMiss ;
     l1t::L1TkEtMissParticleCollection TketMissColl ;
@@ -117,7 +117,7 @@ namespace
     //l1t::L1TkEtMissParticleRefProd refTkProdEtMiss ;
     //edm::reftobase::Holder<reco::Candidate, l1t::L1TkEtMissParticleRef> rtbTkm1;
     //edm::reftobase::Holder<reco::Candidate, l1t::L1TkEtMissParticleRefProd> rtbTkm2;
-    
+
     // L1TkEmParticle
     l1t::L1TkEmParticleCollection trkemColl ;
     edm::Wrapper<l1t::L1TkEmParticleCollection> w_trkemColl;
@@ -125,35 +125,35 @@ namespace
     //l1t::L1TkEmParticleRefVector refVectrkEmColl ;
     //l1t::L1TkEmParticleVectorRef vecReftrkEmColl ;
     //edm::reftobase::Holder<reco::Candidate, l1t::L1TkEmParticleRef> rtbtrke;
-    
+
     // L1TkElectronParticle
     l1t::L1TkElectronParticleCollection trkeleColl ;
     edm::Wrapper<l1t::L1TkElectronParticleCollection> w_trkeleColl;
     l1t::L1TkElectronParticleRef reftrkEle ;
-    
+
     // L1TkJetParticle
     l1t::L1TkJetParticleCollection trkjetColl ;
     edm::Wrapper<l1t::L1TkJetParticleCollection> w_trkjetColl;
     l1t::L1TkJetParticleRef reftrkJet ;
     l1t::L1TkJetParticleRefProd refTkProdJet ;
-    
+
     // L1TkHTMissParticle
-     l1t::L1TkHTMissParticle TkHTMiss ;
+    l1t::L1TkHTMissParticle TkHTMiss ;
     l1t::L1TkHTMissParticleCollection TkHTMissColl ;
     edm::Wrapper<l1t::L1TkHTMissParticle> w_TkHTMiss;
     edm::Wrapper<l1t::L1TkHTMissParticleCollection> w_TkHTMissColl;
-    
+
     // L1TkMuonParticle
     l1t::L1TkMuonParticleCollection trkmuColl ;
     edm::Wrapper<l1t::L1TkMuonParticleCollection> w_trkmuColl;
     l1t::L1TkMuonParticleRef reftrkMu ;
-    
+
     // L1TkTauParticle
     l1t::L1TkTauParticleCollection trktauColl ;
     edm::Wrapper<l1t::L1TkTauParticleCollection> w_trktauColl;
     l1t::L1TkTauParticleRef reftrkTau ;
 
-    
+
   };
 
 
