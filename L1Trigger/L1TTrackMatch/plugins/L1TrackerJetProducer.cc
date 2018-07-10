@@ -50,7 +50,6 @@ using namespace std;
 class L1TrackerJetProducer : public edm::EDProducer
 {
 public:
-
   typedef TTTrack< Ref_Phase2TrackerDigi_ >  L1TTTrackType;
   typedef std::vector< L1TTTrackType > L1TTTrackCollectionType;
 
@@ -120,6 +119,7 @@ L1TrackerJetProducer::~L1TrackerJetProducer() {
 // producer
 void L1TrackerJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+
   // ----------------------------------------------------------------------------------------------
   // output container
   // ----------------------------------------------------------------------------------------------
@@ -131,6 +131,7 @@ void L1TrackerJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
   // retrieve input containers
   // ----------------------------------------------------------------------------------------------
   // L1 tracks
+
   edm::Handle< std::vector< TTTrack< Ref_Phase2TrackerDigi_ > > > TTTrackHandle;
   iEvent.getByToken(trackToken, TTTrackHandle);
   std::vector< TTTrack< Ref_Phase2TrackerDigi_ > >::const_iterator iterL1Track;
@@ -195,7 +196,6 @@ void L1TrackerJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
     L1TrackerJets->push_back(trkJet);
 
   }
-
 
   iEvent.put( std::move(L1TrackerJets), "L1TrackerJets");
 
