@@ -5,6 +5,7 @@
 
 HGCalMulticlusteringHistoImpl::HGCalMulticlusteringHistoImpl( const edm::ParameterSet& conf ) :
     dr_(conf.getParameter<double>("dR_multicluster")),
+    dr_byLayer_(conf.existsAs<std::vector<double>>("dR_multicluster_byLayer") ? conf.getParameter<std::vector<double>>("dR_multicluster_byLayer") : std::vector<double>()),
     ptC3dThreshold_(conf.getParameter<double>("minPt_multicluster")),
     multiclusterAlgoType_(conf.getParameter<string>("type_multicluster")),    
     nBinsRHisto_(conf.getParameter<unsigned>("nBins_R_histo_multicluster")),
@@ -88,7 +89,7 @@ HGCalMulticlusteringHistoImpl::Histogram HGCalMulticlusteringHistoImpl::fillHist
         int bin_R = int( (ROverZ-kROverZMin_) * nBinsRHisto_ / (kROverZMax_-kROverZMin_) );
         int bin_phi = int( (reco::reduceRange(clu->phi())+M_PI) * nBinsPhiHisto_ / (2*M_PI) );
 
-        histoClusters[{{clu->zside(), bin_R, bin_phi}}]+=clu->mipPt();
+        histoClusters[{{triggerTools_.zside(clu->detId()), bin_R, bin_phi}}]+=clu->mipPt();
 
     }
 
@@ -189,7 +190,8 @@ std::vector<GlobalPoint> HGCalMulticlusteringHistoImpl::computeMaxSeeds( const H
             for(int bin_phi = 0; bin_phi<int(nBinsPhiHisto_); bin_phi++){
 
                 float MIPT_seed = histoClusters.at({{z_side,bin_R,bin_phi}});
-                bool isMax = MIPT_seed>0;
+                bool isMax = MIPT_seed > histoThreshold_;
+                if (!isMax) continue;
 
                 float MIPT_S = bin_R<(int(nBinsRHisto_)-1) ? histoClusters.at({{z_side,bin_R+1,bin_phi}}) : 0;
                 float MIPT_N = bin_R>0 ? histoClusters.at({{z_side,bin_R-1,bin_phi}}) : 0;
@@ -335,10 +337,9 @@ std::vector<l1t::HGCalMulticluster> HGCalMulticlusteringHistoImpl::clusterSeedMu
     for(auto & clu : clustersPtrs){
 
 
-        HGCalDetId cluDetId( clu->detId() );
-        int z_side = cluDetId.zside();
+        int z_side = triggerTools_.zside(clu->detId());
 
-        double minDist = dr_;
+        double minDist = dr_byLayer_.empty() ? dr_ : dr_byLayer_.at(triggerTools_.layerWithOffset(clu->detId())); // use at() to get the assert, for the moment
         int targetSeed = -1;
 
         for( unsigned int iseed=0; iseed<seeds.size(); iseed++ ){
@@ -438,6 +439,8 @@ finalizeClusters(std::vector<l1t::HGCalMulticluster>& multiclusters_in,
             multicluster.eMax(shape_.eMax(multicluster));
             // fill quality flag
             multicluster.setHwQual(id_->decision(multicluster));
+            // fill H/E
+            multicluster.saveHOverE();            
 
             multiclusters_out.push_back( 0, multicluster);
         }

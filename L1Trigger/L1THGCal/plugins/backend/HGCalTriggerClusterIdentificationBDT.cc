@@ -94,6 +94,10 @@ initialize(const edm::ParameterSet& conf)
       << "BDTs already initialized.";
     return; 
   }
+  categories_.clear();
+  bdts_.clear();
+  working_points_.clear();
+  input_variables_.clear();
   input_variables_ = conf.getParameter< std::vector<std::string> >("Inputs");
   std::vector<std::string> bdt_files = conf.getParameter< std::vector<std::string> >("Weights");
   std::vector<double> categories_etamin = conf.getParameter<std::vector<double>>("CategoriesEtaMin");

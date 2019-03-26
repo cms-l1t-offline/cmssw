@@ -41,7 +41,6 @@ void HGCalTowerMap2DImpl::buildTowerMap2D(const std::vector<edm::Ptr<l1t::HGCalT
     unsigned layer = triggerTools_.layerWithOffset(tc->detId());
     // FIXME: should actually sum the energy not the Et...
     double calibPt = tc->pt();
-    if(useLayerWeights_) calibPt = layerWeights_[layer] * tc->mipPt();
 
     double etEm = layer<=triggerTools_.lastLayerEE() ? calibPt : 0;
     double etHad = layer>triggerTools_.lastLayerEE() ? calibPt : 0;

@@ -25,6 +25,7 @@ class HGCalTowerMap2DImpl{
 
   void eventSetup(const edm::EventSetup& es) {
         triggerTools_.eventSetup(es);
+        towerGeometryHelper_.eventSetup(es);
   }
 
  private:
@@ -33,7 +34,6 @@ class HGCalTowerMap2DImpl{
   std::vector<double> layerWeights_;
   HGCalTriggerTools triggerTools_;
   std::unordered_map<int, l1t::HGCalTowerMap> newTowerMaps();
-
   HGCalTriggerTowerGeometryHelper towerGeometryHelper_;
 
 };

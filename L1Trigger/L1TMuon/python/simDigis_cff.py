@@ -25,7 +25,8 @@ SimL1TMuonCommon = cms.Sequence(simDtTriggerPrimitiveDigis + simCscTriggerPrimit
 # Legacy Trigger:
 #
 from Configuration.Eras.Modifier_stage2L1Trigger_cff import stage2L1Trigger
-if not (stage2L1Trigger.isChosen()):
+from Configuration.Eras.Modifier_phase2_trigger_cff import phase2_trigger
+if not (stage2L1Trigger.isChosen() or phase2_trigger.isChosen()):
 #
 # - CSC Track Finder emulator
 #
@@ -38,7 +39,7 @@ if not (stage2L1Trigger.isChosen()):
     simCsctfDigis.CSCTrackProducer = 'simCsctfTrackDigis'
 #
 # - DT Track Finder emulator
-# 
+#
     import L1Trigger.DTTrackFinder.dttfDigis_cfi
     simDttfDigis = L1Trigger.DTTrackFinder.dttfDigis_cfi.dttfDigis.clone()
     simDttfDigis.DTDigi_Source  = 'simDtTriggerPrimitiveDigis'
@@ -67,20 +68,30 @@ if not (stage2L1Trigger.isChosen()):
 #
 # Stage-2 Trigger
 #
-if stage2L1Trigger.isChosen():
+if (stage2L1Trigger.isChosen() or phase2_trigger.isChosen()):
     from L1Trigger.L1TTwinMux.simTwinMuxDigis_cfi import *
     from L1Trigger.L1TMuonBarrel.simBmtfDigis_cfi import *
     from L1Trigger.L1TMuonEndCap.simEmtfDigis_cfi import *
     from L1Trigger.L1TMuonOverlap.simOmtfDigis_cfi import *
     from L1Trigger.L1TMuon.simGmtCaloSumDigis_cfi import *
     from L1Trigger.L1TMuon.simGmtStage2Digis_cfi import *
+    from L1Trigger.L1TMuonBarrel.simKBmtfStubs_cfi import *
+    from L1Trigger.L1TMuonBarrel.simKBmtfDigis_cfi import *
+
 #
 #
-    SimL1TMuon = cms.Sequence(SimL1TMuonCommon + simTwinMuxDigis + simBmtfDigis + simEmtfDigis + simOmtfDigis + simGmtCaloSumDigis + simGmtStage2Digis)
+    SimL1TMuon = cms.Sequence(SimL1TMuonCommon + simTwinMuxDigis + simBmtfDigis + simKBmtfStubs + simKBmtfDigis + simEmtfDigis + simOmtfDigis + simGmtCaloSumDigis + simGmtStage2Digis)
 
     from L1Trigger.ME0Trigger.me0TriggerPseudoDigis_cff import *
+    from L1Trigger.L1TMuon.simDisplacedGmtStage2Digis_cfi import *
     _phase2_SimL1TMuon = SimL1TMuon.copy()
     _phase2_SimL1TMuon += me0TriggerPseudoDigiSequence
+    #
+    # Remove displaced-muon from sequence, as it crashes 
+    # >Looking for type: std::vector<L1MuBMTrack>
+    # >Looking for module label: simGmtStage2Digis
+    #
+    #_phase2_SimL1TMuon += simDisplacedGmtStage2Digis
 
     from Configuration.Eras.Modifier_phase2_muon_cff import phase2_muon
     phase2_muon.toReplaceWith( SimL1TMuon, _phase2_SimL1TMuon )
