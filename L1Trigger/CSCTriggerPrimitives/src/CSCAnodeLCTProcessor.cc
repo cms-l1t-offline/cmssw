@@ -1,97 +1,6 @@
 #include "L1Trigger/CSCTriggerPrimitives/interface/CSCAnodeLCTProcessor.h"
 #include <set>
 
-//-----------------
-// Static variables
-//-----------------
-
-/* This is the pattern envelope, which is used to define the collision
-   patterns A and B.
-   pattern_envelope[0][i]=layer;
-   pattern_envelope[1+MEposition][i]=key_wire offset. */
-const int CSCAnodeLCTProcessor::pattern_envelope[CSCConstants::NUM_ALCT_PATTERNS][CSCConstants::MAX_WIRES_IN_PATTERN] = {
-  //Layer
-  { 0,  0,  0,
-        1,  1,
-            2,
-            3,  3,
-            4,  4,  4,
-            5,  5,  5},
-
-  //Keywire offset for ME1 and ME2
-  {-2, -1,  0,
-       -1,  0,
-            0,
-            0,  1,
-            0,  1,  2,
-            0,  1,  2},
-
-  //Keywire offset for ME3 and ME4
-  {2,  1,  0,
-       1,  0,
-           0,
-           0, -1,
-           0, -1, -2,
-           0, -1, -2}
-};
-
-// Since the test beams in 2003, both collision patterns are "completely
-// open".  This is our current default.
-const int CSCAnodeLCTProcessor::pattern_mask_open[CSCConstants::NUM_ALCT_PATTERNS][CSCConstants::MAX_WIRES_IN_PATTERN] = {
-  // Accelerator pattern
-  {0,  0,  1,
-       0,  1,
-           1,
-           1,  0,
-           1,  0,  0,
-           1,  0,  0},
-
-  // Collision pattern A
-  {1,  1,  1,
-       1,  1,
-           1,
-           1,  1,
-           1,  1,  1,
-           1,  1,  1},
-
-  // Collision pattern B
-  {1,  1,  1,
-       1,  1,
-           1,
-           1,  1,
-           1,  1,  1,
-           1,  1,  1}
-};
-
-// Special option for narrow pattern for ring 1 stations
-const int CSCAnodeLCTProcessor::pattern_mask_r1[CSCConstants::NUM_ALCT_PATTERNS][CSCConstants::MAX_WIRES_IN_PATTERN] = {
-  // Accelerator pattern
-  {0,  0,  1,
-       0,  1,
-           1,
-           1,  0,
-           1,  0,  0,
-           1,  0,  0},
-
-  // Collision pattern A
-  {0,  1,  1,
-       1,  1,
-           1,
-           1,  0,
-           1,  1,  0,
-           1,  1,  0},
-
-  // Collision pattern B
-  {0,  1,  1,
-       1,  1,
-           1,
-           1,  0,
-           1,  1,  0,
-           1,  1,  0}
-};
-
-
-
 // Default values of configuration parameters.
 const unsigned int CSCAnodeLCTProcessor::def_fifo_tbins   = 16;
 const unsigned int CSCAnodeLCTProcessor::def_fifo_pretrig = 10;
@@ -207,9 +116,9 @@ void CSCAnodeLCTProcessor::loadPatternMask()
   // Load appropriate pattern mask.
   for (int i_patt = 0; i_patt < CSCConstants::NUM_ALCT_PATTERNS; i_patt++) {
     for (int i_wire = 0; i_wire < CSCConstants::MAX_WIRES_IN_PATTERN; i_wire++) {
-      pattern_mask[i_patt][i_wire] = pattern_mask_open[i_patt][i_wire];
+      pattern_mask[i_patt][i_wire] = CSCPatternBank::alct_pattern_mask_open[i_patt][i_wire];
       if (narrow_mask_r1 && (theRing == 1 || theRing == 4))
-        pattern_mask[i_patt][i_wire] = pattern_mask_r1[i_patt][i_wire];
+        pattern_mask[i_patt][i_wire] = CSCPatternBank::alct_pattern_mask_r1[i_patt][i_wire];
     }
   }
 }
@@ -481,27 +390,27 @@ void CSCAnodeLCTProcessor::run(const std::vector<int> wire[CSCConstants::NUM_LAY
             trigger = true;
             int ghost_cleared[2] = {0, 0};
             ghostCancellationLogicOneWire(i_wire, ghost_cleared);
-     
+
             int bx = (use_corrected_bx) ? first_bx_corrected[i_wire]:first_bx[i_wire];
-            if (bx >= CSCConstants::MAX_ALCT_TBINS)  
+            if (bx >= CSCConstants::MAX_ALCT_TBINS)
                edm::LogError("CSCAnodeLCTProcessor") <<" bx of valid trigger : "<< bx <<" > max allowed value "<<  CSCConstants::MAX_ALCT_TBINS;
 
             //acceloration mode
             if (quality[i_wire][0] > 0 and bx <  CSCConstants::MAX_ALCT_TBINS){
                int valid = (ghost_cleared[0] == 0) ? 1 : 0;//cancelled, valid=0, otherwise it is 1
                lct_list.push_back(CSCALCTDigi(valid, quality[i_wire][0], 1, 0, i_wire, bx));
-               if (infoV > 1)   LogTrace("CSCAnodeLCTProcessor") 
-                                  <<"Add one ALCT to list "<< lct_list.back(); 
+               if (infoV > 1)   LogTrace("CSCAnodeLCTProcessor")
+                                  <<"Add one ALCT to list "<< lct_list.back();
                }
 
             //collision mode
             if (quality[i_wire][1] > 0 and bx <  CSCConstants::MAX_ALCT_TBINS){
                int valid = (ghost_cleared[1] == 0) ? 1 : 0;//cancelled, valid=0, otherwise it is 1
                lct_list.push_back(CSCALCTDigi(valid, quality[i_wire][1], 0, quality[i_wire][2], i_wire, bx));
-               if (infoV > 1)   LogTrace("CSCAnodeLCTProcessor") 
-                                  <<"Add one ALCT to list "<< lct_list.back(); 
+               if (infoV > 1)   LogTrace("CSCAnodeLCTProcessor")
+                                  <<"Add one ALCT to list "<< lct_list.back();
             }
-                  
+
             //break;
             // Assume that the earliest time when another pre-trigger can
             // occur in case pattern detection failed is bx_pretrigger+4:
@@ -517,7 +426,7 @@ void CSCAnodeLCTProcessor::run(const std::vector<int> wire[CSCConstants::NUM_LAY
           break;
         }
       }// end of while
-   
+
     }
   }
 
@@ -721,11 +630,11 @@ bool CSCAnodeLCTProcessor::preTrigger(const int key_wire, const int start_bx)
         hit_layer[i_layer] = false;
       layers_hit = 0;
 
-      for (int i_wire = 0; i_wire < CSCConstants::MAX_WIRES_IN_PATTERN; i_wire++){
-        if (pattern_mask[i_pattern][i_wire] != 0){
-          this_layer = pattern_envelope[0][i_wire];
-          this_wire  = pattern_envelope[1+MESelection][i_wire]+key_wire;
-          if ((this_wire >= 0) && (this_wire < numWireGroups)){
+      for (int i_wire = 0; i_wire < CSCConstants::MAX_WIRES_IN_PATTERN; i_wire++) {
+        if (pattern_mask[i_pattern][i_wire] != 0) {
+          this_layer = CSCPatternBank::alct_pattern_envelope[0][i_wire];
+          this_wire = CSCPatternBank::alct_pattern_envelope[1 + MESelection][i_wire] + key_wire;
+          if ((this_wire >= 0) && (this_wire < numWireGroups)) {
             // Perform bit operation to see if pulse is 1 at a certain bx_time.
             if (((pulse[this_layer][this_wire] >> bx_time) & 1) == 1) {
               // Store number of layers hit.
@@ -781,13 +690,12 @@ bool CSCAnodeLCTProcessor::patternDetection(const int key_wire)
     std::multiset<int> mset_for_median;
     mset_for_median.clear();
 
-    for (int i_wire = 0; i_wire < CSCConstants::MAX_WIRES_IN_PATTERN; i_wire++){
-      if (pattern_mask[i_pattern][i_wire] != 0){
-        this_layer = pattern_envelope[0][i_wire];
-        delta_wire = pattern_envelope[1+MESelection][i_wire];
-        this_wire  = delta_wire + key_wire;
-        if ((this_wire >= 0) && (this_wire < numWireGroups)){
-
+    for (int i_wire = 0; i_wire < CSCConstants::MAX_WIRES_IN_PATTERN; i_wire++) {
+      if (pattern_mask[i_pattern][i_wire] != 0) {
+        this_layer = CSCPatternBank::alct_pattern_envelope[0][i_wire];
+        delta_wire = CSCPatternBank::alct_pattern_envelope[1 + MESelection][i_wire];
+        this_wire = delta_wire + key_wire;
+        if ((this_wire >= 0) && (this_wire < numWireGroups)) {
           // Wait a drift_delay time later and look for layers hit in
           // the pattern.
           if ( ( (pulse[this_layer][this_wire] >>
@@ -864,7 +772,7 @@ bool CSCAnodeLCTProcessor::patternDetection(const int key_wire)
         // Only one collision pattern (of the best quality) is reported
         if (static_cast<int>(temp_quality) > quality[key_wire][1]) {
           quality[key_wire][1] = temp_quality;//real quality
-          quality[key_wire][2] = i_pattern-1; // pattern, left or right 
+          quality[key_wire][2] = i_pattern-1; // pattern, left or right
         }
       }
       if (infoV > 1) {
@@ -974,7 +882,7 @@ void CSCAnodeLCTProcessor::ghostCancellationLogic()
 
 
 void  CSCAnodeLCTProcessor::ghostCancellationLogicOneWire(const int key_wire, int *ghost_cleared){
-    
+
 
   //int ghost_cleared[2];
 
@@ -992,9 +900,9 @@ void  CSCAnodeLCTProcessor::ghostCancellationLogicOneWire(const int key_wire, in
         for (auto& p : lct_list){
           //ignore whether ALCT is valid or not in ghost cancellation
           //if wiregroup 10, 11, 12 all have trigger and same quality, only wiregroup 10 can keep the trigger
-          //this met with firmware 
+          //this met with firmware
           if (not (p.getKeyWG() == key_wire -1 and 1-p.getAccelerator() == i_pattern)) continue;
-            
+
           bool ghost_cleared_prev = false;
           int qual_prev = p.getQuality();
           int first_bx_prev = p.getBX();
@@ -1032,8 +940,8 @@ void  CSCAnodeLCTProcessor::ghostCancellationLogicOneWire(const int key_wire, in
             << " pattern ghost cancelled on key_wire " << key_wire <<" q="<<qual_this
             << "  by wire " << key_wire-1<<" q="<<qual_prev;
           //cancellation for key_wire is done when ALCT is created and pushed to lct_list
-        } 
-     
+        }
+
         if (ghost_cleared_prev) {
           if (infoV > 1) LogTrace("CSCAnodeLCTProcessor")
             << ((i_pattern == 0) ? "Accelerator" : "Collision")
@@ -1514,8 +1422,8 @@ void CSCAnodeLCTProcessor::showPatterns(const int key_wire)
     for (int i_wire = 0; i_wire < CSCConstants::MAX_WIRES_IN_PATTERN; i_wire++) {
       if (pattern_mask[i_pattern][i_wire] != 0) {
         std::ostringstream strstrm_pulse;
-        int this_layer = pattern_envelope[0][i_wire];
-        int this_wire  = pattern_envelope[1+MESelection][i_wire]+key_wire;
+        int this_layer = CSCPatternBank::alct_pattern_envelope[0][i_wire];
+        int this_wire = CSCPatternBank::alct_pattern_envelope[1 + MESelection][i_wire] + key_wire;
         if (this_wire >= 0 && this_wire < numWireGroups) {
           for (int i = 1; i <= 32; i++) {
             strstrm_pulse << ((pulse[this_layer][this_wire]>>(32-i)) & 1);

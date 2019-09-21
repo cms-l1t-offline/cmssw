@@ -87,22 +87,23 @@ bool CSCUpgradeCathodeLCTProcessor::preTrigger(
 
           // write each pre-trigger to output
           nPreTriggers++;
-          const int bend = pattern2007[best_pid[hstrip]][CSCConstants::MAX_HALFSTRIPS_IN_PATTERN];
-          const int halfstrip = hstrip%CSCConstants::NUM_HALF_STRIPS_PER_CFEB;
-          const int cfeb = hstrip/CSCConstants::NUM_HALF_STRIPS_PER_CFEB;
-          thePreTriggerDigis.push_back(CSCCLCTPreTriggerDigi(1, nhits[hstrip], best_pid[hstrip],
-                                                             1, bend, halfstrip, cfeb, bx_time, nPreTriggers, 0));
+          const int bend = CSCPatternBank::clct_pattern2007[best_pid[hstrip]][CSCConstants::MAX_HALFSTRIPS_IN_PATTERN];
+          const int halfstrip = hstrip % CSCConstants::NUM_HALF_STRIPS_PER_CFEB;
+          const int cfeb = hstrip / CSCConstants::NUM_HALF_STRIPS_PER_CFEB;
+          thePreTriggerDigis.push_back(CSCCLCTPreTriggerDigi(
+              1, nhits[hstrip], best_pid[hstrip], 1, bend, halfstrip, cfeb, bx_time, nPreTriggers, 0));
 
-        }else if (nhits[hstrip]    >= nplanes_hit_pretrig &&
-            best_pid[hstrip] >= pid_thresh_pretrig){//busy zone, keep pretriggering,ignore this
-            ispretrig[hstrip] = true;
-		if (infoV > 1)  LogTrace("CSCUpgradeCathodeLCTProcessor")
-						<<" halfstrip "<< std::setw(3) << hstrip  <<" in dead zone and is pretriggerred";
-        }else if (nhits[hstrip] < nplanes_hit_pretrig || best_pid[hstrip] < pid_thresh_pretrig){
-            // not pretriggered anyone, release dead zone
-            ispretrig[hstrip] = false;
-	  }
-      }// find all pretriggers
+        } else if (nhits[hstrip] >= nplanes_hit_pretrig &&
+                   best_pid[hstrip] >= pid_thresh_pretrig) {  //busy zone, keep pretriggering,ignore this
+          ispretrig[hstrip] = true;
+          if (infoV > 1)
+            LogTrace("CSCUpgradeCathodeLCTProcessor")
+                << " halfstrip " << std::setw(3) << hstrip << " in dead zone and is pretriggerred";
+        } else if (nhits[hstrip] < nplanes_hit_pretrig || best_pid[hstrip] < pid_thresh_pretrig) {
+          // not pretriggered anyone, release dead zone
+          ispretrig[hstrip] = false;
+        }
+      }  // find all pretriggers
 
       //update dead zone
       for (int hstrip = stagger[CSCConstants::KEY_CLCT_LAYER-1];
@@ -320,7 +321,8 @@ CSCUpgradeCathodeLCTProcessor::findLCTs(const std::vector<int> halfstrip[CSCCons
             }
             //ptn_trig = true;
             keystrip_data[ilct][CLCT_PATTERN] = best_pid[best_hs];
-            keystrip_data[ilct][CLCT_BEND] = pattern2007[best_pid[best_hs]][CSCConstants::MAX_HALFSTRIPS_IN_PATTERN];
+            keystrip_data[ilct][CLCT_BEND] =
+                CSCPatternBank::clct_pattern2007[best_pid[best_hs]][CSCConstants::MAX_HALFSTRIPS_IN_PATTERN];
             // Remove stagger if any.
             keystrip_data[ilct][CLCT_STRIP] = best_hs - stagger[CSCConstants::KEY_CLCT_LAYER - 1];
             keystrip_data[ilct][CLCT_BX] = bx;
