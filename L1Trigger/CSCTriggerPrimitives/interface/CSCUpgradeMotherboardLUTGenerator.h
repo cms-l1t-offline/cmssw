@@ -43,6 +43,11 @@ public:
   // create LUT: pad->HS
   void gemPadToCscHsLUT(const CSCLayer*, const GEMEtaPartition*, std::vector<int>&) const;
 
+  // create LUT: roll-> center wg
+  void gemRollToCscWgLUT(const CSCLayer*,
+                         const GEMChamber*,
+                         std::vector<int>&) const;
+
   const CSCGeometry* csc_g;
   const GEMGeometry* gem_g;
 };

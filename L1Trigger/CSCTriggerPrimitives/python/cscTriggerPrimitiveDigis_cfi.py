@@ -21,7 +21,7 @@ cscTriggerPrimitiveDigis = cms.EDProducer("CSCTriggerPrimitivesProducer",
     commonParam = cms.PSet(
         # Master flag for SLHC studies
         isSLHC = cms.bool(False),
-        
+
         # Debug
         verbosity = cms.int32(0),
 
@@ -304,14 +304,14 @@ copadParamGE11 = cms.PSet(
      verbosity = cms.uint32(0),
      maxDeltaPad = cms.uint32(2),
      maxDeltaRoll = cms.uint32(1),
-     maxDeltaBX = cms.uint32(1)
+     maxDeltaBX = cms.uint32(0)
  )
 
 copadParamGE21 = cms.PSet(
      verbosity = cms.uint32(0),
      maxDeltaPad = cms.uint32(2),
      maxDeltaRoll = cms.uint32(1),
-     maxDeltaBX = cms.uint32(1)
+     maxDeltaBX = cms.uint32(0)
  )
 
 # to be used by ME11 chambers with GEM-CSC ILT
@@ -353,10 +353,10 @@ me11tmbSLHCGEM = cms.PSet(
     dropLowQualityCLCTsNoGEMs_ME1b = cms.bool(True),
     dropLowQualityALCTsNoGEMs_ME1a = cms.bool(False),
     dropLowQualityALCTsNoGEMs_ME1b = cms.bool(False),
-    buildLCTfromALCTandGEM_ME1a = cms.bool(True),
+    buildLCTfromALCTandGEM_ME1a = cms.bool(False),
     buildLCTfromALCTandGEM_ME1b = cms.bool(True),
     buildLCTfromCLCTandGEM_ME1a = cms.bool(False),
-    buildLCTfromCLCTandGEM_ME1b = cms.bool(False),
+    buildLCTfromCLCTandGEM_ME1b = cms.bool(True),
     doLCTGhostBustingWithGEMs = cms.bool(False),
     promoteALCTGEMpattern = cms.bool(True),
     promoteALCTGEMquality = cms.bool(True),
@@ -463,7 +463,7 @@ phase2_muon.toModify( cscTriggerPrimitiveDigis,
                                          runME21ILT = cms.bool(True),
                                          runME31Up = cms.bool(True),
                                          runME41Up = cms.bool(True)),
-                      tmbSLHC = dict(ignoreAlctCrossClct = cms.bool(True)),
+                      tmbSLHC = dict(ignoreAlctCrossClct = cms.bool(False)),
                       clctSLHC = dict(useDynamicStateMachineZone = cms.bool(True)),
                       alctSLHCME21 = cscTriggerPrimitiveDigis.alctSLHC.clone(alctNplanesHitPattern = 3),
                       clctSLHCME21 = cscTriggerPrimitiveDigis.clctSLHC.clone(clctNplanesHitPattern = 3),

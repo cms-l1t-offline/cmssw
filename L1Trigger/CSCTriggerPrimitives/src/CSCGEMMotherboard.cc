@@ -140,6 +140,7 @@ CSCCorrelatedLCTDigi CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct
     thisLCT.setCLCT(clct);
     thisLCT.setGEM1(gem1);
     thisLCT.setType(CSCCorrelatedLCTDigi::ALCTCLCTGEM);
+  valid = doesWiregroupCrossStrip(keyWG, keyStrip) ? 1 : 0;
   }
   else if (alct.isValid() and clct.isValid() and not gem1.isValid() and gem2.isValid()) {
     pattern = encodePattern(clct.getPattern());
@@ -153,6 +154,7 @@ CSCCorrelatedLCTDigi CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct
     thisLCT.setGEM1(gem2.first());
     thisLCT.setGEM2(gem2.second());
     thisLCT.setType(CSCCorrelatedLCTDigi::ALCTCLCT2GEM);
+    valid = doesWiregroupCrossStrip(keyWG, keyStrip) ? 1 : 0;
   }
   else if (alct.isValid() and gem2.isValid() and not clct.isValid()) {
     //in ME11
@@ -166,7 +168,7 @@ CSCCorrelatedLCTDigi CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct
       if (alct.getKeyWG() >= 10)
         p = CSCPart::ME1B;
       else
-	p = CSCPart::ME1A;
+        p = CSCPart::ME1A;
     }
 
     const auto& mymap1 = getLUT()->get_gem_pad_to_csc_hs(theParity, p);
@@ -192,10 +194,10 @@ CSCCorrelatedLCTDigi CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct
     thisLCT.setGEM1(gem2.first());
     thisLCT.setGEM2(gem2.second());
     thisLCT.setType(CSCCorrelatedLCTDigi::ALCT2GEM);
+    valid = true;
   }
   else if (clct.isValid() and gem2.isValid() and not alct.isValid()) {
-    auto p(getCSCPart(clct.getKeyStrip()));
-    const auto& mymap2 = getLUT()->get_gem_roll_to_csc_wg(theParity, p);
+    const auto& mymap2 = getLUT()->get_gem_roll_to_csc_wg(theParity);
     pattern = encodePattern(clct.getPattern());
     quality = promoteCLCTGEMquality_ ? 15 : 11;
     bx = gem2.bx(1) + CSCConstants::LCT_CENTRAL_BX;
@@ -207,9 +209,10 @@ CSCCorrelatedLCTDigi CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct
     thisLCT.setGEM1(gem2.first());
     thisLCT.setGEM2(gem2.second());
     thisLCT.setType(CSCCorrelatedLCTDigi::CLCT2GEM);
+    valid = true;
   }
 
-  valid = doesWiregroupCrossStrip(keyWG, keyStrip) ? 1 : 0;
+
   if (valid == 0)
        LogTrace("CSCGEMCMotherboard") << "Warning!!! wiregroup and strip pair are not crossing each other"
 	   <<" detid "<<cscId_ <<" with wiregroup "<< keyWG << "keyStrip "<< keyStrip <<" \n";
@@ -274,9 +277,9 @@ int CSCGEMMotherboard::getRoll(const GEMCoPadDigiId& p) const
   return p.second.roll();
 }
 
-int CSCGEMMotherboard::getRoll(const CSCALCTDigi& alct) const
+std::pair<int,int> CSCGEMMotherboard::getRolls(const CSCALCTDigi& alct) const
 {
-  return (getLUT()->get_csc_wg_to_gem_roll(theParity))[alct.getKeyWG()].first;
+  return std::make_pair((getLUT()->get_csc_wg_to_gem_roll(theParity))[alct.getKeyWG()].first, (getLUT()->get_csc_wg_to_gem_roll(theParity))[alct.getKeyWG()].second);
 }
 
 float CSCGEMMotherboard::getPad(const GEMPadDigi& p) const

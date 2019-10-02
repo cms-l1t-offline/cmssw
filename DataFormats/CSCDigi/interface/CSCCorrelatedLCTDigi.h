@@ -3,7 +3,7 @@
 
 /**\class CSCCorrelatedLCTDigi
  *
- * Digi for Correlated LCT trigger primitives. 
+ * Digi for Correlated LCT trigger primitives.
  *
  *
  * \author L. Gray, UF
@@ -120,8 +120,8 @@ public:
 
   /// SIMULATION ONLY ////
   enum Type {
-    CLCTALCT,      // CLCT-centric
     ALCTCLCT,      // ALCT-centric
+    CLCTALCT,      // CLCT-centric
     ALCTCLCTGEM,   // ALCT-CLCT-1 GEM pad
     ALCTCLCT2GEM,  // ALCT-CLCT-2 GEM pads in coincidence
     ALCT2GEM,      // ALCT-2 GEM pads in coincidence
