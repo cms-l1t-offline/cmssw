@@ -7,6 +7,7 @@
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisRCTDataFormat.h"
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisCaloTPDataFormat.h"
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisGeneratorDataFormat.h"
+#include "L1Trigger/L1TNtuples/interface/L1AnalysisCustomGeneratorDataFormat.h" 
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisSimulationDataFormat.h"
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisL1ExtraDataFormat.h"
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisRecoMuonDataFormat.h"
@@ -25,10 +26,11 @@
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisBMTFInputsDataFormat.h"
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisL1HODataFormat.h"
 
-
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisRecoTauDataFormat.h"
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisRecoMuon2DataFormat.h"
 #include "L1Trigger/L1TNtuples/interface/L1AnalysisRecoElectronDataFormat.h"
+
+#include "L1Trigger/L1TNtuples/interface/L1AnalysisPhaseIIDataFormat.h"
 
 namespace{
   namespace{
@@ -41,6 +43,7 @@ namespace{
     L1Analysis::L1AnalysisRCTDataFormat            pL1rct;
     L1Analysis::L1AnalysisCaloTPDataFormat         pL1calotp;
     L1Analysis::L1AnalysisGeneratorDataFormat      pL1generator;
+    L1Analysis::L1AnalysisCustomGeneratorDataFormat pL1customgenerator;
     L1Analysis::L1AnalysisSimulationDataFormat     pL1simu;
     L1Analysis::L1AnalysisL1ExtraDataFormat        pLl1extra;
     L1Analysis::L1AnalysisRecoMuonDataFormat       pL1muon;
@@ -62,5 +65,8 @@ namespace{
     L1Analysis::L1AnalysisRecoTauDataFormat        pL1tau; 
     L1Analysis::L1AnalysisRecoMuon2DataFormat      pL1muon2;
     L1Analysis::L1AnalysisRecoElectronDataFormat   pL1electron;
+
+    L1Analysis::L1AnalysisPhaseIIDataFormat        pL1PhaseII;
+
    }
 }

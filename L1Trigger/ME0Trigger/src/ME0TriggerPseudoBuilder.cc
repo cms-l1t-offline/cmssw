@@ -30,8 +30,9 @@ void ME0TriggerPseudoBuilder::build(const ME0SegmentCollection* me0Segments,
     for (int cham = 0; cham < static_cast<int>(trig_me0s::MAX_CHAMBERS); cham++)
     {
       // 0th layer means whole chamber.
+      // chamber counts from 1 to 18 in ME0ID
       const int region(endc == 0 ? -1 : 1);
-      ME0DetId detid(region, 0, cham, 0);
+      ME0DetId detid(region, 0, cham + 1, 0);
 
       const auto& drange = me0Segments->get(detid);
       std::vector<ME0TriggerDigi> trigV;
@@ -73,7 +74,7 @@ ME0TriggerDigi ME0TriggerPseudoBuilder::segmentConversion(const ME0Segment segme
         rolls.push_back(rechit.me0Id().roll());
   }
   if (rolls.size() > 2 or rolls.empty()) LogTrace("L1ME0Trigger") << " ME0 segment is crossing "<< rolls.size() <<" roll !!! \n";
-  assert( rolls.size() <=2 );
+  //assert(rolls.size() <= 2);   // we did found very few ME0 segments crossing 3 rolls!!! this cut is applied offline
   if (rolls.empty()) return ME0TriggerDigi();
   if (rolls[0] < 1)  LogTrace("L1ME0Trigger") << " ME0 segment has wrong roll number "<< rolls[0] <<" which should be >= 1 \n !!!";
   assert(rolls[0] >= 1);
@@ -87,9 +88,12 @@ ME0TriggerDigi ME0TriggerPseudoBuilder::segmentConversion(const ME0Segment segme
      return ME0TriggerDigi();
   }
   
+  //globalpoint from ME0 segment
+  GlobalPoint gp = me0_g->idToDet(segment.me0DetId())->surface().toGlobal(segment.localPosition());
   const ME0EtaPartition* etapart = keylayer->etaPartition(rolls[0]);
-  float strippitch = etapart->localPitch(segment.localPosition());
-  float strip = etapart->strip(segment.localPosition());
+  LocalPoint segment_lp = etapart->surface().toLocal(gp);  // convert segment gp into lp in etapartition coordinate
+  float strippitch = etapart->localPitch(segment_lp);//unit in cm
+  float strip = etapart->strip(segment_lp);
   int totstrip = etapart->nstrips();
   int istrip = static_cast<int>(strip);
   int phiposition  = istrip;
@@ -98,14 +102,13 @@ ME0TriggerDigi ME0TriggerPseudoBuilder::segmentConversion(const ME0Segment segme
   int phiposition2 = (static_cast<int>((strip - phiposition)/phi_resolution) & 1);// half-strip resolution
   phiposition = (phiposition << 1) | phiposition2;
   
-  //globalpoint from ME0 segment
-  GlobalPoint gp = me0_g->idToDet(segment.me0DetId())->surface().toGlobal(segment.localPosition());
   //gloablpoint from ME0 trigger digi
   float centreOfStrip = istrip + 0.25 +phiposition2*0.5;
   GlobalPoint gp_digi = etapart->toGlobal(etapart->centreOfStrip(centreOfStrip));
+  float strippitch_rad = strippitch/gp.perp(); //unit in rad
 
 
-  int idphi = static_cast<int>(fabs(dphi)/(strippitch*dphiresolution_));
+  int idphi = static_cast<int>(fabs(dphi)/(strippitch_rad*dphiresolution_));
   const int max_idphi = 512;
   if (idphi >= max_idphi){ 
      LogTrace("L1ME0Trigger")<<" ME0 segment dphi "<< dphi <<" and int type: "<< idphi <<" larger than max allowed: "<< max_idphi <<" !!! \n";
@@ -119,7 +122,7 @@ ME0TriggerDigi ME0TriggerPseudoBuilder::segmentConversion(const ME0Segment segme
                     <<"\t rolls size of all hits "<< rolls.size() <<" rolls[0] "<< rolls[0] <<" rolls.back() "<< rolls.back() <<" roll "<< partition <<" \n"
                     <<"\t nRechits "<< nrechits <<" quality "<< quality <<" \n"
                     <<"\t strip(float) "<< strip <<" (int) "<< istrip<<" phiposition "<< phiposition <<" resolution (in term of strip) "<< phi_resolution <<" \n"
-                    <<"\t deltaphi(float) "<< dphi <<" (int) "<< idphi <<" resolution "<< strippitch*dphiresolution_ <<" bend "<< bend <<" \n"
+                    <<"\t deltaphi(float) "<< dphi <<" (int) "<< idphi <<" resolution "<< strippitch_rad*dphiresolution_ <<" bend "<< bend <<" \n"
                     <<"\t global point eta "<< gp.eta() <<" phi "<< gp.phi() <<" trigger digi eta "<< gp_digi.eta() <<" phi "<< gp_digi.phi() <<" \n"
                     <<"\t time (ns, float) "<< time <<" BX "<< BX <<" \n";
   

@@ -18,10 +18,8 @@ class GEMCoPadProcessor
 {
  public:
   /** Normal constructor. */
-  GEMCoPadProcessor(unsigned endcap, unsigned station,
-		    unsigned chamber,
-		    const edm::ParameterSet& copad);
-  
+  GEMCoPadProcessor(unsigned region, unsigned station, unsigned chamber, const edm::ParameterSet& copad);
+
   /** Default constructor. Used for testing. */
   GEMCoPadProcessor();
 
@@ -47,7 +45,7 @@ class GEMCoPadProcessor
 
  private:
   /** Chamber id (trigger-type labels). */
-  const int theEndcap;
+  const int theRegion;
   const int theStation;
   const int theChamber;
 
@@ -59,7 +57,7 @@ class GEMCoPadProcessor
   unsigned int maxDeltaPad_;
   unsigned int maxDeltaBX_;
   unsigned int maxDeltaRoll_;
-  
+
   // output collection
   std::vector<GEMCoPadDigi> gemCoPadV;
 };

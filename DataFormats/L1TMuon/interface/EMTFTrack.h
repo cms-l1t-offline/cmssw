@@ -39,7 +39,8 @@ namespace l1t {
       _PtLUT(), endcap(-99), sector(-99), sector_idx(-99),
       mode(-99), mode_CSC(0), mode_RPC(0), mode_neighbor(0), mode_inv(-99),
       rank(-99), winner(-99), charge(-99), bx(-99), first_bx(-99), second_bx(-99),
-      pt(-99), pt_XML(-99), zone(-99), ph_num(-99), ph_q(-99),
+      pt(-99), pt_XML(-99), invpt_prompt(-99), invpt_displ(-99), d0_displ(-99),
+      zone(-99), ph_num(-99), ph_q(-99),
       theta_fp(-99), theta(-99), eta(-99), phi_fp(-99), phi_loc(-99), phi_glob(-999),
       gmt_pt(-99), gmt_phi(-999), gmt_eta(-999), gmt_quality(-99), gmt_charge(-99), gmt_charge_valid(-99),
       track_num(-99), numHits(-99)
@@ -81,10 +82,10 @@ namespace l1t {
     EMTFHitCollection Hits           () const { return _Hits;   }
     std::vector<unsigned int> HitIdx () const { return _HitIdx; }
 
-    void set_Road(const EMTFRoad& bits) { _Road    = bits; }
-    void set_RoadIdx(unsigned int bits) { _RoadIdx = bits; }
-    EMTFRoad Road              () const { return _Road;    }
-    unsigned int RoadIdx       () const { return _RoadIdx; }
+    //void set_Road(const EMTFRoad& bits) { _Road    = bits; }
+    //void set_RoadIdx(unsigned int bits) { _RoadIdx = bits; }
+    //EMTFRoad Road              () const { return _Road;    }
+    //unsigned int RoadIdx       () const { return _RoadIdx; }
 
     void set_PtLUT(EMTFPtLUT bits)     { _PtLUT = bits; }
     EMTFPtLUT PtLUT           () const { return _PtLUT; }
@@ -102,6 +103,9 @@ namespace l1t {
     void set_second_bx    (int  bits) { second_bx    = bits; }
     void set_pt           (float val) { pt           = val;  }
     void set_pt_XML       (float val) { pt_XML       = val;  }
+    void set_invpt_prompt (float val) { invpt_prompt = val;  }
+    void set_invpt_displ  (float val) { invpt_displ  = val;  }
+    void set_d0_displ     (float val) { d0_displ     = val;  }
     void set_zone         (int  bits) { zone         = bits; }
     void set_ph_num       (int  bits) { ph_num       = bits; }
     void set_ph_q         (int  bits) { ph_q         = bits; }
@@ -136,6 +140,9 @@ namespace l1t {
     int   Second_BX    () const { return second_bx   ; }
     float Pt           () const { return pt          ; }
     float Pt_XML       () const { return pt_XML      ; }
+    float Invpt_prompt () const { return invpt_prompt; }
+    float Invpt_displ  () const { return invpt_displ ; }
+    float D0_displ     () const { return d0_displ    ; }
     int   Zone         () const { return zone        ; }
     int   Ph_num       () const { return ph_num      ; }
     int   Ph_q         () const { return ph_q        ; }
@@ -159,8 +166,8 @@ namespace l1t {
     EMTFHitCollection _Hits;
     std::vector<unsigned int> _HitIdx;
 
-    EMTFRoad     _Road;
-    unsigned int _RoadIdx;
+    //EMTFRoad     _Road;
+    //unsigned int _RoadIdx;
 
     EMTFPtLUT _PtLUT;
 
@@ -180,6 +187,9 @@ namespace l1t {
     int   second_bx   ; // -3 - +3.
     float pt          ; //  0 - 255
     float pt_XML      ; //  0 - 999
+    float invpt_prompt; //  0 - 0.5 [1/GeV]
+    float invpt_displ ; //  0 - 0.5 [1/GeV]
+    float d0_displ    ; //  0 - 120 [cm]
     int   zone        ; //  0 -  3.
     int   ph_num      ;
     int   ph_q        ;

@@ -21,27 +21,36 @@ void L1TMuonEndCapTrackProducer::produce(edm::Event& iEvent, const edm::EventSet
   // Create pointers to output products
   // auto out_cppfs   = std::make_unique<l1t::CPPFDigiCollection>();
   auto out_hits_tmp = std::make_unique<EMTFHitCollection>();
-  auto out_hits_ZS  = std::make_unique<EMTFHitCollection>();
+  auto out_hits     = std::make_unique<EMTFHitCollection>();
   auto out_tracks   = std::make_unique<EMTFTrackCollection>();
   auto out_cands    = std::make_unique<l1t::RegionalMuonCandBxCollection>();
 
   // Main EMTF emulator process, produces tracks from hits in each sector in each event
   track_finder_->process(iEvent, iSetup, *out_hits_tmp, *out_tracks);
 
+#ifdef PHASE_TWO_TRIGGER
+  // Do not apply ZeroSuppression
+  for (const auto& h : *out_hits_tmp) {
+    out_hits->push_back( h );
+  }
+#else
   // Apply ZeroSuppression: Only save RPC hits if there is at least one CSC LCT in the sector
-  bool has_LCT[12] = {false};
+  std::array<bool, 12> has_csc_arr;
+  has_csc_arr.fill(false);
   for (int iSect = 0; iSect < 12; iSect++) {
     for (const auto& h : *out_hits_tmp) {
       if (h.Is_CSC() && h.Sector_idx() == iSect) {
-	has_LCT[iSect] = true; break;
+        has_csc_arr.at(iSect) = true;
+        break;
       }
     }
   }
   for (const auto& h : *out_hits_tmp) {
-    if (has_LCT[h.Sector_idx()] || h.Is_RPC() == 0) {
-      out_hits_ZS->push_back( h );
+    if (has_csc_arr.at(h.Sector_idx()) || h.Is_RPC() == false) {
+      out_hits->push_back( h );
     }
   }
+#endif
 
   // // Fill collection of emulated CPPFDigis
   // for (const auto& h : *out_hits_ZS) {
@@ -52,10 +61,10 @@ void L1TMuonEndCapTrackProducer::produce(edm::Event& iEvent, const edm::EventSet
   uGMT_converter_->convert_all(iEvent, *out_tracks, *out_cands);
 
   // Fill the output products
-  // iEvent.put(std::move(out_cppfs),     "");
-  iEvent.put(std::move(out_hits_ZS),   "");
-  iEvent.put(std::move(out_tracks),    "");
-  iEvent.put(std::move(out_cands), "EMTF");
+  // iEvent.put(std::move(out_cppfs) , "");
+  iEvent.put(std::move(out_hits)  , "");
+  iEvent.put(std::move(out_tracks), "");
+  iEvent.put(std::move(out_cands) , "EMTF");
 }
 
 // void L1TMuonEndCapTrackProducer::beginJob() {

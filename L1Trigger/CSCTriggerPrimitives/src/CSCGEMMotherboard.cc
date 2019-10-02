@@ -15,10 +15,9 @@ CSCGEMMotherboard::CSCGEMMotherboard(unsigned endcap, unsigned station,
   // super chamber has layer=0!
   gemId = GEMDetId(theRegion, 1, theStation, 0, theChamber, 0).rawId();
 
-  const edm::ParameterSet coPadParams(station==1 ?
-				      conf.getParameter<edm::ParameterSet>("copadParamGE11") :
-				      conf.getParameter<edm::ParameterSet>("copadParamGE21"));
-  coPadProcessor.reset( new GEMCoPadProcessor(endcap, station, chamber, coPadParams) );
+  const edm::ParameterSet coPadParams(station == 1 ? conf.getParameter<edm::ParameterSet>("copadParamGE11")
+                                                   : conf.getParameter<edm::ParameterSet>("copadParamGE21"));
+  coPadProcessor.reset(new GEMCoPadProcessor(theRegion, theStation, theChamber, coPadParams));
 
   maxDeltaPadL1_ = (theParity ? tmbParams_.getParameter<int>("maxDeltaPadL1Even") :
 		    tmbParams_.getParameter<int>("maxDeltaPadL1Odd") );
@@ -166,7 +165,7 @@ CSCCorrelatedLCTDigi CSCGEMMotherboard::constructLCTsGEM(const CSCALCTDigi& alct
     if (p == CSCPart::ME11){
       if (alct.getKeyWG() >= 10)
         p = CSCPart::ME1B;
-      else 
+      else
 	p = CSCPart::ME1A;
     }
 
@@ -296,7 +295,7 @@ float CSCGEMMotherboard::getPad(const CSCCLCTDigi& clct, enum CSCPart part) cons
   const auto& mymap = (getLUT()->get_csc_hs_to_gem_pad(theParity, part));
   int keyStrip = clct.getKeyStrip();
   //ME1A part, convert halfstrip from 128-223 to 0-95
-  if (part == CSCPart::ME1A and keyStrip > CSCConstants::MAX_HALF_STRIP_ME1B) 
+  if (part == CSCPart::ME1A and keyStrip > CSCConstants::MAX_HALF_STRIP_ME1B)
       keyStrip = keyStrip -  CSCConstants::MAX_HALF_STRIP_ME1B -1;
   return 0.5*(mymap[keyStrip].first + mymap[keyStrip].second);
 
