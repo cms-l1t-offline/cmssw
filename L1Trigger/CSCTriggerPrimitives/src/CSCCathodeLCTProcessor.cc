@@ -1347,14 +1347,23 @@ std::vector<CSCCLCTDigi> CSCCathodeLCTProcessor::getCLCTs() const
   return tmpV;
 }
 
+// shift the BX from 7 to 8
+// the unpacked real data CLCTs have central BX at bin 7
+// however in simulation the central BX  is bin 8
+// to make a proper comparison with ALCTs we need
+// CLCT and ALCT to have the central BX in the same bin
 CSCCLCTDigi
 CSCCathodeLCTProcessor::getBestCLCT(int bx) const
 {
-  return bestCLCT[bx];
+  CSCCLCTDigi lct = bestCLCT[bx];
+  lct.setBX(lct.getBX() + alctClctOffset_);
+  return lct;
 }
 
 CSCCLCTDigi
 CSCCathodeLCTProcessor::getSecondCLCT(int bx) const
 {
-  return secondCLCT[bx];
+  CSCCLCTDigi lct = bestCLCT[bx];
+  lct.setBX(lct.getBX() + alctClctOffset_);
+  return lct;
 }

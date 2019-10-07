@@ -1398,7 +1398,7 @@ void CSCAnodeLCTProcessor::dumpDigis(const std::vector<int> wire[CSCConstants::N
 
 // Returns vector of read-out ALCTs, if any.  Starts with the vector of
 // all found ALCTs and selects the ones in the read-out time window.
-std::vector<CSCALCTDigi> CSCAnodeLCTProcessor::readoutALCTs()
+std::vector<CSCALCTDigi> CSCAnodeLCTProcessor::readoutALCTs() const
 {
   std::vector<CSCALCTDigi> tmpV;
 
@@ -1474,7 +1474,7 @@ std::vector<CSCALCTDigi> CSCAnodeLCTProcessor::readoutALCTs()
 }
 
 // Returns vector of all found ALCTs, if any.  Used in ALCT-CLCT matching.
-std::vector<CSCALCTDigi> CSCAnodeLCTProcessor::getALCTs()
+std::vector<CSCALCTDigi> CSCAnodeLCTProcessor::getALCTs() const
 {
   std::vector<CSCALCTDigi> tmpV;
   for (int bx = 0; bx < CSCConstants::MAX_ALCT_TBINS; bx++) {

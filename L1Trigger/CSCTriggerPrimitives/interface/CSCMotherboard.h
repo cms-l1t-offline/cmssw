@@ -91,6 +91,7 @@ class CSCMotherboard : public CSCBaseboard
 
   // helper function to return ALCT with correct central BX
   CSCALCTDigi getBXShiftedALCT(const CSCALCTDigi&) const;
+  CSCCLCTDigi getBXShiftedCLCT(const CSCCLCTDigi&) const;
 
   /** Configuration parameters. */
   unsigned int mpc_block_me1a;

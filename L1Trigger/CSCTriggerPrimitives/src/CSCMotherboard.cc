@@ -169,8 +169,8 @@ CSCMotherboard::run(const CSCWireDigiCollection* wiredc,
         // need to access "full BX" words, which are not readily
         // available.
         bool is_matched = false;
-        const int bx_alct_start = bx_clct - match_trig_window_size/2 + alctClctOffset_;
-        const int bx_alct_stop  = bx_clct + match_trig_window_size/2 + alctClctOffset_;
+        const int bx_alct_start = bx_clct - match_trig_window_size/2;
+        const int bx_alct_stop  = bx_clct + match_trig_window_size/2;
 
         for (int bx_alct = bx_alct_start; bx_alct <= bx_alct_stop; bx_alct++) {
           if (bx_alct < 0 || bx_alct >= CSCConstants::MAX_ALCT_TBINS)
@@ -249,8 +249,8 @@ CSCMotherboard::run(const CSCWireDigiCollection* wiredc,
         // need to access "full BX" words, which are not readily
         // available.
         bool is_matched = false;
-        const int bx_clct_start = bx_alct - match_trig_window_size/2 - alctClctOffset_;
-        const int bx_clct_stop  = bx_alct + match_trig_window_size/2 - alctClctOffset_;
+        const int bx_clct_start = bx_alct - match_trig_window_size/2;
+        const int bx_clct_stop  = bx_alct + match_trig_window_size/2;
 
         for (int bx_clct = bx_clct_start; bx_clct <= bx_clct_stop; bx_clct++) {
           if (bx_clct < 0 || bx_clct >= CSCConstants::MAX_CLCT_TBINS)
@@ -496,7 +496,7 @@ CSCCorrelatedLCTDigi CSCMotherboard::constructLCTs(const CSCALCTDigi& aLCT,
   thisLCT.setType(type);
   // make sure to shift the ALCT BX from 8 to 3!
   thisLCT.setALCT(getBXShiftedALCT(aLCT));
-  thisLCT.setCLCT(cLCT);
+  thisLCT.setCLCT(getBXShiftedCLCT(cLCT));
   return thisLCT;
 }
 
@@ -648,4 +648,10 @@ CSCMotherboard::getBXShiftedALCT(const CSCALCTDigi& aLCT) const
   CSCALCTDigi aLCT_shifted = aLCT;
   aLCT_shifted.setBX(aLCT_shifted.getBX() - (CSCConstants::LCT_CENTRAL_BX - tmb_l1a_window_size/2));
   return aLCT_shifted;
+}
+
+CSCCLCTDigi CSCMotherboard::getBXShiftedCLCT(const CSCCLCTDigi& cLCT) const {
+  CSCCLCTDigi cLCT_shifted = cLCT;
+  cLCT_shifted.setBX(cLCT_shifted.getBX() - alctClctOffset_);
+  return cLCT_shifted;
 }
