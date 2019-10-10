@@ -267,6 +267,9 @@ void CSCGEMMotherboard::matchingPads(const CSCALCTDigi& alct,
   for (const auto& p: lut.at(alct.getBX())){
     auto padRoll(getRoll(p));
 
+    int delta;
+    if (GEMDetId(p.first).station()==2) delta = 1;
+
     // pad bx needs to match to ALCT bx
     int pad_bx = getBX(p.second)+CSCConstants::LCT_CENTRAL_BX;
 
@@ -284,7 +287,7 @@ void CSCGEMMotherboard::matchingPads(const CSCALCTDigi& alct,
     // ignore pads that are too far away in roll number
     else if ((alctRoll.first != CSCGEMMotherboard::DEFAULT_MATCHING_VALUE and
               alctRoll.second != CSCGEMMotherboard::DEFAULT_MATCHING_VALUE) and
-	     (alctRoll.first > padRoll or padRoll > alctRoll.second)) continue;
+	     (alctRoll.first - delta > padRoll or padRoll > alctRoll.second)) continue;
     result.push_back(p);
   }
 }
@@ -461,9 +464,12 @@ S CSCGEMMotherboard::bestMatchingPad(const CSCALCTDigi& alct1,
 
     float averagePadNumberGEM = getPad(p.second);
 
+    int delta;
+    if (GEMDetId(p.first).station()==2) delta = 1;
+
     // add another safety to make sure that the deltaPad is not larger than max value!!!
     if (std::abs(averagePadNumberCSC - averagePadNumberGEM) < minDeltaPad and
-        getRolls(alct1).first <= getRoll(p) and
+        getRolls(alct1).first - delta <= getRoll(p) and
         getRoll(p) <= getRolls(alct1).second){
       minDeltaPad = std::abs(averagePadNumberCSC - averagePadNumberGEM);
       result = p.second;
