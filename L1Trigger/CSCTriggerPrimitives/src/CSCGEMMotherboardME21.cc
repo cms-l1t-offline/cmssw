@@ -277,7 +277,7 @@ CSCGEMMotherboardME21::run(const CSCWireDigiCollection* wiredc,
     // at this point we have invalid ALCTs --> try GEM pad matching
     else{
       auto coPads(coPads_[bx_alct]);
-      if (!coPads.empty()) {
+      if (!coPads.empty() and buildLCTfromCLCTandGEM_) {
         const int bx_clct_start(bx_alct - match_trig_window_size/2);
         const int bx_clct_stop(bx_alct + match_trig_window_size/2);
 
