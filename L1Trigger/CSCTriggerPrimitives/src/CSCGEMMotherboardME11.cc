@@ -188,35 +188,37 @@ void CSCGEMMotherboardME11::run(const CSCWireDigiCollection* wiredc,
                            mCoPads,
                            allLCTs(bx_alct, mbx, 0),
                            allLCTs(bx_alct, mbx, 1));
-          if (debug_matching) {
-            LogTrace("CSCGEMMotherboardME11")
+
+          if (allLCTs(bx_alct,mbx,0).isValid()) {
+            used_clct_mask[bx_clct] += 1;
+
+            if (debug_matching) {
+              LogTrace("CSCGEMMotherboardME11")
                 << "Successful ALCT-CLCT match in ME1b: bx_alct = " << bx_alct << "; match window: [" << bx_clct_start
                 << "; " << bx_clct_stop << "]; bx_clct = " << bx_clct << "\n"
                 << "+++ Best CLCT Details: " << clctProc->getBestCLCT(bx_clct) << "\n"
                 << "+++ Second CLCT Details: " << clctProc->getSecondCLCT(bx_clct) << std::endl;
-            if (allLCTs(bx_alct, mbx, 0).isValid()) {
-              LogTrace("CSCGEMMotherboardME11") << "LCT #1 " << allLCTs(bx_alct, mbx, 0) << std::endl;
-              LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 0).getALCT() << std::endl;
-              LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 0).getCLCT() << std::endl;
-              if (allLCTs(bx_alct, mbx, 0).getType() == 2) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 0).getGEM1() << std::endl;
-              if (allLCTs(bx_alct, mbx, 0).getType() == 3) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 0).getGEM1() << " " << allLCTs(bx_alct, mbx, 0).getGEM2() << std::endl;
-            }
-            else
-              LogTrace("CSCGEMMotherboardME11") << "No valid LCT is built from ALCT-CLCT matching in ME1b"  << std::endl;
+              if (allLCTs(bx_alct, mbx, 0).isValid()) {
+                LogTrace("CSCGEMMotherboardME11") << "LCT #1 " << allLCTs(bx_alct, mbx, 0) << std::endl;
+                LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 0).getALCT() << std::endl;
+                LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 0).getCLCT() << std::endl;
+                if (allLCTs(bx_alct, mbx, 0).getType() == 2) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 0).getGEM1() << std::endl;
+                if (allLCTs(bx_alct, mbx, 0).getType() == 3) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 0).getGEM1() << " " << allLCTs(bx_alct, mbx, 0).getGEM2() << std::endl;
+              }
 
-            if (allLCTs(bx_alct,mbx,1).isValid()) {
-              LogTrace("CSCGEMMotherboardME11") << "LCT #2 "<< allLCTs(bx_alct,mbx,1) << std::endl;
-              LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 1).getALCT() << std::endl;
-              LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 1).getCLCT() << std::endl;
-              if (allLCTs(bx_alct, mbx, 1).getType() == 2) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 1).getGEM1() << std::endl;
-              if (allLCTs(bx_alct, mbx, 1).getType() == 3) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 1).getGEM1() << " " << allLCTs(bx_alct, mbx, 1).getGEM2() << std::endl;
+              if (allLCTs(bx_alct,mbx,1).isValid()) {
+                LogTrace("CSCGEMMotherboardME11") << "LCT #2 "<< allLCTs(bx_alct,mbx,1) << std::endl;
+                LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 1).getALCT() << std::endl;
+                LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 1).getCLCT() << std::endl;
+                if (allLCTs(bx_alct, mbx, 1).getType() == 2) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 1).getGEM1() << std::endl;
+                if (allLCTs(bx_alct, mbx, 1).getType() == 3) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 1).getGEM1() << " " << allLCTs(bx_alct, mbx, 1).getGEM2() << std::endl;
+              }
             }
-          }
 
-          if (allLCTs(bx_alct,mbx,0).isValid()) {
-            used_clct_mask[bx_clct] += 1;
             if (match_earliest_clct_only) break;
           }
+          else
+            LogTrace("CSCGEMMotherboardME11") << "No valid LCT is built from ALCT-CLCT matching in ME1b"  << std::endl;
         }
       }
 
@@ -244,26 +246,28 @@ void CSCGEMMotherboardME11::run(const CSCWireDigiCollection* wiredc,
                                               allLCTs(bx_alct, 0, 0),
                                               allLCTs(bx_alct, 0, 1));
 
-          if (debug_matching) {
-            LogTrace("CSCGEMMotherboardME11") << "Successful ALCT-GEM CoPad match in ME1b: bx_alct = " << bx_alct << "\n\n"
-                                               << "------------------------------------------------------------------------" << std::endl << std::endl;
-            if (allLCTs(bx_alct,0,0).isValid()) {
-              LogTrace("CSCGEMMotherboardME11") << "LCT #1 "<< allLCTs(bx_alct,0,0) << std::endl;
-              LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, 0, 0).getALCT() << std::endl;
-              if (allLCTs(bx_alct, 0, 0).getType() == 4) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, 0, 0).getGEM1() << " " << allLCTs(bx_alct, 0, 0).getGEM2() << std::endl << std::endl;
-            }
-            else {
-              LogTrace("CSCGEMMotherboardME11") << "No valid LCT is built from ALCT-GEM matching in ME1b"  << std::endl;
-            }
-            if (allLCTs(bx_alct,0,1).isValid()) {
-              LogTrace("CSCGEMMotherboardME11") << "LCT #2 "<< allLCTs(bx_alct,0,1) << std::endl;
-              LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, 0, 1).getALCT() << std::endl;
-              if (allLCTs(bx_alct, 0, 1).getType() == 4) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, 0, 1).getGEM1() << " " << allLCTs(bx_alct, 0, 1).getGEM2() << std::endl << std::endl;
-            }
-          }
 
           if (allLCTs(bx_alct,0,0).isValid()) {
             ++nSuccesFulGEMMatches;
+
+            if (debug_matching) {
+              LogTrace("CSCGEMMotherboardME11") << "Successful ALCT-GEM CoPad match in ME1b: bx_alct = " << bx_alct << "\n\n"
+                                                << "------------------------------------------------------------------------" << std::endl << std::endl;
+              if (allLCTs(bx_alct,0,0).isValid()) {
+                LogTrace("CSCGEMMotherboardME11") << "LCT #1 "<< allLCTs(bx_alct,0,0) << std::endl;
+                LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, 0, 0).getALCT() << std::endl;
+                if (allLCTs(bx_alct, 0, 0).getType() == 4) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, 0, 0).getGEM1() << " " << allLCTs(bx_alct, 0, 0).getGEM2() << std::endl << std::endl;
+              }
+              else {
+                LogTrace("CSCGEMMotherboardME11") << "No valid LCT is built from ALCT-GEM matching in ME1b"  << std::endl;
+              }
+              if (allLCTs(bx_alct,0,1).isValid()) {
+                LogTrace("CSCGEMMotherboardME11") << "LCT #2 "<< allLCTs(bx_alct,0,1) << std::endl;
+                LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, 0, 1).getALCT() << std::endl;
+                if (allLCTs(bx_alct, 0, 1).getType() == 4) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, 0, 1).getGEM1() << " " << allLCTs(bx_alct, 0, 1).getGEM2() << std::endl << std::endl;
+              }
+            }
+
             if (match_earliest_clct_only) break;
           }
         }
@@ -319,24 +323,26 @@ void CSCGEMMotherboardME11::run(const CSCWireDigiCollection* wiredc,
                                                   coPads,
                                                   allLCTs(bx_alct, mbx, 0),
                                                   allLCTs(bx_alct, mbx, 1));
-              if (debug_matching) {
-                //	    if (infoV > 1) LogTrace("CSCMotherboard")
-                LogTrace("CSCGEMMotherboardME11")
+              if (allLCTs(bx_alct,mbx,0).isValid()) {
+                used_clct_mask[bx_clct] += 1;
+
+                if (debug_matching) {
+                  //	    if (infoV > 1) LogTrace("CSCMotherboard")
+                  LogTrace("CSCGEMMotherboardME11")
                     << "Successful GEM-CLCT match in ME1b: bx_alct = " << bx_alct << "; match window: ["
                     << bx_clct_start << "; " << bx_clct_stop << "]; bx_clct = " << bx_clct << "\n"
                     << "+++ Best CLCT Details: " << clctProc->getBestCLCT(bx_clct) << "\n"
                     << "+++ Second CLCT Details: " << clctProc->getSecondCLCT(bx_clct) << std::endl;
 
-                LogTrace("CSCGEMMotherboardME11") << "LCT #1 "<< allLCTs(bx_alct,mbx,0) << std::endl;
-                LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 0).getALCT() << std::endl;
-                if (allLCTs(bx_alct, mbx, 0).getType() == 5) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 0).getGEM1() << " " << allLCTs(bx_alct, mbx, 0).getGEM2() << std::endl << std::endl;
+                  LogTrace("CSCGEMMotherboardME11") << "LCT #1 "<< allLCTs(bx_alct,mbx,0) << std::endl;
+                  LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 0).getALCT() << std::endl;
+                  if (allLCTs(bx_alct, mbx, 0).getType() == 5) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 0).getGEM1() << " " << allLCTs(bx_alct, mbx, 0).getGEM2() << std::endl << std::endl;
 
-                LogTrace("CSCGEMMotherboardME11") << "LCT #2 "<< allLCTs(bx_alct,mbx,1) << std::endl;
-                LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 1).getALCT() << std::endl;
-                if (allLCTs(bx_alct, mbx, 1).getType() == 5) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 1).getGEM1() << " " << allLCTs(bx_alct, mbx, 1).getGEM2() << std::endl << std::endl;
-              }
-              if (allLCTs(bx_alct,mbx,0).isValid()) {
-                used_clct_mask[bx_clct] += 1;
+                  LogTrace("CSCGEMMotherboardME11") << "LCT #2 "<< allLCTs(bx_alct,mbx,1) << std::endl;
+                  LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 1).getALCT() << std::endl;
+                  if (allLCTs(bx_alct, mbx, 1).getType() == 5) LogTrace("CSCGEMMotherboardME11") << allLCTs(bx_alct, mbx, 1).getGEM1() << " " << allLCTs(bx_alct, mbx, 1).getGEM2() << std::endl << std::endl;
+                }
+
                 if (match_earliest_clct_only) break;
               }
             }

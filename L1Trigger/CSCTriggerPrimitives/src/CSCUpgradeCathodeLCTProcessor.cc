@@ -336,7 +336,7 @@ CSCUpgradeCathodeLCTProcessor::findLCTs(const std::vector<int> halfstrip[CSCCons
 
             CSCCLCTDigi thisLCT(1, keystrip_data[ilct][CLCT_QUALITY], keystrip_data[ilct][CLCT_PATTERN],
                 keystrip_data[ilct][CLCT_STRIP_TYPE], keystrip_data[ilct][CLCT_BEND], halfstrip_in_cfeb,
-                keystrip_data[ilct][CLCT_CFEB], keystrip_data[ilct][CLCT_BX]);
+                keystrip_data[ilct][CLCT_CFEB], keystrip_data[ilct][CLCT_BX] + alctClctOffset_);
             thisLCT.setFullBX(fbx);
             lctList.push_back(thisLCT);
             lctListBX.push_back(thisLCT);

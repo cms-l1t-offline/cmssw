@@ -393,16 +393,16 @@ me21tmbSLHCGEM = cms.PSet(
     ## matching to pads
     maxDeltaBXPad = cms.int32(1),
     maxDeltaBXCoPad = cms.int32(1),
-    maxDeltaPadL1Even = cms.int32(6),
-    maxDeltaPadL1Odd = cms.int32(12),
-    maxDeltaPadL2Even = cms.int32(6),
-    maxDeltaPadL2Odd = cms.int32(12),
+    maxDeltaPadL1Even = cms.int32(6*2),
+    maxDeltaPadL1Odd = cms.int32(12*2),
+    maxDeltaPadL2Even = cms.int32(6*2),
+    maxDeltaPadL2Odd = cms.int32(12*2),
 
     ## efficiency recovery switches
     dropLowQualityALCTsNoGEMs = cms.bool(False),
     dropLowQualityCLCTsNoGEMs = cms.bool(True),
     buildLCTfromALCTandGEM = cms.bool(True),
-    buildLCTfromCLCTandGEM = cms.bool(False),
+    buildLCTfromCLCTandGEM = cms.bool(True),
     doLCTGhostBustingWithGEMs = cms.bool(False),
     promoteALCTGEMpattern = cms.bool(True),
     promoteALCTGEMquality = cms.bool(True),
