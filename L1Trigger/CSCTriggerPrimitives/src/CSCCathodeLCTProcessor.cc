@@ -468,7 +468,7 @@ CSCCathodeLCTProcessor::run(const CSCComparatorDigiCollection* compdc)
   // this shift does not affect the readout of the CLCTs
   // emulated CLCTs put in the event should be centered at bin 7 (as in data)
   for (auto& p : tmpV){
-    p.setBX(p.getBX());
+    p.setBX(p.getBX() + alctClctOffset_);
   }
 
   return tmpV;
@@ -641,12 +641,12 @@ void CSCCathodeLCTProcessor::readComparatorDigis(
       for (unsigned int i = 0; i < bx_times.size(); i++) {
 	// Total number of time bins in DAQ readout is given by fifo_tbins,
 	// which thus determines the maximum length of time interval.
-	// 
+	//
 	// In data, only the CLCT in the time bin that was matched with L1A are read out
 	// while comparator digi is read out by 12 time bin, which includes 12 time bin info
 	// in other word, CLCTs emulated from comparator digis usually showed the OTMB behavior in 12 time bin
 	// while CLCT from data only showed 1 time bin OTMB behavior
-	// the CLCT emulated from comparator digis usually is centering at time bin 7 (BX7) and 
+	// the CLCT emulated from comparator digis usually is centering at time bin 7 (BX7) and
 	// it is definitly safe to ignore any CLCTs in bx 0 or 1 and those CLCTs will never impacts on any triggers
 	if (bx_times[i] > 1 && bx_times[i] < static_cast<int>(fifo_tbins)) {
 
@@ -830,7 +830,7 @@ std::vector<CSCCLCTDigi> CSCCathodeLCTProcessor::findLCTs(const std::vector<int>
 				keystrip_data[ilct][CLCT_BEND],
 				halfstrip_in_cfeb,
 				keystrip_data[ilct][CLCT_CFEB],
-				keystrip_data[ilct][CLCT_BX]+ alctClctOffset_);
+				keystrip_data[ilct][CLCT_BX]);
 	    lctList.push_back(thisLCT);
 	  }
 	}
@@ -1355,17 +1355,15 @@ std::vector<CSCCLCTDigi> CSCCathodeLCTProcessor::getCLCTs() const
 CSCCLCTDigi
 CSCCathodeLCTProcessor::getBestCLCT(int bx) const
 {
-  // std::cout << "Getbest1 " << bestCLCT[bx] << std::endl;
-  // CSCCLCTDigi lct = bestCLCT[bx];
-  // lct.setBX(lct.getBX());
-  // std::cout << "Getbest2 " << lct << std::endl;
-  return bestCLCT[bx];
+  CSCCLCTDigi lct = bestCLCT[bx];
+  lct.setBX(lct.getBX() + alctClctOffset_);
+  return lct;
 }
 
 CSCCLCTDigi
 CSCCathodeLCTProcessor::getSecondCLCT(int bx) const
 {
-  // CSCCLCTDigi lct = secondCLCT[bx];
-  // lct.setBX(lct.getBX());
-  return secondCLCT[bx];
+  CSCCLCTDigi lct = bestCLCT[bx];
+  lct.setBX(lct.getBX() + alctClctOffset_);
+  return lct;
 }

@@ -56,7 +56,7 @@ bool CSCUpgradeCathodeLCTProcessor::preTrigger(
   int nPreTriggers = 0;
 
   bool pre_trig = false;
-  int delta_hs = clct_state_machine_zone;//dead time zone 
+  int delta_hs = clct_state_machine_zone;//dead time zone
 
   // Now do a loop over bx times to see (if/when) track goes over threshold
   for (unsigned int bx_time = start_bx; bx_time < fifo_tbins; bx_time++) {
@@ -83,7 +83,7 @@ bool CSCUpgradeCathodeLCTProcessor::preTrigger(
             best_pid[hstrip] >= pid_thresh_pretrig && !busyMap[hstrip][bx_time]) {
           pre_trig = true;
           ispretrig[hstrip] = true;
-         
+
 
           // write each pre-trigger to output
           nPreTriggers++;
@@ -99,7 +99,7 @@ bool CSCUpgradeCathodeLCTProcessor::preTrigger(
 		if (infoV > 1)  LogTrace("CSCUpgradeCathodeLCTProcessor")
 						<<" halfstrip "<< std::setw(3) << hstrip  <<" in dead zone and is pretriggerred";
         }else if (nhits[hstrip] < nplanes_hit_pretrig || best_pid[hstrip] < pid_thresh_pretrig){
-            // not pretriggered anyone, release dead zone 
+            // not pretriggered anyone, release dead zone
             ispretrig[hstrip] = false;
 	  }
       }// find all pretriggers
@@ -107,7 +107,7 @@ bool CSCUpgradeCathodeLCTProcessor::preTrigger(
       //update dead zone
       for (int hstrip = stagger[CSCConstants::KEY_CLCT_LAYER-1];
          hstrip < nStrips; hstrip++) {
-        
+
         if (ispretrig[hstrip]){
           int min_hstrip = hstrip - delta_hs;//only fixed localized dead time zone is implemented
           int max_hstrip = hstrip + delta_hs;
@@ -129,7 +129,7 @@ bool CSCUpgradeCathodeLCTProcessor::preTrigger(
     } else //no pattern found, remove all dead time zone
       for (int hstrip = stagger[CSCConstants::KEY_CLCT_LAYER-1];
            hstrip < nStrips; hstrip++){
-		if (ispretrig[hstrip]) 
+		if (ispretrig[hstrip])
 			ispretrig[hstrip] = false;//dead zone is gone by default
 		}
 
@@ -161,7 +161,7 @@ CSCUpgradeCathodeLCTProcessor::findLCTs(const std::vector<int> halfstrip[CSCCons
    hstrip < maxHalfStrips; hstrip++){
       ispretrig[hstrip] = false;
    }
-     
+
   if (infoV > 1) dumpDigis(halfstrip, maxHalfStrips);
 
   // keeps dead-time zones around key halfstrips of triggered CLCTs
@@ -336,7 +336,7 @@ CSCUpgradeCathodeLCTProcessor::findLCTs(const std::vector<int> halfstrip[CSCCons
 
             CSCCLCTDigi thisLCT(1, keystrip_data[ilct][CLCT_QUALITY], keystrip_data[ilct][CLCT_PATTERN],
                 keystrip_data[ilct][CLCT_STRIP_TYPE], keystrip_data[ilct][CLCT_BEND], halfstrip_in_cfeb,
-                keystrip_data[ilct][CLCT_CFEB], keystrip_data[ilct][CLCT_BX] + alctClctOffset_);
+                keystrip_data[ilct][CLCT_CFEB], keystrip_data[ilct][CLCT_BX]);
             thisLCT.setFullBX(fbx);
             lctList.push_back(thisLCT);
             lctListBX.push_back(thisLCT);
