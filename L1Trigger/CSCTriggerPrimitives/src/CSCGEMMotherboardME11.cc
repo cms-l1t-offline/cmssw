@@ -146,13 +146,8 @@ void CSCGEMMotherboardME11::run(const CSCWireDigiCollection* wiredc,
         if (drop_used_clcts and used_clct_mask[bx_clct])
           continue;
         if (clctProc->getBestCLCT(bx_clct).isValid()) {
-          const int quality(clctProc->getBestCLCT(bx_clct).getQuality());
           if (debug_matching)
             LogTrace("CSCGEMMotherboardME11") << "++Valid ME1b CLCT: " << clctProc->getBestCLCT(bx_clct) << std::endl;
-
-          // Low quality LCTs have at most 3 layers. Check if there is a matching GEM pad to keep the CLCT
-          if (dropLowQualityCLCTsNoGEMs_ME1b_ and quality < 4 and hasPads)
-            continue;
 
           // pick the pad that corresponds
           matches<GEMPadDigi> mPads;
@@ -168,7 +163,14 @@ void CSCGEMMotherboardME11::run(const CSCWireDigiCollection* wiredc,
                                      alctProc->getSecondALCT(bx_alct),
                                      mCoPads);
 
-          ++nSuccesFulMatches;
+          const bool lowQualityCLCT(clctProc->getBestCLCT(bx_clct).getQuality() <= 3);
+          const bool hasMatchingPads(mPads.size() >=1 or mCoPads.size()>=1);
+          // Low quality LCTs have at most 3 layers. Check if there is a matching GEM pad to keep the CLCT
+          if (dropLowQualityCLCTsNoGEMs_ME1b_ and lowQualityCLCT and !hasMatchingPads) {
+            std::cout << "Dropping low quality CLCT without matching GEM pads " << clctProc->getBestCLCT(bx_clct) << std::endl;
+            continue;
+          }
+
           if (debug_matching) {
             LogTrace("CSCGEMMotherboardME11") << "mPads " << mPads.size() << " " << " mCoPads " << mCoPads.size() << std::endl;
             for (auto p : mPads) {
@@ -190,6 +192,7 @@ void CSCGEMMotherboardME11::run(const CSCWireDigiCollection* wiredc,
                            allLCTs(bx_alct, mbx, 1));
 
           if (allLCTs(bx_alct,mbx,0).isValid()) {
+            ++nSuccesFulMatches;
             used_clct_mask[bx_clct] += 1;
 
             if (debug_matching) {

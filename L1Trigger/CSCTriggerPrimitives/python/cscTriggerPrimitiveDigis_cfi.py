@@ -335,7 +335,7 @@ me11tmbSLHCGEM = cms.PSet(
 
     ## run in debug mode
     debugLUTs = cms.bool(False),
-    debugMatching = cms.bool(False),
+    debugMatching = cms.bool(True),
 
     ## use old dataformat
     useOldLCTDataFormat = cms.bool(True),
@@ -399,7 +399,7 @@ me21tmbSLHCGEM = cms.PSet(
     maxDeltaPadL2Odd = cms.int32(12*2),
 
     ## efficiency recovery switches
-    dropLowQualityALCTsNoGEMs = cms.bool(False),
+    dropLowQualityALCTsNoGEMs = cms.bool(True),
     dropLowQualityCLCTsNoGEMs = cms.bool(True),
     buildLCTfromALCTandGEM = cms.bool(True),
     buildLCTfromCLCTandGEM = cms.bool(True),

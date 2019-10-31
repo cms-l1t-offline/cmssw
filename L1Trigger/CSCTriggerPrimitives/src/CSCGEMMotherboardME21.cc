@@ -121,9 +121,6 @@ CSCGEMMotherboardME21::run(const CSCWireDigiCollection* wiredc,
           continue;
         if (drop_used_clcts and used_clct_mask[bx_clct])
           continue;
-        // if (!clctProc->getBestCLCT(bx_clct).isValid()) {
-        //   std::cout << "++InValid ME21 CLCT: " << bx_clct << " " << clctProc->getBestCLCT(bx_clct) << std::endl;
-        // }
         if (clctProc->getBestCLCT(bx_clct).isValid()) {
 
           if (debug_matching){
@@ -132,11 +129,9 @@ CSCGEMMotherboardME21::run(const CSCWireDigiCollection* wiredc,
           }
 
           // clct quality
-          const int quality(clctProc->getBestCLCT(bx_clct).getQuality());
+          const bool lowQualityCLCT(clctProc->getBestCLCT(bx_clct).getQuality() <= 3);
           // low quality ALCT
           const bool lowQualityALCT(alctProc->getBestALCT(bx_alct).getQuality() == 0);
-          // low quality ALCT or CLCT
-          const bool lowQuality(quality < 4 or lowQualityALCT);
 
           // pick the pad that corresponds
           matches<GEMPadDigi> mPads;
@@ -152,10 +147,14 @@ CSCGEMMotherboardME21::run(const CSCWireDigiCollection* wiredc,
                                      alctProc->getSecondALCT(bx_alct),
                                      mCoPads);
 
-          if (dropLowQualityCLCTsNoGEMs_ and lowQuality and hasPads) {
+          bool hasMatchingPads(mPads.size() >=1 or mCoPads.size()>=1);
+
+          if (dropLowQualityCLCTsNoGEMs_ and lowQualityCLCT and !hasMatchingPads) {
             continue;
           }
-
+          if (dropLowQualityALCTsNoGEMs_ and lowQualityALCT and !hasMatchingPads) {
+            continue;
+          }
 
           int mbx = bx_clct - bx_clct_start;
           correlateLCTsGEM(alctProc->getBestALCT(bx_alct),
