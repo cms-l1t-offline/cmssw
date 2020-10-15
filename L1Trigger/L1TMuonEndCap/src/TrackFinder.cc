@@ -28,6 +28,7 @@ void TrackFinder::process(const edm::Event& iEvent,
   // Clear output collections
   out_hits.clear();
   out_tracks.clear();
+  out_showers.clear();
 
   // Check and update geometry, conditions, versions, sp LUTs, and pt assignment engine
   setup_.reload(iEvent, iSetup);
@@ -101,7 +102,7 @@ void TrackFinder::process(const edm::Event& iEvent,
                      (sector - emtf::MIN_TRIGSECTOR);
 
       sector_processors_.at(es).configure(&setup_, verbose_, endcap, sector);
-      sector_processors_.at(es).process(iEvent.id(), muon_primitives, out_hits, out_tracks);
+      sector_processors_.at(es).process(iEvent.id(), muon_primitives, out_hits, out_tracks, out_showers);
     }
   }
 

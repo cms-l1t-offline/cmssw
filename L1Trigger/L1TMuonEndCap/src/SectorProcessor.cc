@@ -18,7 +18,8 @@ void SectorProcessor::configure(const EMTFSetup* setup, int verbose, int endcap,
 void SectorProcessor::process(const edm::EventID& event_id,
                               const TriggerPrimitiveCollection& muon_primitives,
                               EMTFHitCollection& out_hits,
-                              EMTFTrackCollection& out_tracks) const {
+                              EMTFTrackCollection& out_tracks,
+                              EMTFShowerCollection& out_showers) const {
   auto cfg = setup_->getVersionControl();
 
   // List of converted hits, extended from previous BXs
@@ -42,8 +43,8 @@ void SectorProcessor::process(const edm::EventID& event_id,
                 << std::endl;
     }
 
-    process_single_bx(
-        bx, muon_primitives, out_hits, out_tracks, extended_conv_hits, extended_best_track_cands, patt_lifetime_map);
+    process_single_bx(bx, muon_primitives, out_hits, out_tracks, out_showers,
+                      extended_conv_hits, extended_best_track_cands, patt_lifetime_map);
 
     // Drop earliest BX outside of BX window
     if (bx >= cfg.minBX_ + delayBX) {
@@ -62,6 +63,7 @@ void SectorProcessor::process_single_bx(int bx,
                                         const TriggerPrimitiveCollection& muon_primitives,
                                         EMTFHitCollection& out_hits,
                                         EMTFTrackCollection& out_tracks,
+                                        EMTFShowerCollection& out_showers,
                                         std::deque<EMTFHitCollection>& extended_conv_hits,
                                         std::deque<EMTFTrackCollection>& extended_best_track_cands,
                                         std::map<pattern_ref_t, int>& patt_lifetime_map) const {
@@ -163,6 +165,15 @@ void SectorProcessor::process_single_bx(int bx,
                       cfg.promoteMode7_,
                       cfg.modeQualVer_);
 
+  // Hadronic Showers
+  ShowerRecognition shower_recog;
+  shower_recog.configure(verbose_,
+                         endcap_,
+                         sector_,
+                         bx,
+                         cfg.bxWindow_,
+                         cfg.useSecondEarliest_);
+
   std::map<int, TriggerPrimitiveCollection> selected_dt_map;
   std::map<int, TriggerPrimitiveCollection> selected_csc_map;
   std::map<int, TriggerPrimitiveCollection> selected_rpc_map;
@@ -179,6 +190,8 @@ void SectorProcessor::process_single_bx(int bx,
   emtf::zone_array<EMTFTrackCollection> zone_tracks;  // each zone has its track collection
 
   EMTFTrackCollection best_tracks;  // "best" tracks selected from all the zones
+
+  EMTFShowerCollection best_showers;  // "best" showers selected
 
   // ___________________________________________________________________________
   // Process
@@ -246,11 +259,15 @@ void SectorProcessor::process_single_bx(int bx,
   // From src/PtAssignment.cc
   pt_assign.process(best_tracks);
 
+  // Hadronic showers
+  shower_recog.process(extended_conv_hits, best_showers);
+
   // ___________________________________________________________________________
   // Output
 
   out_hits.insert(out_hits.end(), inclusive_conv_hits.begin(), inclusive_conv_hits.end());
   out_tracks.insert(out_tracks.end(), best_tracks.begin(), best_tracks.end());
+  out_showers.insert(out_showers.end(), best_showers.begin(), best_showers.end());
 
   return;
 }

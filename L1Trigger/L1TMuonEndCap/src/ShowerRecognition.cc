@@ -22,7 +22,8 @@ void ShowerRecognition::configure_details() {
   emtf_assert(1 <= bxWindow_ && bxWindow_ <= 3);  // only work for BX windows <= 3
 }
 
-void ShowerRecognition::process(const std::deque<EMTFHitCollection>& extended_conv_hits) const {
+void ShowerRecognition::process(const std::deque<EMTFHitCollection>& extended_conv_hits,
+                                EMTFShowerCollection& best_showers) const {
   // Exit if no hits
   int num_conv_hits = 0;
   for (const auto& conv_hits : extended_conv_hits)
