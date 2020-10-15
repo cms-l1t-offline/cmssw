@@ -7,6 +7,7 @@
 #include "DataFormats/L1Trigger/interface/Muon.h"
 #include "DataFormats/L1TMuon/interface/RegionalMuonCandFwd.h"
 #include "DataFormats/L1TMuon/interface/MuonCaloSumFwd.h"
+#include "DataFormats/L1TMuon/interface/EMTFShower.h"
 #include "L1Trigger/L1TMuon/interface/GMTInternalMuonFwd.h"
 
 #include <map>

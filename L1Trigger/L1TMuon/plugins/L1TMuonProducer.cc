@@ -114,6 +114,7 @@ private:
   edm::InputTag m_overlapTfInputTag;
   edm::InputTag m_endcapTfInputTag;
   edm::InputTag m_trigTowerTag;
+  edm::InputTag m_showerTfInputTag;
   std::shared_ptr<MicroGMTRankPtQualLUT> m_rankPtQualityLUT;
   MicroGMTIsolationUnit m_isolationUnit;
   MicroGMTCancelOutUnit m_cancelOutUnit;
@@ -124,6 +125,7 @@ private:
   edm::EDGetTokenT<MicroGMTConfiguration::InputCollection> m_overlapTfInputToken;
   edm::EDGetTokenT<MicroGMTConfiguration::InputCollection> m_endcapTfInputToken;
   edm::EDGetTokenT<MicroGMTConfiguration::CaloInputCollection> m_caloTowerInputToken;
+  edm::EDGetTokenT<l1t::EMTFShowerCollection> m_showerTfInputToken;
 };
 
 //
@@ -147,6 +149,7 @@ L1TMuonProducer::L1TMuonProducer(const edm::ParameterSet& iConfig)
   m_overlapTfInputTag = iConfig.getParameter<edm::InputTag>("overlapTFInput");
   m_endcapTfInputTag = iConfig.getParameter<edm::InputTag>("forwardTFInput");
   m_trigTowerTag = iConfig.getParameter<edm::InputTag>("triggerTowerInput");
+  m_showerTfInputTag = iConfig.getParameter<edm::InputTag>("showerTFInput");
 
   m_autoBxRange = iConfig.getParameter<bool>("autoBxRange");
   m_bxMin = iConfig.getParameter<int>("bxMin");
@@ -161,6 +164,7 @@ L1TMuonProducer::L1TMuonProducer(const edm::ParameterSet& iConfig)
   m_overlapTfInputToken = consumes<MicroGMTConfiguration::InputCollection>(m_overlapTfInputTag);
   m_endcapTfInputToken = consumes<MicroGMTConfiguration::InputCollection>(m_endcapTfInputTag);
   m_caloTowerInputToken = consumes<MicroGMTConfiguration::CaloInputCollection>(m_trigTowerTag);
+  m_showerTfInputToken = consumes<l1t::EMTFShowerCollection>(m_showerTfInputTag);
 
   //register your products
   produces<MuonBxCollection>();
