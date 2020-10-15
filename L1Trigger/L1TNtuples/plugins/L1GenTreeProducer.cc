@@ -38,6 +38,9 @@ Implementation:
 #include "HepMC/GenVertex.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
+#include "DataFormats/METReco/interface/GenMET.h"
+#include "DataFormats/METReco/interface/GenMETFwd.h"
+
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
 // ROOT output stuff
@@ -75,13 +78,22 @@ private:
 
   // EDM input tags
   edm::EDGetTokenT<reco::GenJetCollection> genJetToken_;
+  edm::EDGetTokenT<reco::GenMETCollection> genMETTrueToken_;
+  edm::EDGetTokenT<reco::GenMETCollection> genMETCaloToken_;
   edm::EDGetTokenT<reco::GenParticleCollection> genParticleToken_;
   edm::EDGetTokenT<std::vector<PileupSummaryInfo>> pileupInfoToken_;
   edm::EDGetTokenT<GenEventInfoProduct> genInfoToken_;
+  edm::EDGetTokenT<edm::HepMCProduct> hepMCProductTag_;
 };
 
 L1GenTreeProducer::L1GenTreeProducer(const edm::ParameterSet& iConfig) {
+  hepMCProductTag_ = consumes<edm::HepMCProduct>(
+      iConfig.getUntrackedParameter<edm::InputTag>("hepMCProductTag", edm::InputTag("generatorSmeared")));
   genJetToken_ = consumes<reco::GenJetCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genJetToken"));
+  genMETTrueToken_ = consumes<reco::GenMETCollection>(
+      iConfig.getUntrackedParameter<edm::InputTag>("genMETTrueToken", edm::InputTag("genMetTrue")));
+  genMETCaloToken_ = consumes<reco::GenMETCollection>(
+      iConfig.getUntrackedParameter<edm::InputTag>("genMETCaloToken", edm::InputTag("genMetCalo")));
   genParticleToken_ =
       consumes<reco::GenParticleCollection>(iConfig.getUntrackedParameter<edm::InputTag>("genParticleToken"));
   pileupInfoToken_ =
@@ -114,6 +126,7 @@ void L1GenTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   if (genInfo.isValid()) {
     l1GenData_->weight = genInfo->weight();
     l1GenData_->pthat = genInfo->hasBinningValues() ? (genInfo->binningValues())[0] : 0.0;
+    // std::cout<<genInfo->signalProcessID()<<std::endl;
   }
 
   edm::Handle<reco::GenJetCollection> genJets;
@@ -126,11 +139,34 @@ void L1GenTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       l1GenData_->jetPt.push_back(jetItr->pt());
       l1GenData_->jetEta.push_back(jetItr->eta());
       l1GenData_->jetPhi.push_back(jetItr->phi());
+      l1GenData_->jetM.push_back(jetItr->mass());
       l1GenData_->nJet++;
     }
 
   } else {
     edm::LogWarning("MissingProduct") << "Gen jets not found. Branch will not be filled" << std::endl;
+  }
+
+  edm::Handle<reco::GenMETCollection> genMetsTrue;
+  iEvent.getByToken(genMETTrueToken_, genMetsTrue);
+
+  if (genMetsTrue.isValid()) {
+    l1GenData_->genMetTrue = genMetsTrue->at(0).pt();
+
+  } else {
+    edm::LogWarning("MissingProduct") << "Gen Met True not found. Branch will not be filled" << std::endl;
+  }
+
+  edm::Handle<reco::GenMETCollection> genMetsCalo;
+  iEvent.getByToken(genMETCaloToken_, genMetsCalo);
+
+  //std::cout<< genMetsCalo->at(0).pt()<<std::endl;
+
+  if (genMetsCalo.isValid()) {
+    l1GenData_->genMetCalo = genMetsCalo->at(0).pt();
+
+  } else {
+    edm::LogWarning("MissingProduct") << "Gen Met Calo not found. Branch will not be filled" << std::endl;
   }
 
   edm::Handle<reco::GenParticleCollection> genParticles;
@@ -142,6 +178,11 @@ void L1GenTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     for (size_t i = 0; i < genParticles->size(); ++i) {
       const reco::GenParticle& p = (*genParticles)[i];
       int id = p.pdgId();
+
+      double LXY = sqrt(p.vertex().x() * p.vertex().x() + p.vertex().y() * p.vertex().y());  // or rho
+      double DXY = -p.vertex().x() * sin(p.phi()) + p.vertex().y() * cos(p.phi());
+
+      //if(abs(id)==13) std::cout<<"p?" <<id<<"    ->"<<p.pt()<<"  "<<p.eta()<<" ->"<<distance<<std::endl;
 
       // See if the parent was interesting
       int parentID = -10000;
@@ -160,9 +201,10 @@ void L1GenTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
         parentID = dynamic_cast<const reco::GenParticle*>(p.mother(0))->pdgId();
       //
       // If the parent of this particle is interesting, store all of the info
-      if ((parentID != p.pdgId()) &&
-          ((parentID > -9999) || (abs(id) == 11) || (abs(id) == 13) || (abs(id) == 23) || (abs(id) == 24) ||
-           (abs(id) == 25) || (abs(id) == 4) || (abs(id) == 5) || (abs(id) == 6))) {
+      // Maria: also save all the status 1 particles
+      if (p.status() == 1 || ((parentID != p.pdgId()) && ((parentID > -9999) || (abs(id) == 11) || (abs(id) == 13) ||
+                                                          (abs(id) == 23) || (abs(id) == 24) || (abs(id) == 25) ||
+                                                          (abs(id) == 4) || (abs(id) == 5) || (abs(id) == 6)))) {
         l1GenData_->partId.push_back(p.pdgId());
         l1GenData_->partStat.push_back(p.status());
         l1GenData_->partPt.push_back(p.pt());
@@ -171,6 +213,13 @@ void L1GenTreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup&
         l1GenData_->partE.push_back(p.energy());
         l1GenData_->partParent.push_back(parentID);
         l1GenData_->partCh.push_back(p.charge());
+        l1GenData_->partP.push_back(p.p());
+        l1GenData_->partDxy.push_back(DXY);
+        l1GenData_->partLxy.push_back(LXY);
+        l1GenData_->partVx.push_back(p.vertex().x());
+        l1GenData_->partVy.push_back(p.vertex().y());
+        l1GenData_->partVz.push_back(p.vertex().z());
+
         ++nPart;
       }
     }

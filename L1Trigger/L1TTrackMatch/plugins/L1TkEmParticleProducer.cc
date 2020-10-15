@@ -43,13 +43,13 @@ using namespace l1t;
 // class declaration
 //
 
-class L1TkEmParticleProducer : public edm::global::EDProducer<> {
+class TkEmProducer : public edm::global::EDProducer<> {
 public:
   typedef TTTrack<Ref_Phase2TrackerDigi_> L1TTTrackType;
   typedef std::vector<L1TTTrackType> L1TTTrackCollectionType;
 
-  explicit L1TkEmParticleProducer(const edm::ParameterSet&);
-  ~L1TkEmParticleProducer() override;
+  explicit TkEmProducer(const edm::ParameterSet&);
+  ~TkEmProducer() override;
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -84,7 +84,7 @@ private:
 //
 // constructors and destructor
 //
-L1TkEmParticleProducer::L1TkEmParticleProducer(const edm::ParameterSet& iConfig)
+TkEmProducer::TkEmProducer(const edm::ParameterSet& iConfig)
     : egToken_(consumes<EGammaBxCollection>(iConfig.getParameter<edm::InputTag>("L1EGammaInputTag"))),
       trackToken_(consumes<std::vector<TTTrack<Ref_Phase2TrackerDigi_> > >(
           iConfig.getParameter<edm::InputTag>("L1TrackInputTag"))),
@@ -112,10 +112,10 @@ L1TkEmParticleProducer::L1TkEmParticleProducer(const edm::ParameterSet& iConfig)
   produces<TkEmCollection>(label_);
 }
 
-L1TkEmParticleProducer::~L1TkEmParticleProducer() {}
+TkEmProducer::~TkEmProducer() {}
 
 // ------------ method called to produce the data  ------------
-void L1TkEmParticleProducer::produce(edm::StreamID, edm::Event& iEvent, const edm::EventSetup& iSetup) const {
+void TkEmProducer::produce(edm::StreamID, edm::Event& iEvent, const edm::EventSetup& iSetup) const {
   using namespace edm;
 
   auto result = std::make_unique<TkEmCollection>();
@@ -136,7 +136,7 @@ void L1TkEmParticleProducer::produce(edm::StreamID, edm::Event& iEvent, const ed
   iEvent.getByToken(vertexToken_, L1VertexHandle);
   bool primaryVtxConstrain = primaryVtxConstrain_;
   if (!L1VertexHandle.isValid()) {
-    LogWarning("L1TkEmParticleProducer")
+    LogWarning("TkEmProducer")
         << "Warning: TkPrimaryVertexCollection not found in the event. Won't use any PrimaryVertex constraint."
         << std::endl;
     primaryVtxConstrain = false;
@@ -148,15 +148,14 @@ void L1TkEmParticleProducer::produce(edm::StreamID, edm::Event& iEvent, const ed
   }
 
   if (!L1TTTrackHandle.isValid()) {
-    LogError("L1TkEmParticleProducer") << "\nWarning: L1TTTrackCollectionType not found in the event. Exit."
-                                       << std::endl;
+    LogError("TkEmProducer") << "\nWarning: L1TTTrackCollectionType not found in the event. Exit." << std::endl;
     return;
   }
 
   // Now loop over the L1EGamma objects
 
   if (!eGammaHandle.isValid()) {
-    LogError("L1TkEmParticleProducer") << "\nWarning: L1EmCollection not found in the event. Exit." << std::endl;
+    LogError("TkEmProducer") << "\nWarning: L1EmCollection not found in the event. Exit." << std::endl;
     return;
   }
 
@@ -250,7 +249,7 @@ void L1TkEmParticleProducer::produce(edm::StreamID, edm::Event& iEvent, const ed
 
 // --------------------------------------------------------------------------------------
 
-float L1TkEmParticleProducer::CorrectedEta(float eta, float zv) const {
+float TkEmProducer::CorrectedEta(float eta, float zv) const {
   // Correct the eta of the L1EG object once we know the zvertex
 
   bool IsBarrel = (std::abs(eta) < EtaECal);
@@ -281,7 +280,7 @@ float L1TkEmParticleProducer::CorrectedEta(float eta, float zv) const {
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void L1TkEmParticleProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void TkEmProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -290,4 +289,4 @@ void L1TkEmParticleProducer::fillDescriptions(edm::ConfigurationDescriptions& de
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(L1TkEmParticleProducer);
+DEFINE_FWK_MODULE(TkEmProducer);

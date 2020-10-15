@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
-L1TkPhotons = cms.EDProducer("L1TkEmParticleProducer",
-        label = cms.string("EG"), 	# labels the collection of L1TkEmParticleProducer that is produced
+L1TkPhotons = cms.EDProducer("TkEmProducer",
+        label = cms.string("EG"), 	# labels the collection of TkEmProducer that is produced
 					# (not really needed actually)
         L1EGammaInputTag = cms.InputTag("simCaloStage2Digis",""),
                                                 # When the standard sequences are used :
@@ -16,7 +16,7 @@ L1TkPhotons = cms.EDProducer("L1TkEmParticleProducer",
                                                 # are considered. ETmin < 0 means that no cut is applied.
         RelativeIsolation = cms.bool( True ),   # default = True. The isolation variable is relative if True,
                                                 # else absolute.
-        IsoCut = cms.double( 0.23 ),             # Cut on the (Trk-based) isolation: only the L1TkEmParticle for which
+        IsoCut = cms.double( 0.23 ),             # Cut on the (Trk-based) isolation: only the TkEm for which
                                                 # the isolation is below RelIsoCut are written into
                                                 # the output collection. When RelIsoCut < 0, no cut is applied.
                                                 # When RelativeIsolation = False, IsoCut is in GeV.
