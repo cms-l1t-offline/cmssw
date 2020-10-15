@@ -149,8 +149,8 @@ void CSCMotherboard::run(const CSCWireDigiCollection* wiredc, const CSCComparato
     return;
 
   // encode high multiplicity bits
-  unsigned alctBits = alctProc->getHighMultiplictyBits();
-  encodeHighMultiplicityBits(alctBits);
+  unsigned clctBits = clctProc->getHighMultiplicityBits();
+  encodeHighMultiplicityBits(clctBits);
 
   // CLCT-centric matching
   if (clct_to_alct) {
@@ -635,13 +635,12 @@ CSCCLCTDigi CSCMotherboard::getBXShiftedCLCT(const CSCCLCTDigi& cLCT) const {
   return cLCT_shifted;
 }
 
-void CSCMotherboard::encodeHighMultiplicityBits(unsigned alctBits) {
+void CSCMotherboard::encodeHighMultiplicityBits(unsigned clctBits) {
   // encode the high multiplicity bits in the (O)TMB based on
-  // the high multiplicity bits from the ALCT processor
-  // draft version: simply rellay the ALCT bits.
-  // future versions may involve also bits from the CLCT processor
-  // this depends on memory constraints in the TMB FPGA
-  highMultiplicityBits_ = alctBits;
+  // the high multiplicity bits from the ALCT processor and the CLCT processor
+  // current version: relay the CLCT bits
+  // future versions may involve also bits from the ALCT processor
+  highMultiplicityBits_ = clctBits;
 }
 
 void CSCMotherboard::checkValid(const CSCCorrelatedLCTDigi& lct) const {

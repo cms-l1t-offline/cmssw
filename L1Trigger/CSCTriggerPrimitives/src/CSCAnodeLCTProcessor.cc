@@ -1396,3 +1396,49 @@ int CSCAnodeLCTProcessor::getTempALCTQuality(int temp_quality) const {
 
   return Q;
 }
+
+void CSCAnodeLCTProcessor::encodeHighMultiplicityBits(
+    const std::vector<int> wires[CSCConstants::NUM_LAYERS][CSCConstants::MAX_NUM_WIRES]) {
+  highMultiplicityBits_ = 0;
+
+  // temporary lookup table
+  std::vector<std::vector<std::vector<unsigned> > > thresholds = {
+      // ME1
+      {// ME1/1
+       {104, 105, 107},
+       // ME1/2
+       {92, 100, 102},
+       // ME1/3
+       {32, 33, 48}},
+      // ME2
+      {// ME2/1
+       {133, 134, 136},
+       // ME2/2
+       {83, 84, 86}},
+      // ME3
+      {// ME3/1
+       {130, 131, 133},
+       // ME3/2
+       {74, 80, 87}},
+      // ME4
+      {// ME4/1
+       {127, 128, 130},
+       // ME4/2
+       {88, 89, 94}},
+  };
+
+  unsigned hits = 0;
+  for (int i_layer = 0; i_layer < CSCConstants::NUM_LAYERS; i_layer++) {
+    for (int i_hstrip = 0; i_hstrip < CSCConstants::NUM_HALF_STRIPS_7CFEBS; i_hstrip++) {
+      hits += wires[i_layer][i_hstrip].size();
+    }
+  }
+
+  auto station_thresholds = thresholds[theStation - 1][theRing - 1];
+
+  for (unsigned i = 0; i < station_thresholds.size(); i++) {
+    if (hits >= station_thresholds[i]) {
+      highMultiplicityBits_ = i + 1;
+    }
+  }
+}

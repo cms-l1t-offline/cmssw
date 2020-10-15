@@ -273,12 +273,15 @@ std::vector<CSCCLCTDigi> CSCCathodeLCTProcessor::run(const CSCComparatorDigiColl
   }
 
   // Get comparator digis in this chamber.
-  bool noDigis = getDigis(compdc);
+  bool hasDigis = getDigis(compdc);
 
-  if (!noDigis) {
+  if (hasDigis) {
     // Get halfstrip times from comparator digis.
     std::vector<int> halfstrip[CSCConstants::NUM_LAYERS][CSCConstants::NUM_HALF_STRIPS_7CFEBS];
     readComparatorDigis(halfstrip);
+
+    // Get the high multiplicity bits in this chamber
+    encodeHighMultiplicityBits(halfstrip);
 
     // Pass arrays of halfstrips on to another run() doing the
     // LCT search.
@@ -380,7 +383,7 @@ void CSCCathodeLCTProcessor::run(
 }
 
 bool CSCCathodeLCTProcessor::getDigis(const CSCComparatorDigiCollection* compdc) {
-  bool noDigis = true;
+  bool hasDigis = false;
 
   // Loop over layers and save comparator digis on each one into digiV[layer].
   for (int i_layer = 0; i_layer < CSCConstants::NUM_LAYERS; i_layer++) {
@@ -395,7 +398,7 @@ bool CSCCathodeLCTProcessor::getDigis(const CSCComparatorDigiCollection* compdc)
     }
 
     if (!digiV[i_layer].empty()) {
-      noDigis = false;
+      hasDigis = true;
       if (infoV > 1) {
         LogTrace("CSCCathodeLCTProcessor") << "found " << digiV[i_layer].size() << " comparator digi(s) in layer "
                                            << i_layer << " of " << detid.chamberName() << " (trig. sector " << theSector
@@ -404,7 +407,7 @@ bool CSCCathodeLCTProcessor::getDigis(const CSCComparatorDigiCollection* compdc)
     }
   }
 
-  return noDigis;
+  return hasDigis;
 }
 
 void CSCCathodeLCTProcessor::getDigis(const CSCComparatorDigiCollection* compdc, const CSCDetId& id) {
@@ -1339,4 +1342,50 @@ CSCCLCTDigi CSCCathodeLCTProcessor::getSecondCLCT(int bx) const {
   CSCCLCTDigi lct = secondCLCT[bx];
   lct.setBX(lct.getBX() + alctClctOffset_);
   return lct;
+}
+
+void CSCCathodeLCTProcessor::encodeHighMultiplicityBits(
+    const std::vector<int> halfstrip[CSCConstants::NUM_LAYERS][CSCConstants::NUM_HALF_STRIPS_7CFEBS]) {
+  highMultiplicityBits_ = 0;
+
+  // temporary lookup table
+  std::vector<std::vector<std::vector<unsigned>>> thresholds = {
+      // ME1
+      {// ME1/1
+       {98, 99, 101},
+       // ME1/2
+       {56, 62, 73},
+       // ME1/3
+       {30, 31, 33}},
+      // ME2
+      {// ME2/1
+       {49, 53, 55},
+       // ME2/2
+       {42, 43, 46}},
+      // ME3
+      {// ME3/1
+       {49, 50, 52},
+       // ME3/2
+       {35, 36, 38}},
+      // ME4
+      {// ME4/1
+       {42, 49, 51},
+       // ME4/2
+       {31, 34, 36}},
+  };
+
+  unsigned hits = 0;
+  for (int i_layer = 0; i_layer < CSCConstants::NUM_LAYERS; i_layer++) {
+    for (int i_hstrip = 0; i_hstrip < CSCConstants::NUM_HALF_STRIPS_7CFEBS; i_hstrip++) {
+      hits += halfstrip[i_layer][i_hstrip].size();
+    }
+  }
+
+  auto station_thresholds = thresholds[theStation - 1][theRing - 1];
+
+  for (unsigned i = 0; i < station_thresholds.size(); i++) {
+    if (hits >= station_thresholds[i]) {
+      highMultiplicityBits_ = i + 1;
+    }
+  }
 }
