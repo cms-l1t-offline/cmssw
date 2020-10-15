@@ -24,7 +24,8 @@ public:
       const edm::EventSetup& iSetup,
       // Output
       EMTFHitCollection& out_hits,
-      EMTFTrackCollection& out_tracks);
+      EMTFTrackCollection& out_tracks,
+      l1t::EMTFShowerCollection& showers);
 
 private:
   EMTFSetup setup_;

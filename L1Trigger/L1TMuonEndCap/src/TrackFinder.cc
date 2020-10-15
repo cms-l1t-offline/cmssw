@@ -23,7 +23,8 @@ TrackFinder::~TrackFinder() {}
 void TrackFinder::process(const edm::Event& iEvent,
                           const edm::EventSetup& iSetup,
                           EMTFHitCollection& out_hits,
-                          EMTFTrackCollection& out_tracks) {
+                          EMTFTrackCollection& out_tracks,
+                          l1t::EMTFShowerCollection& out_showers) {
   // Clear output collections
   out_hits.clear();
   out_tracks.clear();
