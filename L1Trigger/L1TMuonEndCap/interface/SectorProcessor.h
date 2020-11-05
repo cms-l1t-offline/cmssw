@@ -37,7 +37,7 @@ public:
       // Output
       EMTFHitCollection& out_hits,
       EMTFTrackCollection& out_tracks,
-      EMTFShowerCollection& out_showers) const;
+      RegionalMuonShowerBxCollection& out_showers) const;
 
   void process_single_bx(
       // Input
@@ -46,7 +46,7 @@ public:
       // Output
       EMTFHitCollection& out_hits,
       EMTFTrackCollection& out_tracks,
-      EMTFShowerCollection& out_showers,
+      RegionalMuonShowerBxCollection& out_showers,
       // Intermediate objects
       std::deque<EMTFHitCollection>& extended_conv_hits,
       std::deque<EMTFTrackCollection>& extended_best_track_cands,

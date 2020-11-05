@@ -24,11 +24,11 @@ void TrackFinder::process(const edm::Event& iEvent,
                           const edm::EventSetup& iSetup,
                           EMTFHitCollection& out_hits,
                           EMTFTrackCollection& out_tracks,
-                          l1t::EMTFShowerCollection& out_showers) {
+                          l1t::RegionalMuonShowerBxCollection& out_showers) {
   // Clear output collections
   out_hits.clear();
   out_tracks.clear();
-  out_showers.clear();
+  // out_showers.clear();
 
   // Check and update geometry, conditions, versions, sp LUTs, and pt assignment engine
   setup_.reload(iEvent, iSetup);

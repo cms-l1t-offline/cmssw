@@ -15,7 +15,7 @@ public:
   void configure_details();
 
   void process(const std::deque<EMTFHitCollection>& extended_conv_hits,
-               EMTFShowerCollection& best_showers) const;
+               RegionalMuonShowerBxCollection& best_showers) const;
 
 private:
   int verbose_, endcap_, sector_, bx_;

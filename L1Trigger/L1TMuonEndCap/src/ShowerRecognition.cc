@@ -23,7 +23,7 @@ void ShowerRecognition::configure_details() {
 }
 
 void ShowerRecognition::process(const std::deque<EMTFHitCollection>& extended_conv_hits,
-                                EMTFShowerCollection& best_showers) const {
+                                RegionalMuonShowerBxCollection& best_showers) const {
   // Exit if no hits
   int num_conv_hits = 0;
   for (const auto& conv_hits : extended_conv_hits)
@@ -47,5 +47,12 @@ void ShowerRecognition::process(const std::deque<EMTFHitCollection>& extended_co
       }
     }
   }  // end debug
+
+  best_showers.clear();
+  best_showers.setBXRange(-1, 1);
+
+  l1t::RegionalMuonShower best_shower;
+  best_showers.push_back(0, best_shower);
+
   // shower recognition goes here
 }

@@ -25,7 +25,7 @@ public:
       // Output
       EMTFHitCollection& out_hits,
       EMTFTrackCollection& out_tracks,
-      l1t::EMTFShowerCollection& showers);
+      RegionalMuonShowerBxCollection& showers);
 
 private:
   EMTFSetup setup_;

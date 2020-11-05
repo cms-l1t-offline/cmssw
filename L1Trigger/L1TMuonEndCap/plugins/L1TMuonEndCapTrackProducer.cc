@@ -8,7 +8,6 @@ L1TMuonEndCapTrackProducer::L1TMuonEndCapTrackProducer(const edm::ParameterSet& 
   produces<EMTFHitCollection>("");                      // All CSC LCTs and RPC clusters received by EMTF
   produces<EMTFTrackCollection>("");                    // All output EMTF tracks, in same format as unpacked data
   produces<l1t::RegionalMuonCandBxCollection>("EMTF");  // EMTF tracks output to uGMT
-  produces<l1t::EMTFShowerCollection>();
   produces<l1t::RegionalMuonShowerBxCollection>("EMTF");
 }
 
@@ -20,7 +19,7 @@ void L1TMuonEndCapTrackProducer::produce(edm::Event& iEvent, const edm::EventSet
   auto out_hits = std::make_unique<EMTFHitCollection>();      // after zero suppression
   auto out_tracks = std::make_unique<EMTFTrackCollection>();
   auto out_cands = std::make_unique<l1t::RegionalMuonCandBxCollection>();
-  auto out_showers = std::make_unique<l1t::EMTFShowerCollection>();
+  auto out_showers = std::make_unique<l1t::RegionalMuonShowerBxCollection>();
 
   // Main EMTF emulator process, produces tracks from hits in each sector in each event
   track_finder_->process(iEvent, iSetup, *out_hits_tmp, *out_tracks, *out_showers);
@@ -49,7 +48,7 @@ void L1TMuonEndCapTrackProducer::produce(edm::Event& iEvent, const edm::EventSet
   iEvent.put(std::move(out_hits), "");
   iEvent.put(std::move(out_tracks), "");
   iEvent.put(std::move(out_cands), "EMTF");
-  iEvent.put(std::move(out_showers), "");
+  iEvent.put(std::move(out_showers), "EMTF");
 }
 
 // Fill 'descriptions' with the allowed parameters

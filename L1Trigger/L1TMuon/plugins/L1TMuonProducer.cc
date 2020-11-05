@@ -125,7 +125,7 @@ private:
   edm::EDGetTokenT<MicroGMTConfiguration::InputCollection> m_overlapTfInputToken;
   edm::EDGetTokenT<MicroGMTConfiguration::InputCollection> m_endcapTfInputToken;
   edm::EDGetTokenT<MicroGMTConfiguration::CaloInputCollection> m_caloTowerInputToken;
-  edm::EDGetTokenT<l1t::EMTFShowerCollection> m_showerTfInputToken;
+  edm::EDGetTokenT<l1t::RegionalMuonShowerBxCollection> m_showerTfInputToken;
 };
 
 //
@@ -164,7 +164,7 @@ L1TMuonProducer::L1TMuonProducer(const edm::ParameterSet& iConfig)
   m_overlapTfInputToken = consumes<MicroGMTConfiguration::InputCollection>(m_overlapTfInputTag);
   m_endcapTfInputToken = consumes<MicroGMTConfiguration::InputCollection>(m_endcapTfInputTag);
   m_caloTowerInputToken = consumes<MicroGMTConfiguration::CaloInputCollection>(m_trigTowerTag);
-  m_showerTfInputToken = consumes<l1t::EMTFShowerCollection>(m_showerTfInputTag);
+  m_showerTfInputToken = consumes<l1t::RegionalMuonShowerBxCollection>(m_showerTfInputTag);
 
   //register your products
   produces<MuonBxCollection>();
