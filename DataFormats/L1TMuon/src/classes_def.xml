@@ -6,6 +6,11 @@
   <class name="l1t::RegionalMuonCandBxCollection"/>
   <class name="edm::Wrapper<l1t::RegionalMuonCandBxCollection>"/>
 
+  <class name="l1t::RegionalMuonShower"/>
+  <class name="std::vector<l1t::RegionalMuonShower>"/>
+  <class name="l1t::RegionalMuonShowerBxCollection"/>
+  <class name="edm::Wrapper<l1t::RegionalMuonShowerBxCollection>"/>
+
   <class name="l1t::MuonCaloSum"/>
   <class name="std::vector<l1t::MuonCaloSum>"/>
   <class name="l1t::MuonCaloSumBxCollection"/>
@@ -38,9 +43,6 @@
   <class name="l1t::EMTFTrackCollection"/>
   <class name="edm::Wrapper<l1t::EMTFTrackCollection>"/>
   <class name="l1t::EMTFPtLUT"/>
-  <class name="l1t::EMTFShower"/>
-  <class name="l1t::EMTFShowerCollection"/>
-  <class name="edm::Wrapper<l1t::EMTFShowerCollection>"/>
 
   <class name="l1t::CPPFDigi" ClassVersion="3">
     <version ClassVersion="3" checksum="1846750827"/>

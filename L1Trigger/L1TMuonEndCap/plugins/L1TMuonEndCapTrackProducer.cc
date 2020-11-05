@@ -9,6 +9,7 @@ L1TMuonEndCapTrackProducer::L1TMuonEndCapTrackProducer(const edm::ParameterSet& 
   produces<EMTFTrackCollection>("");                    // All output EMTF tracks, in same format as unpacked data
   produces<l1t::RegionalMuonCandBxCollection>("EMTF");  // EMTF tracks output to uGMT
   produces<l1t::EMTFShowerCollection>();
+  produces<l1t::RegionalMuonShowerBxCollection>("EMTF");
 }
 
 L1TMuonEndCapTrackProducer::~L1TMuonEndCapTrackProducer() {}

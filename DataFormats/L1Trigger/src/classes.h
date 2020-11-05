@@ -31,4 +31,4 @@
 #include "DataFormats/L1Trigger/interface/L1DataEmulResult.h"
 #include "DataFormats/L1Trigger/interface/HOTwinMuxDigiCollection.h"
 #include "DataFormats/L1Trigger/interface/HOTPDigiTwinMux.h"
-#include "DataFormats/L1Trigger/interface/Shower.h"
+#include "DataFormats/L1Trigger/interface/MuonShower.h"
