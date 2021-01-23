@@ -169,8 +169,8 @@ void L1TkElectronTrackProducer::produce(edm::Event& iEvent, const edm::EventSetu
     return;
   }
   if (!L1TTTrackHandle.isValid()) {
-    throw cms::Exception("TkEmProducer") << "\nWarning: L1TTTrackCollectionType not found in the event. Exit."
-                                         << std::endl;
+    throw cms::Exception("L1TkElectronTrackProducer")
+        << "\nWarning: L1TTTrackCollectionType not found in the event. Exit." << std::endl;
     return;
   }
 

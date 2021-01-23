@@ -43,13 +43,13 @@ using namespace l1t;
 // class declaration
 //
 
-class TkEmProducer : public edm::global::EDProducer<> {
+class L1TkEmParticleProducer : public edm::global::EDProducer<> {
 public:
   typedef TTTrack<Ref_Phase2TrackerDigi_> L1TTTrackType;
   typedef std::vector<L1TTTrackType> L1TTTrackCollectionType;
 
-  explicit TkEmProducer(const edm::ParameterSet&);
-  ~TkEmProducer() override;
+  explicit L1TkEmParticleProducer(const edm::ParameterSet&);
+  ~L1TkEmParticleProducer() override;
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -84,7 +84,7 @@ private:
 //
 // constructors and destructor
 //
-TkEmProducer::TkEmProducer(const edm::ParameterSet& iConfig)
+L1TkEmParticleProducer::L1TkEmParticleProducer(const edm::ParameterSet& iConfig)
     : egToken_(consumes<EGammaBxCollection>(iConfig.getParameter<edm::InputTag>("L1EGammaInputTag"))),
       trackToken_(consumes<std::vector<TTTrack<Ref_Phase2TrackerDigi_> > >(
           iConfig.getParameter<edm::InputTag>("L1TrackInputTag"))),
@@ -112,10 +112,10 @@ TkEmProducer::TkEmProducer(const edm::ParameterSet& iConfig)
   produces<TkEmCollection>(label_);
 }
 
-TkEmProducer::~TkEmProducer() {}
+L1TkEmParticleProducer::~L1TkEmParticleProducer() {}
 
 // ------------ method called to produce the data  ------------
-void TkEmProducer::produce(edm::StreamID, edm::Event& iEvent, const edm::EventSetup& iSetup) const {
+void L1TkEmParticleProducer::produce(edm::StreamID, edm::Event& iEvent, const edm::EventSetup& iSetup) const {
   using namespace edm;
 
   auto result = std::make_unique<TkEmCollection>();
@@ -136,7 +136,7 @@ void TkEmProducer::produce(edm::StreamID, edm::Event& iEvent, const edm::EventSe
   iEvent.getByToken(vertexToken_, L1VertexHandle);
   bool primaryVtxConstrain = primaryVtxConstrain_;
   if (!L1VertexHandle.isValid()) {
-    LogWarning("TkEmProducer")
+    LogWarning("L1TkEmParticleProducer")
         << "Warning: TkPrimaryVertexCollection not found in the event. Won't use any PrimaryVertex constraint."
         << std::endl;
     primaryVtxConstrain = false;
@@ -148,14 +148,15 @@ void TkEmProducer::produce(edm::StreamID, edm::Event& iEvent, const edm::EventSe
   }
 
   if (!L1TTTrackHandle.isValid()) {
-    LogError("TkEmProducer") << "\nWarning: L1TTTrackCollectionType not found in the event. Exit." << std::endl;
+    LogError("L1TkEmParticleProducer") << "\nWarning: L1TTTrackCollectionType not found in the event. Exit."
+                                       << std::endl;
     return;
   }
 
   // Now loop over the L1EGamma objects
 
   if (!eGammaHandle.isValid()) {
-    LogError("TkEmProducer") << "\nWarning: L1EmCollection not found in the event. Exit." << std::endl;
+    LogError("L1TkEmParticleProducer") << "\nWarning: L1EmCollection not found in the event. Exit." << std::endl;
     return;
   }
 
@@ -249,7 +250,7 @@ void TkEmProducer::produce(edm::StreamID, edm::Event& iEvent, const edm::EventSe
 
 // --------------------------------------------------------------------------------------
 
-float TkEmProducer::CorrectedEta(float eta, float zv) const {
+float L1TkEmParticleProducer::CorrectedEta(float eta, float zv) const {
   // Correct the eta of the L1EG object once we know the zvertex
 
   bool IsBarrel = (std::abs(eta) < EtaECal);
@@ -280,7 +281,7 @@ float TkEmProducer::CorrectedEta(float eta, float zv) const {
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void TkEmProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void L1TkEmParticleProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -289,4 +290,4 @@ void TkEmProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(TkEmProducer);
+DEFINE_FWK_MODULE(L1TkEmParticleProducer);
