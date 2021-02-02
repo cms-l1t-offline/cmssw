@@ -1,13 +1,13 @@
 # hltGetConfiguration --full --data /dev/CMSSW_11_2_0/GRun --type GRun --unprescale --process HLTGRun --globaltag auto:run3_hlt_GRun --input file:RelVal_Raw_GRun_DATA.root
 
-# /dev/CMSSW_11_2_0/GRun/V12 (CMSSW_11_2_0_pre9)
+# /dev/CMSSW_11_2_0/GRun/V13 (CMSSW_11_2_0_pre11)
 
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process( "HLTGRun" )
 
 process.HLTConfigVersion = cms.PSet(
-  tableName = cms.string('/dev/CMSSW_11_2_0/GRun/V12')
+  tableName = cms.string('/dev/CMSSW_11_2_0/GRun/V13')
 )
 
 process.transferSystem = cms.PSet( 
@@ -5084,6 +5084,16 @@ process.HcalTimeSlewEP = cms.ESSource( "HcalTimeSlewEP",
 process.HepPDTESSource = cms.ESSource( "HepPDTESSource",
     pdtFileName = cms.FileInPath( "SimGeneral/HepPDTESSource/data/pythiaparticle.tbl" )
 )
+process.ecalMustacheSCParamsSource = cms.ESSource( "EmptyESSource",
+    iovIsRunNotTime = cms.bool( True ),
+    recordName = cms.string( "EcalMustacheSCParametersRcd" ),
+    firstValid = cms.vuint32( 1 )
+)
+process.ecalSCDynamicDPhiParamsSource = cms.ESSource( "EmptyESSource",
+    iovIsRunNotTime = cms.bool( True ),
+    recordName = cms.string( "EcalSCDynamicDPhiParametersRcd" ),
+    firstValid = cms.vuint32( 1 )
+)
 process.eegeom = cms.ESSource( "EmptyESSource",
     iovIsRunNotTime = cms.bool( True ),
     recordName = cms.string( "EcalMappingRcd" ),
@@ -5446,6 +5456,62 @@ process.ecalDetIdAssociator = cms.ESProducer( "DetIdAssociatorESProducer",
   includeBadChambers = cms.bool( False ),
   includeME0 = cms.bool( False ),
   includeGEM = cms.bool( False )
+)
+process.ecalMustacheSCParametersESProducer = cms.ESProducer( "EcalMustacheSCParametersESProducer",
+  sqrtLogClustETuning = cms.double( 1.1 ),
+  appendToDataLabel = cms.string( "" ),
+  parabolaParameterSets = cms.VPSet( 
+    cms.PSet(  pLow = cms.vdouble( -0.0268843, 0.147742, -0.0191235 ),
+      w0Up = cms.vdouble( -0.00681785, -0.00239516 ),
+      w1Low = cms.vdouble( 6.99995E-4, -0.00554331 ),
+      w0Low = cms.vdouble( -0.00681785, -0.00239516 ),
+      etaMin = cms.double( 0.0 ),
+      log10EMin = cms.double( -3.0 ),
+      w1Up = cms.vdouble( 6.99995E-4, -0.00554331 ),
+      pUp = cms.vdouble( -0.107537, 0.590969, -0.076494 )
+    )
+  )
+)
+process.ecalSCDynamicDPhiParametersESProducer = cms.ESProducer( "EcalSCDynamicDPhiParametersESProducer",
+  dynamicDPhiParameterSets = cms.VPSet( 
+    cms.PSet(  cutoff = cms.double( 0.3 ),
+      eMin = cms.double( 0.0 ),
+      etaMin = cms.double( 2.0 ),
+      saturation = cms.double( 0.12 ),
+      scale = cms.double( 1.22321 ),
+      width = cms.double( 0.345852 ),
+      xoffset = cms.double( -0.260256 ),
+      yoffset = cms.double( 0.0928887 )
+    ),
+    cms.PSet(  cutoff = cms.double( 0.45 ),
+      eMin = cms.double( 0.0 ),
+      etaMin = cms.double( 1.75 ),
+      saturation = cms.double( 0.12 ),
+      scale = cms.double( 1.60429 ),
+      width = cms.double( 0.458106 ),
+      xoffset = cms.double( -0.642352 ),
+      yoffset = cms.double( 0.05643 )
+    ),
+    cms.PSet(  cutoff = cms.double( 0.55 ),
+      eMin = cms.double( 0.0 ),
+      etaMin = cms.double( 1.479 ),
+      saturation = cms.double( 0.14 ),
+      scale = cms.double( 0.975707 ),
+      width = cms.double( 0.431729 ),
+      xoffset = cms.double( -0.18149 ),
+      yoffset = cms.double( 0.0497038 )
+    ),
+    cms.PSet(  cutoff = cms.double( 0.6 ),
+      eMin = cms.double( 0.0 ),
+      etaMin = cms.double( 0.0 ),
+      saturation = cms.double( 0.14 ),
+      scale = cms.double( 0.946048 ),
+      width = cms.double( 0.432767 ),
+      xoffset = cms.double( -0.101172 ),
+      yoffset = cms.double( 0.0280506 )
+    )
+  ),
+  appendToDataLabel = cms.string( "" )
 )
 process.ecalSeverityLevel = cms.ESProducer( "EcalSeverityLevelESProducer",
   dbstatusMask = cms.PSet( 
@@ -53480,13 +53546,13 @@ process.hltDeepBLifetimeTagInfosPF = cms.EDProducer( "CandIPProducer",
     minimumTransverseMomentum = cms.double( 1.0 ),
     primaryVertex = cms.InputTag( "hltVerticesPFFilter" ),
     maximumLongitudinalImpactParameter = cms.double( 17.0 ),
-    computeGhostTrack = cms.bool( True ),
+    jets = cms.InputTag( "hltPFJetForBtag" ),
     maxDeltaR = cms.double( 0.4 ),
     candidates = cms.InputTag( "hltParticleFlow" ),
     jetDirectionUsingGhostTrack = cms.bool( False ),
     minimumNumberOfPixelHits = cms.int32( 2 ),
     jetDirectionUsingTracks = cms.bool( False ),
-    jets = cms.InputTag( "hltPFJetForBtag" ),
+    computeGhostTrack = cms.bool( True ),
     useTrackQuality = cms.bool( False ),
     ghostTrackPriorDeltaR = cms.double( 0.03 ),
     maximumChiSquared = cms.double( 5.0 ),
@@ -86364,13 +86430,13 @@ process.hltDeepBLifetimeTagInfosPFAK8 = cms.EDProducer( "CandIPProducer",
     minimumTransverseMomentum = cms.double( 1.0 ),
     primaryVertex = cms.InputTag( "hltVerticesPFFilter" ),
     maximumLongitudinalImpactParameter = cms.double( 17.0 ),
-    computeGhostTrack = cms.bool( True ),
+    jets = cms.InputTag( "hltPFJetForBtagAK8" ),
     maxDeltaR = cms.double( 0.4 ),
     candidates = cms.InputTag( "hltParticleFlow" ),
     jetDirectionUsingGhostTrack = cms.bool( False ),
     minimumNumberOfPixelHits = cms.int32( 2 ),
     jetDirectionUsingTracks = cms.bool( False ),
-    jets = cms.InputTag( "hltPFJetForBtagAK8" ),
+    computeGhostTrack = cms.bool( True ),
     useTrackQuality = cms.bool( False ),
     ghostTrackPriorDeltaR = cms.double( 0.03 ),
     maximumChiSquared = cms.double( 5.0 ),
@@ -86587,13 +86653,13 @@ process.hltBoostedDBLifetimeTagInfosPFAK8 = cms.EDProducer( "CandIPProducer",
     minimumTransverseMomentum = cms.double( 1.0 ),
     primaryVertex = cms.InputTag( "hltVerticesPFFilter" ),
     maximumLongitudinalImpactParameter = cms.double( 17.0 ),
-    computeGhostTrack = cms.bool( True ),
+    jets = cms.InputTag( "hltPFJetForDBtagAK8" ),
     maxDeltaR = cms.double( 0.4 ),
     candidates = cms.InputTag( "hltParticleFlow" ),
     jetDirectionUsingGhostTrack = cms.bool( False ),
     minimumNumberOfPixelHits = cms.int32( 2 ),
     jetDirectionUsingTracks = cms.bool( False ),
-    jets = cms.InputTag( "hltPFJetForDBtagAK8" ),
+    computeGhostTrack = cms.bool( True ),
     useTrackQuality = cms.bool( False ),
     ghostTrackPriorDeltaR = cms.double( 0.03 ),
     maximumChiSquared = cms.double( 5.0 ),
@@ -88763,12 +88829,13 @@ process.hltScoutingMuonPacker = cms.EDProducer( "HLTScoutingMuonProducer",
     HcalPFClusterIsoMap = cms.InputTag( 'hltMuonHcalPFClusterIsoForMuons','','@currentProcess' ),
     EcalPFClusterIsoMap = cms.InputTag( 'hltMuonEcalPFClusterIsoForMuons','','@currentProcess' ),
     ChargedCandidates = cms.InputTag( 'hltL3MuonCandidates','','@currentProcess' ),
-    muonPtCut = cms.double( 3.0 ),
-    InputLinks = cms.InputTag( 'hltL3MuonsIterL3LinksNoVtx','','@currentProcess' ),
+    InputMuons = cms.InputTag( "hltIterL3MuonsNoVtx" ),
+    TrackIsoMap = cms.InputTag( 'hltMuonTkRelIsolationCut0p09Map','combinedRelativeIsoDeposits','@currentProcess' ),
     displacedvertexCollection = cms.InputTag( 'hltDisplacedmumuVtxProducerDoubleMu3NoVtx','','@currentProcess' ),
     Tracks = cms.InputTag( "hltL3Muons" ),
     muonEtaCut = cms.double( 2.4 ),
-    TrackIsoMap = cms.InputTag( 'hltMuonTkRelIsolationCut0p09Map','combinedRelativeIsoDeposits','@currentProcess' )
+    muonPtCut = cms.double( 3.0 ),
+    InputLinks = cms.InputTag( 'hltL3MuonsIterL3LinksNoVtx','','@currentProcess' )
 )
 process.hltScoutingEgammaPacker = cms.EDProducer( "HLTScoutingEgammaProducer",
     egammaEtaCut = cms.double( 2.5 ),
@@ -88776,15 +88843,21 @@ process.hltScoutingEgammaPacker = cms.EDProducer( "HLTScoutingEgammaProducer",
     EgammaCandidates = cms.InputTag( 'hltEgammaCandidates','','@currentProcess' ),
     egammaPtCut = cms.double( 4.0 ),
     EcalPFClusterIsoMap = cms.InputTag( 'hltEgammaEcalPFClusterIso','','@currentProcess' ),
-    SigmaIEtaIEtaMap = cms.InputTag( 'hltEgammaClusterShape','sigmaIEtaIEta5x5','@currentProcess' ),
+    saveRecHitTiming = cms.bool( False ),
+    rechitMatrixSize = cms.int32( 10 ),
     MissingHitsMap = cms.InputTag( 'hltEgammaGsfTrackVars','MissingHits','@currentProcess' ),
+    OneOEMinusOneOPMap = cms.InputTag( 'hltEgammaGsfTrackVars','OneOESuperMinusOneOP','@currentProcess' ),
     HoverEMap = cms.InputTag( 'hltEgammaHoverE','','@currentProcess' ),
     EgammaGsfTracks = cms.InputTag( 'hltEgammaGsfTracks','','@currentProcess' ),
-    OneOEMinusOneOPMap = cms.InputTag( 'hltEgammaGsfTrackVars','OneOESuperMinusOneOP','@currentProcess' ),
+    mantissaPrecision = cms.int32( 10 ),
+    r9Map = cms.InputTag( 'hltEgammaR9ID','r95x5' ),
+    SigmaIEtaIEtaMap = cms.InputTag( 'hltEgammaClusterShape','sigmaIEtaIEta5x5','@currentProcess' ),
     DetaMap = cms.InputTag( 'hltEgammaGsfTrackVars','DetaSeed','@currentProcess' ),
     egammaHoverECut = cms.double( 1.0 ),
-    EleGsfTrackIsoMap = cms.InputTag( 'hltEgammaEleGsfTrackIso','','@currentProcess' ),
-    DphiMap = cms.InputTag( 'hltEgammaGsfTrackVars','Dphi','@currentProcess' )
+    ecalRechitEB = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEB' ),
+    ecalRechitEE = cms.InputTag( 'hltEcalRecHit','EcalRecHitsEE' ),
+    DphiMap = cms.InputTag( 'hltEgammaGsfTrackVars','Dphi','@currentProcess' ),
+    EleGsfTrackIsoMap = cms.InputTag( 'hltEgammaEleGsfTrackIso','','@currentProcess' )
 )
 process.hltScoutingPrimaryVertexPacker = cms.EDProducer( "HLTScoutingPrimaryVertexProducer",
     vertexCollection = cms.InputTag( 'hltPixelVertices','','@currentProcess' )
@@ -88811,18 +88884,22 @@ process.hltScoutingMuonPackerCalo = cms.EDProducer( "HLTScoutingMuonProducer",
     HcalPFClusterIsoMap = cms.InputTag( "" ),
     EcalPFClusterIsoMap = cms.InputTag( "" ),
     ChargedCandidates = cms.InputTag( 'hltIterL3MuonCandidatesNoVtx','','@currentProcess' ),
-    muonPtCut = cms.double( 3.0 ),
-    InputLinks = cms.InputTag( 'hltL3MuonsIterL3LinksNoVtx','','@currentProcess' ),
+    InputMuons = cms.InputTag( "hltIterL3MuonsNoVtx" ),
+    TrackIsoMap = cms.InputTag( 'hltMuonTkRelIsolationCut0p09MapNoVtx','combinedRelativeIsoDeposits','@currentProcess' ),
     displacedvertexCollection = cms.InputTag( 'hltDisplacedmumuVtxProducer','','@currentProcess' ),
     Tracks = cms.InputTag( 'hltIterL3MuonAndMuonFromL1MergedNoVtx','','@currentProcess' ),
     muonEtaCut = cms.double( 2.4 ),
-    TrackIsoMap = cms.InputTag( 'hltMuonTkRelIsolationCut0p09MapNoVtx','combinedRelativeIsoDeposits','@currentProcess' )
+    muonPtCut = cms.double( 3.0 ),
+    InputLinks = cms.InputTag( 'hltL3MuonsIterL3LinksNoVtx','','@currentProcess' )
 )
 process.hltScoutingPrimaryVertexPackerCaloMuon = cms.EDProducer( "HLTScoutingPrimaryVertexProducer",
     vertexCollection = cms.InputTag( 'hltPixelVerticesL3MuonNoVtx','','@currentProcess' )
 )
 process.hltScoutingTrackPacker = cms.EDProducer( "HLTScoutingTrackProducer",
-    OtherTracks = cms.InputTag( "hltPixelTracksL3MuonNoVtx" )
+    vtxMinDist = cms.double( 0.01 ),
+    OtherTracks = cms.InputTag( "hltPixelTracksL3MuonNoVtx" ),
+    vertexCollection = cms.InputTag( "hltPixelVertices" ),
+    mantissaPrecision = cms.int32( 10 )
 )
 process.hltPrePhysicsScoutingMonitorOutput = cms.EDFilter( "HLTPrescaler",
     L1GtReadoutRecordTag = cms.InputTag( "hltGtStage2Digis" ),

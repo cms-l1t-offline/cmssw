@@ -390,18 +390,6 @@ const bool l1t::MuCondition::checkObjectParameter(const int iCondition,
 	std::cout << "\t\t Muon Failed unconstrainedPt checkThreshold; iCondition = " << iCondition << std::endl;
 	return false;
     }
-      // check impact parameter ( bit check ) with impact parameter LUT
-    // sanity check on candidate impact parameter
-    if (cand.hwDXY() > 3) {
-      LogDebug("L1TGlobal") << "\t\t l1t::Candidate has out of range hwDXY = " << cand.hwDXY() << std::endl;
-      return false;
-    }
-    bool passImpactParameterLUT = ((objPar.impactParameterLUT >> cand.hwDXY()) & 1);
-    if (!passImpactParameterLUT) // POTENITAL PROBLEM RICK
-      {
-	LogDebug("L1TGlobal") << "\t\t l1t::Candidate failed impact parameter requirement" << std::endl;
-	return false;
-      }
   }
 
   if (!checkThreshold(objPar.ptLowThreshold, objPar.ptHighThreshold, cand.hwPt(), m_gtMuonTemplate->condGEq())) {
@@ -465,6 +453,18 @@ const bool l1t::MuCondition::checkObjectParameter(const int iCondition,
   bool passIsoLUT = ((objPar.isolationLUT >> cand.hwIso()) & 1);
   if (!passIsoLUT) {
     LogDebug("L1TGlobal") << "\t\t l1t::Candidate failed isolation requirement" << std::endl;
+    return false;
+  }
+
+  // check impact parameter ( bit check ) with impact parameter LUT
+  // sanity check on candidate impact parameter
+  if (cand.hwDXY() > 3) {
+    LogDebug("L1TGlobal") << "\t\t l1t::Candidate has out of range hwDXY = " << cand.hwDXY() << std::endl;
+    return false;
+  }
+  bool passImpactParameterLUT = ((objPar.impactParameterLUT >> cand.hwDXY()) & 1);
+  if (!passImpactParameterLUT) {
+    LogDebug("L1TGlobal") << "\t\t l1t::Candidate failed impact parameter requirement" << std::endl;
     return false;
   }
 
