@@ -19,7 +19,9 @@ CSCBaseboard::CSCBaseboard(unsigned endcap,
 
   cscId_ = CSCDetId(theEndcap, theStation, theRing, theChamber, 0);
 
-  commonParams_ = conf.getParameter<edm::ParameterSet>("commonParam");
+  commonParams_ = conf.getParameterSet("commonParam");
+
+  showerParams_ = conf.getParameterSet("showerParam");
 
   theCSCName_ = CSCDetId::chamberName(theEndcap, theStation, theRing, theChamber);
 
@@ -42,9 +44,9 @@ CSCBaseboard::CSCBaseboard(unsigned endcap,
   runCCLUT_ = commonParams_.getParameter<bool>("runCCLUT");
 
   // general case
-  tmbParams_ = conf.getParameter<edm::ParameterSet>("tmbPhase1");
-  alctParams_ = conf.getParameter<edm::ParameterSet>("alctPhase1");
-  clctParams_ = conf.getParameter<edm::ParameterSet>("clctPhase1");
+  tmbParams_ = conf.getParameterSet("tmbPhase1");
+  alctParams_ = conf.getParameterSet("alctPhase1");
+  clctParams_ = conf.getParameterSet("clctPhase1");
 
   const bool upgradeME11 = runPhase2_ and isME11_ and runME11Up_;
   const bool upgradeME21 = runPhase2_ and isME21_ and runME21Up_;

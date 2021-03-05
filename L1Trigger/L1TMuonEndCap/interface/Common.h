@@ -8,6 +8,7 @@
 #include "DataFormats/L1TMuon/interface/EMTFHit.h"
 #include "DataFormats/L1TMuon/interface/EMTFRoad.h"
 #include "DataFormats/L1TMuon/interface/EMTFTrack.h"
+#include "DataFormats/L1TMuon/interface/RegionalMuonShower.h"
 
 #include "L1Trigger/L1TMuon/interface/GeometryTranslator.h"
 #include "L1Trigger/L1TMuon/interface/MuonTriggerPrimitive.h"
@@ -26,6 +27,7 @@ typedef l1t::EMTFRoadCollection EMTFRoadCollection;
 typedef l1t::EMTFTrack EMTFTrack;
 typedef l1t::EMTFTrackCollection EMTFTrackCollection;
 typedef l1t::EMTFPtLUT EMTFPtLUT;
+typedef l1t::RegionalMuonShowerBxCollection RegionalMuonShowerBxCollection;
 
 typedef L1TMuon::GeometryTranslator GeometryTranslator;
 typedef L1TMuon::TriggerPrimitive TriggerPrimitive;

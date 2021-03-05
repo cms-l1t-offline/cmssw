@@ -81,6 +81,11 @@ CSCAnodeLCTProcessor::CSCAnodeLCTProcessor(unsigned endcap,
 
   // quality control of stubs
   qualityControl_ = std::make_unique<LCTQualityControl>(endcap, station, sector, subsector, chamber, conf);
+
+  const auto& shower = showerParams_.getParameterSet("anodeShower");
+  thresholds_ = shower.getParameter<std::vector<unsigned>>("showerThresholds");
+  showerMinTBin_ = shower.getParameter<unsigned>("showerMinTBin");
+  showerMaxTBin_ = shower.getParameter<unsigned>("showerMaxTBin");
 }
 
 CSCAnodeLCTProcessor::CSCAnodeLCTProcessor() : CSCBaseboard() {
@@ -195,6 +200,8 @@ void CSCAnodeLCTProcessor::clear() {
     secondALCT[bx].clear();
   }
   lct_list.clear();
+  inTimeHMT_ = 0;
+  outTimeHMT_ = 0;
 }
 
 void CSCAnodeLCTProcessor::clear(const int wire, const int pattern) {
@@ -1382,4 +1389,43 @@ void CSCAnodeLCTProcessor::setWireContainer(CSCALCTDigi& alct, CSCALCTDigi::Wire
 
   // set the hit container
   alct.setHits(wireHits);
+}
+
+void CSCAnodeLCTProcessor::encodeHighMultiplicityBits(
+    const std::vector<int> wires[CSCConstants::NUM_LAYERS][CSCConstants::MAX_NUM_WIRES]) {
+  inTimeHMT_ = 0;
+  outTimeHMT_ = 0;
+
+  auto inTime = [=](unsigned time) { return time >= showerMinTBin_ and time <= showerMaxTBin_; };
+  auto outTime = [=](unsigned time) { return time < showerMinTBin_ or time > showerMaxTBin_; };
+
+  unsigned hitsInTime = 0;
+  unsigned hitsOutTime = 0;
+
+  unsigned hits = 0;
+  for (int i_layer = 0; i_layer < CSCConstants::NUM_LAYERS; i_layer++) {
+    for (int i_hstrip = 0; i_hstrip < CSCConstants::NUM_HALF_STRIPS_7CFEBS; i_hstrip++) {
+      auto times = wires[i_layer][i_hstrip];
+      // count the wires in-time and out-time
+      hitsInTime += std::count_if(times.begin(), times.end(), inTime);
+      hitsOutTime += std::count_if(times.begin(), times.end(), outTime);
+    }
+  }
+
+  // convert station and ring number to index
+  // index runs from 2 to 10, subtract 2
+  unsigned csc_idx = CSCDetId::iChamberType(theStation, theRing) - 2;
+
+  // loose, nominal and tight
+  std::vector<unsigned> station_thresholds = {
+      thresholds_[csc_idx * 3], thresholds_[csc_idx * 3 + 1], thresholds_[csc_idx * 3 + 2]};
+
+  for (unsigned i = 0; i < station_thresholds.size(); i++) {
+    if (hitsInTime >= station_thresholds[i]) {
+      inTimeHMT_ = i + 1;
+    }
+    if (hitsOutTime >= station_thresholds[i]) {
+      outTimeHMT_ = i + 1;
+    }
+  }
 }

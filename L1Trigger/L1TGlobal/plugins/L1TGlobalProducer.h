@@ -68,6 +68,7 @@ private:
 
   // number of objects of each type
   int m_nrL1Mu;
+  int m_nrL1MuShower;
   int m_nrL1EG;
   int m_nrL1Tau;
 
@@ -119,7 +120,9 @@ private:
 
   /// input tag for muon collection from GMT
   edm::InputTag m_muInputTag;
+  edm::InputTag m_muShowerInputTag;
   edm::EDGetTokenT<BXVector<l1t::Muon>> m_muInputToken;
+  edm::EDGetTokenT<BXVector<l1t::MuonShower>> m_muShowerInputToken;
 
   /// input tag for calorimeter collections from GCT
   edm::InputTag m_egInputTag;

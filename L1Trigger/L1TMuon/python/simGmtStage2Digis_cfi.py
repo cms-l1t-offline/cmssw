@@ -20,6 +20,14 @@ simGmtStage2Digis = cms.EDProducer('L1TMuonProducer',
     emtfCancelMode = cms.string("coordinate") # 'tracks' or 'coordinate'
 )
 
+# Muon shower trigger
+simGmtShowerDigis = cms.EDProducer('L1TMuonShowerProducer',
+    showerInput = cms.InputTag("simEmtfDigis","EMTF"),
+    bxMin = cms.int32(0),
+    bxMax = cms.int32(0),
+                                   minShowers = cms.uint32(1)
+)
+
 from CondCore.CondDB.CondDB_cfi import CondDB
 CondDB.connect = cms.string("frontier://FrontierProd/CMS_CONDITIONS")
 l1ugmtdb = cms.ESSource("PoolDBESSource",

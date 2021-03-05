@@ -38,7 +38,8 @@ alctPhase1 = cms.PSet(
     # whether to store the "corrected" ALCT stub time
     # (currently it is median time of particular hits in a pattern) into the CSCCLCTDigi bx,
     # and temporary store the regular "key layer hit" time into the CSCCLCTDigi fullBX:
-    alctUseCorrectedBx = cms.bool(False)
+    alctUseCorrectedBx = cms.bool(False),
+
 )
 
 # Parameters for upgrade ALCT processors

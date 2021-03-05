@@ -10,6 +10,7 @@ from L1Trigger.CSCTriggerPrimitives.params.clctParams import clctPSets
 from L1Trigger.CSCTriggerPrimitives.params.tmbParams import tmbPSets
 from L1Trigger.CSCTriggerPrimitives.params.auxiliaryParams import auxPSets
 from L1Trigger.CSCTriggerPrimitives.params.cclutParams import cclutParams
+from L1Trigger.CSCTriggerPrimitives.params.showerParams import showerPSet
 
 cscTriggerPrimitiveDigis = cms.EDProducer(
     "CSCTriggerPrimitivesProducer",
@@ -39,6 +40,7 @@ cscTriggerPrimitiveDigis = cms.EDProducer(
     writeOutAllCLCTs = cms.bool(False),
     writeOutAllALCTs = cms.bool(False),
     savePreTriggers = cms.bool(False),
+    writeOutShowers = cms.bool(True),
 
     commonParam = auxPSets.commonParam.clone(),
     mpcParam = auxPSets.mpcParamRun1.clone()

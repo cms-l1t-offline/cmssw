@@ -291,19 +291,19 @@ void l1t::GlobalBoard::receiveCaloObjectData(edm::Event& iEvent,
 			 //(*m_candETM).push_back(i,&(*etsum));
 			 LogDebug("L1TGlobal") << "ETM:  Pt " << etsum->hwPt() <<  " Phi " << etsum->hwPhi()  << std::endl;
 		       }
-		       break; 
+		       break;
 		     case l1t::EtSum::EtSumType::kMissingHt:
 		       {
 			 //(*m_candHTM).push_back(i,&(*etsum));
 			 LogDebug("L1TGlobal") << "HTM:  Pt " << etsum->hwPt() <<  " Phi " << etsum->hwPhi()  << std::endl;
 		       }
-		       break; 		     
+		       break;
 		     case l1t::EtSum::EtSumType::kTotalEt:
 		       {
 			 //(*m_candETT).push_back(i,&(*etsum));
 			 LogDebug("L1TGlobal") << "ETT:  Pt " << etsum->hwPt() << std::endl;
 		       }
-		       break; 		     
+		       break;
 		     case l1t::EtSum::EtSumType::kTotalHt:
 		       {
 			 //(*m_candHTT).push_back(i,&(*etsum));
@@ -378,6 +378,48 @@ void l1t::GlobalBoard::receiveMuonObjectData(edm::Event& iEvent,
       }    //end loop over bx
 
     }  //end if over valid muon data
+
+  }  //end if ReveiveMuon data
+}
+
+// receive data from Global Muon Trigger
+void l1t::GlobalBoard::receiveMuonShowerObjectData(edm::Event& iEvent,
+                                                   const edm::EDGetTokenT<BXVector<l1t::MuonShower>>& muShowerInputToken,
+                                                   const bool receiveMuShower,
+                                                   const int nrL1MuShower) {
+  if (m_verbosity) {
+    LogDebug("L1TGlobal") << "\n**** GlobalBoard receiving muon shower data = "
+                          //<< "\n     from input tag " << muInputTag << "\n"
+                          << std::endl;
+  }
+
+  // resetMu();
+
+  // get data from Global Muon Trigger
+  if (receiveMuShower) {
+    edm::Handle<BXVector<l1t::MuonShower>> muonData;
+    iEvent.getByToken(muShowerInputToken, muonData);
+
+    if (!muonData.isValid()) {
+      if (m_verbosity) {
+        edm::LogWarning("L1TGlobal") << "\nWarning: BXVector<l1t::MuonShower> with input tag "
+                                     //<< muInputTag
+                                     << "\nrequested in configuration, but not found in the event.\n"
+                                     << std::endl;
+      }
+    } else {
+      //Loop over Muons in this bx
+      int nObj = 0;
+      for (auto mu = muonData->begin(0); mu != muonData->end(0); ++mu) {
+        std::cout << "processing MuonShower in BX 0" << std::endl;
+        if (nObj < nrL1MuShower) {
+          (*m_candL1MuShower).push_back(0, &(*mu));
+        } else {
+          edm::LogWarning("L1TGlobal") << " Too many Muon Showers (" << nObj
+                                       << ") for uGT Configuration maxMuShower =" << nrL1MuShower << std::endl;
+        }
+      }  //end loop over muons in bx
+    }    //end if over valid muon data
 
   }  //end if ReveiveMuon data
 }
