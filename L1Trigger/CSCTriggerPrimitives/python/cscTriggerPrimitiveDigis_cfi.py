@@ -43,7 +43,8 @@ cscTriggerPrimitiveDigis = cms.EDProducer(
     writeOutShowers = cms.bool(True),
 
     commonParam = auxPSets.commonParam.clone(),
-    mpcParam = auxPSets.mpcParamRun1.clone()
+    mpcParam = auxPSets.mpcParamRun1.clone(),
+    showerParam = showerPSet.clone()
 )
 
 

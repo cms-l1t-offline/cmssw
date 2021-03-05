@@ -430,8 +430,6 @@ std::vector<CSCCorrelatedLCTDigi> CSCMotherboard::getLCTs() const {
 }
 
 CSCShowerDigi CSCMotherboard::readoutShower() const {
-  std::cout << "New CSCShowerDigi in " << theCSCName_ << ", endcap " << theEndcap << " sector " << theSector
-            << std::endl;
   return shower_;
 }
 
@@ -724,17 +722,25 @@ void CSCMotherboard::encodeHighMultiplicityBits() {
     case 0:
       inTimeHMT_ = cathodeInTime;
       outTimeHMT_ = cathodeOutTime;
+      break;
     case 1:
       inTimeHMT_ = anodeInTime;
       outTimeHMT_ = anodeOutTime;
+      break;
     case 2:
       inTimeHMT_ = (anodeInTime & CSCShowerDigi::kInTimeMask) | (cathodeInTime & CSCShowerDigi::kInTimeMask);
       outTimeHMT_ = (anodeOutTime & CSCShowerDigi::kOutTimeMask) | (cathodeOutTime & CSCShowerDigi::kOutTimeMask);
+      break;
     default:
       inTimeHMT_ = cathodeInTime;
       outTimeHMT_ = cathodeOutTime;
+      break;
   };
 
   // create a new object
   shower_ = CSCShowerDigi(inTimeHMT_, outTimeHMT_, theTrigChamber);
+  if (shower_.isValid()) {
+    std::cout << "New CSCShowerDigi in " << theCSCName_ << ", endcap " << theEndcap << " sector " << theSector
+              << std::endl;
+  }
 }
