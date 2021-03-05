@@ -14,25 +14,28 @@ showerPSet = cms.PSet(
     ## settings for cathode showers (counting CSCComparatorDigi)
     cathodeShower = cms.PSet(
         ## {loose, nominal, tight} thresholds for hit counters
+        ## loose ~ 0.75 kHz
+        ## nominal ~ 0.5  kHz
+        ## tight ~ 0.25 kHz
         showerThresholds = cms.vuint32(
             # ME1/1
-            98, 99, 101,
+            100, 100, 100,
             # ME1/2
-            56, 62, 73,
+            54, 55, 61,
             # ME1/3
-            30, 31, 33,
+            20, 20, 30,
             # ME2/1
-            49, 53, 55,
+            35, 35, 35,
             # ME2/2
-            42, 43, 46,
+            29, 29, 35,
             # ME3/1
-            49, 50, 52,
+            35, 35, 40,
             # ME3/2
-            35, 36, 38,
+            24, 25, 30,
             # ME4/1
-            42, 49, 51,
+            36, 40, 40,
             # ME4/2
-            31, 34, 36
+            26, 30, 30
         ),
         showerMinTBin = cms.uint32(6),
         showerMaxTBin = cms.uint32(8),
@@ -60,7 +63,7 @@ showerPSet = cms.PSet(
             # ME4/2
             88, 89, 94
         ),
-        showerMinTBin = cms.uint32(7),
-        showerMaxTBin = cms.uint32(9),
+        showerMinTBin = cms.uint32(8),
+        showerMaxTBin = cms.uint32(10),
     )
 )
