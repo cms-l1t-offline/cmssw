@@ -12,4 +12,8 @@ simEmtfShowersMC = cms.EDProducer("L1TMuonEndCapShowerProducer",
     )
 )
 
+## this producer would use unpacked CSC Showers
+## not available yet
+simEmtfShowersData = simEmtfShowersMC.clone()
+
 simEmtfShowers = simEmtfShowersMC.clone()
