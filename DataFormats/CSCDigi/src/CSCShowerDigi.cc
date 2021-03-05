@@ -7,7 +7,7 @@ using namespace std;
 
 /// Constructors
 CSCShowerDigi::CSCShowerDigi(const uint16_t bitsInTime, const uint16_t bitsOutTime, const uint16_t cscID)
-  : cscID_(cscID) {
+    : cscID_(cscID) {
   setDataWord(bitsInTime, bits_, kInTimeShift, kInTimeMask);
   setDataWord(bitsOutTime, bits_, kOutTimeShift, kOutTimeMask);
 }
@@ -32,20 +32,11 @@ bool CSCShowerDigi::isNominalOutTime() const { return bitsOutTime() >= kNominal;
 
 bool CSCShowerDigi::isTightOutTime() const { return bitsOutTime() >= kTight; }
 
-uint16_t CSCShowerDigi::bitsInTime() const
-{
-  return getDataWord(bits_, kInTimeShift, kInTimeMask);
-}
+uint16_t CSCShowerDigi::bitsInTime() const { return getDataWord(bits_, kInTimeShift, kInTimeMask); }
 
-uint16_t CSCShowerDigi::bitsOutTime() const
-{
-  return getDataWord(bits_, kOutTimeShift, kOutTimeMask);
-}
+uint16_t CSCShowerDigi::bitsOutTime() const { return getDataWord(bits_, kOutTimeShift, kOutTimeMask); }
 
-void CSCShowerDigi::setDataWord(const uint16_t newWord,
-                                uint16_t& word,
-                                const unsigned shift,
-                                const unsigned mask) {
+void CSCShowerDigi::setDataWord(const uint16_t newWord, uint16_t& word, const unsigned shift, const unsigned mask) {
   // clear the old value
   word &= ~(mask << shift);
 

@@ -1,11 +1,10 @@
 #include "L1Trigger/L1TMuonEndCap/plugins/L1TMuonEndCapShowerProducer.h"
 
 L1TMuonEndCapShowerProducer::L1TMuonEndCapShowerProducer(const edm::ParameterSet& iConfig)
-  : config_(iConfig),
-    verbose_(iConfig.getUntrackedParameter<int>("verbosity")),
-    tokenCSCShower_(consumes<CSCShowerDigiCollection>(iConfig.getParameter<edm::InputTag>("CSCShowerInput"))),
-    sector_processors_shower_()
-{
+    : config_(iConfig),
+      verbose_(iConfig.getUntrackedParameter<int>("verbosity")),
+      tokenCSCShower_(consumes<CSCShowerDigiCollection>(iConfig.getParameter<edm::InputTag>("CSCShowerInput"))),
+      sector_processors_shower_() {
   // Make output products
   produces<l1t::RegionalMuonShowerBxCollection>("EMTF");
 }

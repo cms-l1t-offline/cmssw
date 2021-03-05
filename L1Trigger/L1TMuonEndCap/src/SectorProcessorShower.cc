@@ -51,10 +51,10 @@ void SectorProcessorShower::process(const CSCShowerDigiCollection& in_showers,
   }
 
   // Shower recognition logic: at least one nominal shower (see DN-20-033, section 5.2)
-  const unsigned nLoose(
-      std::count_if(selected_showers.begin(), selected_showers.end(), [](CSCShowerDigi p) { return p.isLooseInTime(); }));
-  const unsigned nNominal(
-      std::count_if(selected_showers.begin(), selected_showers.end(), [](CSCShowerDigi p) { return p.isNominalInTime(); }));
+  const unsigned nLoose(std::count_if(
+      selected_showers.begin(), selected_showers.end(), [](CSCShowerDigi p) { return p.isLooseInTime(); }));
+  const unsigned nNominal(std::count_if(
+      selected_showers.begin(), selected_showers.end(), [](CSCShowerDigi p) { return p.isNominalInTime(); }));
 
   const bool hasTwoLoose(nLoose >= 2);
   const bool hasNominal(nNominal >= 1);

@@ -21,7 +21,7 @@ const int CSCTriggerPrimitivesBuilder::max_chamber = CSCTriggerNumbering::maxTri
 
 CSCTriggerPrimitivesBuilder::CSCTriggerPrimitivesBuilder(const edm::ParameterSet& conf) {
   // special configuration parameters for ME11 treatment
-  edm::ParameterSet commonParams = conf.getParameter<edm::ParameterSet>("commonParam");
+  edm::ParameterSet commonParams = conf.getParameterSet("commonParam");
   runPhase2_ = commonParams.getParameter<bool>("runPhase2");
   infoV = commonParams.getParameter<int>("verbosity");
   disableME1a_ = commonParams.getParameter<bool>("disableME1a");

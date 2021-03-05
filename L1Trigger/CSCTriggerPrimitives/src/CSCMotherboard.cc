@@ -430,8 +430,7 @@ std::vector<CSCCorrelatedLCTDigi> CSCMotherboard::getLCTs() const {
 }
 
 CSCShowerDigi CSCMotherboard::readoutShower() const {
-  std::cout << "New CSCShowerDigi in " << theCSCName_
-            << ", endcap " << theEndcap << " sector " << theSector
+  std::cout << "New CSCShowerDigi in " << theCSCName_ << ", endcap " << theEndcap << " sector " << theSector
             << std::endl;
   return shower_;
 }
@@ -721,19 +720,19 @@ void CSCMotherboard::encodeHighMultiplicityBits() {
   unsigned outTimeHMT_;
 
   // set the value according to source
-  switch(showerSource_){
-  case 0:
-    inTimeHMT_ = cathodeInTime;
-    outTimeHMT_ = cathodeOutTime;
-  case 1:
-    inTimeHMT_ = anodeInTime;
-    outTimeHMT_ = anodeOutTime;
-  case 2:
-    inTimeHMT_ = (anodeInTime & CSCShowerDigi::kInTimeMask) | (cathodeInTime & CSCShowerDigi::kInTimeMask);
-    outTimeHMT_ = (anodeOutTime & CSCShowerDigi::kOutTimeMask) | (cathodeOutTime & CSCShowerDigi::kOutTimeMask);
-  default:
-    inTimeHMT_ = cathodeInTime;
-    outTimeHMT_ = cathodeOutTime;
+  switch (showerSource_) {
+    case 0:
+      inTimeHMT_ = cathodeInTime;
+      outTimeHMT_ = cathodeOutTime;
+    case 1:
+      inTimeHMT_ = anodeInTime;
+      outTimeHMT_ = anodeOutTime;
+    case 2:
+      inTimeHMT_ = (anodeInTime & CSCShowerDigi::kInTimeMask) | (cathodeInTime & CSCShowerDigi::kInTimeMask);
+      outTimeHMT_ = (anodeOutTime & CSCShowerDigi::kOutTimeMask) | (cathodeOutTime & CSCShowerDigi::kOutTimeMask);
+    default:
+      inTimeHMT_ = cathodeInTime;
+      outTimeHMT_ = cathodeOutTime;
   };
 
   // create a new object

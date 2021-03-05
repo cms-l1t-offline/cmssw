@@ -55,25 +55,25 @@ CSCBaseboard::CSCBaseboard(unsigned endcap,
   const bool upgradeME = upgradeME11 or upgradeME21 or upgradeME31 or upgradeME41;
 
   if (upgradeME) {
-    tmbParams_ = conf.getParameter<edm::ParameterSet>("tmbPhase2");
-    clctParams_ = conf.getParameter<edm::ParameterSet>("clctPhase2");
+    tmbParams_ = conf.getParameterSet("tmbPhase2");
+    clctParams_ = conf.getParameterSet("clctPhase2");
     // upgrade ME1/1
     if (upgradeME11) {
       // do not run the Phase-2 ALCT for Run-3
       if (enableAlctPhase2_) {
-        alctParams_ = conf.getParameter<edm::ParameterSet>("alctPhase2");
+        alctParams_ = conf.getParameterSet("alctPhase2");
       }
 
       if (runME11ILT_) {
-        tmbParams_ = conf.getParameter<edm::ParameterSet>("tmbPhase2GE11");
-        clctParams_ = conf.getParameter<edm::ParameterSet>("clctPhase2GEM");
+        tmbParams_ = conf.getParameterSet("tmbPhase2GE11");
+        clctParams_ = conf.getParameterSet("clctPhase2GEM");
       }
     }
     // upgrade ME2/1
     if (upgradeME21 and runME21ILT_) {
-      tmbParams_ = conf.getParameter<edm::ParameterSet>("tmbPhase2GE21");
-      clctParams_ = conf.getParameter<edm::ParameterSet>("clctPhase2GEM");
-      alctParams_ = conf.getParameter<edm::ParameterSet>("alctPhase2GEM");
+      tmbParams_ = conf.getParameterSet("tmbPhase2GE21");
+      clctParams_ = conf.getParameterSet("clctPhase2GEM");
+      alctParams_ = conf.getParameterSet("alctPhase2GEM");
     }
   }
 }

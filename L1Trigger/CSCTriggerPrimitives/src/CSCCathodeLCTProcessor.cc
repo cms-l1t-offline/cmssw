@@ -1505,7 +1505,8 @@ void CSCCathodeLCTProcessor::encodeHighMultiplicityBits(
   // only print when a valid shower
   if (inTimeHMT_) {
     std::cout << "CSCCathodeLCTProcessor :: encodeHighMultiplicityBits " << theCSCName_ << std::endl;
-    std::cout << "HMT in " << theCSCName_ << ": " << hitsInTime << " " << inTimeHMT_ << " minT " << showerMinTBin_ <<  " maxT " << showerMaxTBin_ << std::endl;
+    std::cout << "HMT in " << theCSCName_ << ": " << hitsInTime << " " << inTimeHMT_ << " minT " << showerMinTBin_
+              << " maxT " << showerMaxTBin_ << std::endl;
     std::cout << "HitsOut in " << theCSCName_ << ": " << hitsOutTime << std::endl;
   }
 }
