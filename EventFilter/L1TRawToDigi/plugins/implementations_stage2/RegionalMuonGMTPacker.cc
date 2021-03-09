@@ -19,8 +19,9 @@ namespace l1t {
       packTF(event, bmtfToken, blocks);
       packTF(event, omtfToken, blocks);
       packTF(event, emtfToken, blocks);
-      packTFShower(event, emtfShowerToken, blocks);
-
+      if (packShowers_) {
+        packTFShower(event, emtfShowerToken, blocks);
+      }
       return blocks;
     }
 
@@ -45,6 +46,7 @@ namespace l1t {
             payloadMap[linkTimes2].reserve(wordsPerBx * nBx);
             // If there was no muon on the link of this muon in previous
             // BX the payload up to this BX must be filled with zeros.
+            // Sven: this needs to be extended with an exception for showers
             if (bxCtr > 0) {
               while (payloadMap[linkTimes2].size() < bxCtr * wordsPerBx) {
                 payloadMap[linkTimes2].push_back(0);
@@ -80,14 +82,23 @@ namespace l1t {
     void RegionalMuonGMTPacker::packTFShower(const edm::Event& event,
                                              const edm::EDGetTokenT<RegionalMuonShowerBxCollection>& tfToken,
                                        Blocks& blocks) {
-      edm::Handle<RegionalMuonShowerBxCollection> muons;
-      event.getByToken(tfToken, muons);
+      edm::Handle<RegionalMuonShowerBxCollection> showers;
+      event.getByToken(tfToken, showers);
 
       constexpr unsigned wordsPerBx = 6;  // number of 32 bit words per BX
 
+      // payloadmap should be loaded from the last function
+      // don't make a new one
       PayloadMap payloadMap;
+      const auto nBx = 1;
 
       // does further nothing yet
+      unsigned bxCtr = 0;
+      for (int i = showers->getFirstBX(); i <= showers->getLastBX(); ++i, ++bxCtr) {
+        for (auto mu = showers->begin(i); mu != showers->end(i); ++mu) {
+          const auto linkTimes2 = mu->link() * 2;
+        }
+      }
     }
   }  // namespace stage2
 }  // namespace l1t
