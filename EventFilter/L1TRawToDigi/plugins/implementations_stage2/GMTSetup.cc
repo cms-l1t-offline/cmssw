@@ -26,6 +26,7 @@ namespace l1t {
       desc.addOptional<edm::InputTag>("BMTFInputLabel")->setComment("for stage2");
       desc.addOptional<edm::InputTag>("OMTFInputLabel")->setComment("for stage2");
       desc.addOptional<edm::InputTag>("EMTFInputLabel")->setComment("for stage2");
+      desc.addOptional<edm::InputTag>("EMTFShowerInputLabel")->setComment("for stage2");
       desc.addOptional<edm::InputTag>("ImdInputLabelBMTF")
           ->setComment("uGMT intermediate muon from BMTF after first sorting stage");
       desc.addOptional<edm::InputTag>("ImdInputLabelEMTFNeg")
@@ -64,7 +65,9 @@ namespace l1t {
       prod.produces<RegionalMuonCandBxCollection>("BMTF");
       prod.produces<RegionalMuonCandBxCollection>("OMTF");
       prod.produces<RegionalMuonCandBxCollection>("EMTF");
+      prod.produces<RegionalMuonShowerBxCollection>("EMTF");
       prod.produces<MuonBxCollection>("Muon");
+      prod.produces<MuonBxCollection>("MuonShower");
       for (int i = 1; i < 6; ++i) {
         prod.produces<MuonBxCollection>("MuonCopy" + std::to_string(i));
       }

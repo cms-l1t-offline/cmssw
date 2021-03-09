@@ -10,7 +10,9 @@ namespace l1t {
       auto bmtfTag = cfg.getParameter<edm::InputTag>("BMTFInputLabel");
       auto omtfTag = cfg.getParameter<edm::InputTag>("OMTFInputLabel");
       auto emtfTag = cfg.getParameter<edm::InputTag>("EMTFInputLabel");
+      auto emtfShowerTag = cfg.getParameter<edm::InputTag>("EMTFShowerInputLabel");
       auto tag = cfg.getParameter<edm::InputTag>("InputLabel");
+      auto showerTag = cfg.getParameter<edm::InputTag>("ShowerInputLabel");
       auto imdBmtfTag = cfg.getParameter<edm::InputTag>("ImdInputLabelBMTF");
       auto imdEmtfNegTag = cfg.getParameter<edm::InputTag>("ImdInputLabelEMTFNeg");
       auto imdEmtfPosTag = cfg.getParameter<edm::InputTag>("ImdInputLabelEMTFPos");
@@ -20,7 +22,9 @@ namespace l1t {
       regionalMuonCandTokenBMTF_ = cc.consumes<RegionalMuonCandBxCollection>(bmtfTag);
       regionalMuonCandTokenOMTF_ = cc.consumes<RegionalMuonCandBxCollection>(omtfTag);
       regionalMuonCandTokenEMTF_ = cc.consumes<RegionalMuonCandBxCollection>(emtfTag);
+      regionalMuonShowerTokenEMTF_ = cc.consumes<RegionalMuonShowerBxCollection>(emtfShowerTag);
       muonToken_ = cc.consumes<MuonBxCollection>(tag);
+      muonShowerToken_ = cc.consumes<MuonShowerBxCollection>(showerTag);
       imdMuonTokenBMTF_ = cc.consumes<MuonBxCollection>(imdBmtfTag);
       imdMuonTokenEMTFNeg_ = cc.consumes<MuonBxCollection>(imdEmtfNegTag);
       imdMuonTokenEMTFPos_ = cc.consumes<MuonBxCollection>(imdEmtfPosTag);

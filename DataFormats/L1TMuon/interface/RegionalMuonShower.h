@@ -26,6 +26,8 @@ namespace l1t {
 
     inline void setDebug(bool debug) { debug_ = debug; };
     inline bool debug() const { return debug_; };
+    /// Get link on which the MicroGMT receives the candidate
+    const int link() const { return m_link; };
 
     bool operator==(const l1t::RegionalMuonShower& rhs) const;
     inline bool operator!=(const l1t::RegionalMuonShower& rhs) const { return !(operator==(rhs)); };
@@ -45,12 +47,14 @@ namespace l1t {
     void set_sector(const unsigned sector) { sector_ = sector; }
     void set_oneNominal(const bool bit);
     void set_twoLoose(const bool bit);
+    void setLink(int link) { m_link = link; };
 
   private:
     bool debug_;
     uint16_t bits_;
     int endcap_;       //    +/-1.  For ME+ and ME-.
     unsigned sector_;  //  1 -  6.
+    int m_link;
   };
 
 }  // namespace l1t

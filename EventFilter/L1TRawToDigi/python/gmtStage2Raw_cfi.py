@@ -7,6 +7,7 @@ gmtStage2Raw = cms.EDProducer(
     BMTFInputLabel = cms.InputTag("simBmtfDigis", "BMTF"),
     OMTFInputLabel = cms.InputTag("simOmtfDigis", "OMTF"),
     EMTFInputLabel = cms.InputTag("simEmtfDigis", "EMTF"),
+    EMTFShowerInputLabel = cms.InputTag(""),
     ImdInputLabelBMTF = cms.InputTag("simGmtStage2Digis", "imdMuonsBMTF"),
     ImdInputLabelEMTFNeg = cms.InputTag("simGmtStage2Digis", "imdMuonsEMTFNeg"),
     ImdInputLabelEMTFPos = cms.InputTag("simGmtStage2Digis", "imdMuonsEMTFPos"),
@@ -32,4 +33,5 @@ stage2L1Trigger_2018.toModify(gmtStage2Raw, BMTFInputLabel = cms.InputTag("simBm
 
 ### Era: Run3_2021
 from Configuration.Eras.Modifier_stage2L1Trigger_2021_cff import stage2L1Trigger_2021
-stage2L1Trigger_2021.toModify(gmtStage2Raw, BMTFInputLabel = cms.InputTag("simKBmtfDigis", "BMTF"), FWId = cms.uint32(0x6000000))
+stage2L1Trigger_2021.toModify(gmtStage2Raw, BMTFInputLabel = cms.InputTag("simKBmtfDigis", "BMTF"), FWId = cms.uint32(0x6000000), EMTFShowerInputLabel = cms.InputTag("simEmtfShowers", "EMTF"),
+)

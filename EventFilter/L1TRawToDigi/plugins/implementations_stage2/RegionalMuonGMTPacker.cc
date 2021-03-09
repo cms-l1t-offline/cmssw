@@ -11,6 +11,7 @@ namespace l1t {
       auto bmtfToken = static_cast<const GMTTokens*>(toks)->getRegionalMuonCandTokenBMTF();
       auto omtfToken = static_cast<const GMTTokens*>(toks)->getRegionalMuonCandTokenOMTF();
       auto emtfToken = static_cast<const GMTTokens*>(toks)->getRegionalMuonCandTokenEMTF();
+      auto emtfShowerToken = static_cast<const GMTTokens*>(toks)->getRegionalMuonShowerTokenEMTF();
 
       Blocks blocks;
 
@@ -18,6 +19,7 @@ namespace l1t {
       packTF(event, bmtfToken, blocks);
       packTF(event, omtfToken, blocks);
       packTF(event, emtfToken, blocks);
+      packTFShower(event, emtfShowerToken, blocks);
 
       return blocks;
     }
@@ -73,6 +75,19 @@ namespace l1t {
       for (auto& kv : payloadMap) {
         blocks.push_back(Block(kv.first, kv.second));
       }
+    }
+
+    void RegionalMuonGMTPacker::packTFShower(const edm::Event& event,
+                                             const edm::EDGetTokenT<RegionalMuonShowerBxCollection>& tfToken,
+                                       Blocks& blocks) {
+      edm::Handle<RegionalMuonShowerBxCollection> muons;
+      event.getByToken(tfToken, muons);
+
+      constexpr unsigned wordsPerBx = 6;  // number of 32 bit words per BX
+
+      PayloadMap payloadMap;
+
+      // does further nothing yet
     }
   }  // namespace stage2
 }  // namespace l1t

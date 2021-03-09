@@ -6,6 +6,7 @@
 #include "EventFilter/L1TRawToDigi/interface/PackerTokens.h"
 #include "EventFilter/L1TRawToDigi/interface/Block.h"
 #include "DataFormats/L1TMuon/interface/RegionalMuonCand.h"
+#include "DataFormats/L1TMuon/interface/RegionalMuonShower.h"
 #include "FWCore/Framework/interface/Event.h"
 
 namespace l1t {
@@ -14,12 +15,15 @@ namespace l1t {
     public:
       Blocks pack(const edm::Event&, const PackerTokens*) override;
       void setKalmanAlgoTrue() { isKalman_ = true; };
+      void setPackShowersTrue() { packShowers_ = true; };
 
     private:
       typedef std::map<unsigned int, std::vector<uint32_t>> PayloadMap;
       void packTF(const edm::Event&, const edm::EDGetTokenT<RegionalMuonCandBxCollection>&, Blocks&);
+      void packTFShower(const edm::Event&, const edm::EDGetTokenT<RegionalMuonShowerBxCollection>&, Blocks&);
 
       bool isKalman_{false};
+      bool packShowers_{false};
     };
   }  // namespace stage2
 }  // namespace l1t
