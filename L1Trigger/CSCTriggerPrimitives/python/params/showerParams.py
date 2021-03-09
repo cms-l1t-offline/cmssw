@@ -37,8 +37,10 @@ showerPSet = cms.PSet(
             # ME4/2
             26, 30, 30
         ),
-        showerMinTBin = cms.uint32(6),
-        showerMaxTBin = cms.uint32(8),
+        showerMinInTBin = cms.uint32(6),
+        showerMaxInTBin = cms.uint32(8),
+        showerMinOutTBin = cms.uint32(2),
+        showerMaxOutTBin = cms.uint32(5),
     ),
     ## settings for anode showers (counting CSCWireDigi)
     anodeShower = cms.PSet(

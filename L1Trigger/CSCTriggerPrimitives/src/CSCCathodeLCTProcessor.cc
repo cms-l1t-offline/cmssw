@@ -100,8 +100,10 @@ CSCCathodeLCTProcessor::CSCCathodeLCTProcessor(unsigned endcap,
 
   const auto& shower = showerParams_.getParameterSet("cathodeShower");
   thresholds_ = shower.getParameter<std::vector<unsigned>>("showerThresholds");
-  showerMinTBin_ = shower.getParameter<unsigned>("showerMinTBin");
-  showerMaxTBin_ = shower.getParameter<unsigned>("showerMaxTBin");
+  showerMinInTBin_ = shower.getParameter<unsigned>("showerMinInTBin");
+  showerMaxInTBin_ = shower.getParameter<unsigned>("showerMaxInTBin");
+  showerMinOutTBin_ = shower.getParameter<unsigned>("showerMinOutTBin");
+  showerMaxOutTBin_ = shower.getParameter<unsigned>("showerMaxOutTBin");
 
   thePreTriggerDigis.clear();
 
@@ -1463,8 +1465,8 @@ void CSCCathodeLCTProcessor::encodeHighMultiplicityBits(
   inTimeHMT_ = 0;
   outTimeHMT_ = 0;
 
-  auto inTime = [=](unsigned time) { return time >= showerMinTBin_ and time <= showerMaxTBin_; };
-  auto outTime = [=](unsigned time) { return time < showerMinTBin_ or time > showerMaxTBin_; };
+  auto inTime = [=](unsigned time) { return time >= showerMinInTBin_ and time <= showerMaxInTBin_; };
+  auto outTime = [=](unsigned time) { return time >= showerMinOutTBin_ and time <= showerMaxOutTBin_; };
 
   unsigned hitsInTime = 0;
   unsigned hitsOutTime = 0;
@@ -1474,14 +1476,6 @@ void CSCCathodeLCTProcessor::encodeHighMultiplicityBits(
       // count the half-strips in-time and out-time
       hitsInTime += std::count_if(times.begin(), times.end(), inTime);
       hitsOutTime += std::count_if(times.begin(), times.end(), outTime);
-      // if (halfstrip[i_layer][i_hstrip].size() > 0) {
-      //   std::cout << " i_layer " << i_layer << " i_hstrip " << i_hstrip << ": " << halfstrip[i_layer][i_hstrip].size() << std::endl;
-      //   std::cout << "\t";
-      //   for (auto p : halfstrip[i_layer][i_hstrip]) {
-      //     std::cout << " " << p;
-      //   }
-      //   std::cout << std::endl;
-      // }
     }
   }
 
@@ -1505,8 +1499,8 @@ void CSCCathodeLCTProcessor::encodeHighMultiplicityBits(
   // only print when a valid shower
   if (inTimeHMT_) {
     std::cout << "CSCCathodeLCTProcessor :: encodeHighMultiplicityBits " << theCSCName_ << std::endl;
-    std::cout << "HMT in " << theCSCName_ << ": " << hitsInTime << " " << inTimeHMT_ << " minT " << showerMinTBin_
-              << " maxT " << showerMaxTBin_ << std::endl;
+    std::cout << "HMT in " << theCSCName_ << ": " << hitsInTime << " " << inTimeHMT_ << " minInT " << showerMinInTBin_
+              << " maxInT " << showerMaxInTBin_ << std::endl;
     std::cout << "HitsOut in " << theCSCName_ << ": " << hitsOutTime << std::endl;
   }
 }
