@@ -1,5 +1,14 @@
-#ifndef L1TMuonEndCap_L1TMuonEndCapShowerProducer_h
-#define L1TMuonEndCap_L1TMuonEndCapShowerProducer_h
+#ifndef L1Trigger_L1TMuonEndCap_L1TMuonEndCapShowerProducer_h
+#define L1Trigger_L1TMuonEndCap_L1TMuonEndCapShowerProducer_h
+
+/*
+  This EDProducer produces EMTF showers from showers in the CSC local trigger.
+  These showers could indicate the passage of a long-lived particle decaying
+  in the endcap muon system.
+
+  The logic is executed in the SectorProcessorShower class. Multiple options
+  are defined: "OneNominal", "TwoLoose"
+ */
 
 // system include files
 #include <memory>

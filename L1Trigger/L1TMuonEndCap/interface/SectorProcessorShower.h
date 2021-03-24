@@ -1,5 +1,5 @@
-#ifndef L1TMuonEndCap_SectorProcessorShower_h
-#define L1TMuonEndCap_SectorProcessorShower_h
+#ifndef L1Trigger_L1TMuonEndCap_SectorProcessorShower_h
+#define L1Trigger_L1TMuonEndCap_SectorProcessorShower_h
 
 #include <deque>
 #include <map>
