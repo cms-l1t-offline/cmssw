@@ -65,7 +65,9 @@ showerPSet = cms.PSet(
             # ME4/2
             88, 89, 94
         ),
-        showerMinTBin = cms.uint32(8),
-        showerMaxTBin = cms.uint32(10),
+        showerMinInTBin = cms.uint32(8),
+        showerMaxInTBin = cms.uint32(10),
+        showerMinOutTBin = cms.uint32(4),
+        showerMaxOutTBin = cms.uint32(7),
     )
 )

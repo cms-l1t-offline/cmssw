@@ -84,8 +84,10 @@ CSCAnodeLCTProcessor::CSCAnodeLCTProcessor(unsigned endcap,
 
   const auto& shower = showerParams_.getParameterSet("anodeShower");
   thresholds_ = shower.getParameter<std::vector<unsigned>>("showerThresholds");
-  showerMinTBin_ = shower.getParameter<unsigned>("showerMinTBin");
-  showerMaxTBin_ = shower.getParameter<unsigned>("showerMaxTBin");
+  showerMinInTBin_ = shower.getParameter<unsigned>("showerMinInTBin");
+  showerMaxInTBin_ = shower.getParameter<unsigned>("showerMaxInTBin");
+  showerMinOutTBin_ = shower.getParameter<unsigned>("showerMinOutTBin");
+  showerMaxOutTBin_ = shower.getParameter<unsigned>("showerMaxOutTBin");
 }
 
 CSCAnodeLCTProcessor::CSCAnodeLCTProcessor() : CSCBaseboard() {
@@ -1396,13 +1398,11 @@ void CSCAnodeLCTProcessor::encodeHighMultiplicityBits(
   inTimeHMT_ = 0;
   outTimeHMT_ = 0;
 
-  auto inTime = [=](unsigned time) { return time >= showerMinTBin_ and time <= showerMaxTBin_; };
-  auto outTime = [=](unsigned time) { return time < showerMinTBin_ or time > showerMaxTBin_; };
+  auto inTime = [=](unsigned time) { return time >= showerMinInTBin_ and time <= showerMaxInTBin_; };
+  auto outTime = [=](unsigned time) { return time >= showerMinOutTBin_ and time <= showerMaxOutTBin_; };
 
   unsigned hitsInTime = 0;
   unsigned hitsOutTime = 0;
-
-  unsigned hits = 0;
   for (int i_layer = 0; i_layer < CSCConstants::NUM_LAYERS; i_layer++) {
     for (int i_hstrip = 0; i_hstrip < CSCConstants::NUM_HALF_STRIPS_7CFEBS; i_hstrip++) {
       auto times = wires[i_layer][i_hstrip];

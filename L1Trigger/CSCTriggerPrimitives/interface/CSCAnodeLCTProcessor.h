@@ -128,8 +128,10 @@ protected:
   unsigned inTimeHMT_;
   unsigned outTimeHMT_;
   std::vector<unsigned> thresholds_;
-  unsigned showerMinTBin_;
-  unsigned showerMaxTBin_;
+  unsigned showerMinInTBin_;
+  unsigned showerMaxInTBin_;
+  unsigned showerMinOutTBin_;
+  unsigned showerMaxOutTBin_;
 
   /** Configuration parameters. */
   unsigned int fifo_tbins, fifo_pretrig, drift_delay;
