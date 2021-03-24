@@ -1335,6 +1335,12 @@ CSCALCTDigi CSCAnodeLCTProcessor::getBestALCT(int bx) const { return bestALCT[bx
 
 CSCALCTDigi CSCAnodeLCTProcessor::getSecondALCT(int bx) const { return secondALCT[bx]; }
 
+/** Returns shower bits */
+CSCShowerDigi CSCAnodeLCTProcessor::readoutShower() const
+{
+  return shower_;
+}
+
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////Test Routines///////////////////////////////
 
@@ -1428,4 +1434,7 @@ void CSCAnodeLCTProcessor::encodeHighMultiplicityBits(
       outTimeHMT_ = i + 1;
     }
   }
+
+  // create a new object
+  shower_ = CSCShowerDigi(inTimeHMT_, outTimeHMT_, theTrigChamber);
 }

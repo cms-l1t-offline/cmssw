@@ -37,6 +37,7 @@
 #include "DataFormats/CSCDigi/interface/CSCWireDigiCollection.h"
 #include "DataFormats/CSCDigi/interface/CSCALCTDigi.h"
 #include "DataFormats/CSCDigi/interface/CSCALCTPreTriggerDigi.h"
+#include "DataFormats/CSCDigi/interface/CSCShowerDigi.h"
 #include "CondFormats/CSCObjects/interface/CSCDBL1TPParameters.h"
 #include "L1Trigger/CSCTriggerPrimitives/interface/CSCBaseboard.h"
 #include "L1Trigger/CSCTriggerPrimitives/interface/LCTQualityControl.h"
@@ -92,6 +93,9 @@ public:
   unsigned getInTimeHMT() const { return inTimeHMT_; }
   unsigned getOutTimeHMT() const { return outTimeHMT_; }
 
+  /** Returns shower bits */
+  CSCShowerDigi readoutShower() const;
+
 protected:
   /** Best LCTs in this chamber, as found by the processor.
       In old ALCT algorithms, up to two best ALCT per Level-1 accept window
@@ -105,6 +109,8 @@ protected:
 
   /** LCTs in this chamber, as found by the processor. */
   std::vector<std::vector<CSCALCTDigi> > ALCTContainer_;
+
+  CSCShowerDigi shower_;
 
   /** Access routines to wire digis. */
   bool getDigis(const CSCWireDigiCollection* wiredc);
