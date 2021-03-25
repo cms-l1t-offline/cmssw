@@ -17,8 +17,6 @@
 #include "DataFormats/L1TMuon/interface/RegionalMuonShower.h"
 #include "DataFormats/L1Trigger/interface/MuonShower.h"
 
-using namespace l1t;
-
 class L1TMuonShowerProducer : public edm::stream::EDProducer<> {
 public:
   explicit L1TMuonShowerProducer(const edm::ParameterSet&);
@@ -30,22 +28,15 @@ private:
   void produce(edm::Event&, const edm::EventSetup&) override;
 
   // ----------member data ---------------------------
-  int m_bxMin;
-  int m_bxMax;
-  bool m_autoCancelMode;
-  edm::InputTag m_showerInputTag;
-  unsigned m_minShowers;
-  edm::EDGetTokenT<l1t::RegionalMuonShowerBxCollection> m_showerInputToken;
+  edm::InputTag showerInputTag_;
+  edm::EDGetTokenT<l1t::RegionalMuonShowerBxCollection> showerInputToken_;
 };
 
 L1TMuonShowerProducer::L1TMuonShowerProducer(const edm::ParameterSet& iConfig) {
-  m_showerInputTag = iConfig.getParameter<edm::InputTag>("showerInput");
-  m_bxMin = iConfig.getParameter<int>("bxMin");
-  m_bxMax = iConfig.getParameter<int>("bxMax");
-  m_showerInputToken = consumes<l1t::RegionalMuonShowerBxCollection>(m_showerInputTag);
-  m_minShowers = iConfig.getParameter<unsigned>("minShowers");
+  showerInputTag_ = iConfig.getParameter<edm::InputTag>("showerInput");
+  showerInputToken_ = consumes<l1t::RegionalMuonShowerBxCollection>(showerInputTag_);
 
-  produces<MuonShowerBxCollection>();
+  produces<l1t::MuonShowerBxCollection>();
 }
 
 L1TMuonShowerProducer::~L1TMuonShowerProducer() {}
@@ -53,32 +44,39 @@ L1TMuonShowerProducer::~L1TMuonShowerProducer() {}
 // ------------ method called to produce the data  ------------
 void L1TMuonShowerProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   using namespace edm;
-  std::unique_ptr<MuonShowerBxCollection> outShowers(new MuonShowerBxCollection());
+  std::unique_ptr<l1t::MuonShowerBxCollection> outShowers(new l1t::MuonShowerBxCollection());
 
-  Handle<l1t::RegionalMuonShowerBxCollection> emtfShowers;
-  iEvent.getByToken(m_showerInputToken, emtfShowers);
+  edm::Handle<l1t::RegionalMuonShowerBxCollection> emtfShowers;
+  iEvent.getByToken(showerInputToken_, emtfShowers);
 
-  outShowers->setBXRange(m_bxMin, m_bxMax);
+  // showers always arrive in-time
+  outShowers->setBXRange(0, 0);
 
-  unsigned sumShowers = 0;
+  bool hasTwoLooseInTime(false);
+  bool hasOneNominalInTime(false);
+  bool hasTwoLooseOutTime(false);
+  bool hasOneNominalOutTime(false);
+
+  // current GMT shower logic: "OR" all 12 sectors together for the in-time and out-of-time bits
   for (size_t i = 0; i < emtfShowers->size(0); ++i) {
     auto shower = emtfShowers->at(0, i);
-    std::cout << "L1TMuonShowerProducer :: Found RegionalMuonShower from endcap " << shower.endcap() << " sector "
-              << shower.sector() << " isTwoLoose " << shower.isTwoLooseInTime() << " isOneNominal " << shower.isOneNominalInTime()
-              << std::endl;
-    if (shower.isValid()) {
-      sumShowers++;
-    }
+    hasTwoLooseInTime |= shower.isTwoLooseInTime();
+    hasTwoLooseOutTime |= shower.isTwoLooseOutTime();
+    hasOneNominalInTime |= shower.isOneNominalInTime();
+    hasOneNominalOutTime |= shower.isOneNominalOutTime();
   }
 
-  // shower logic: at least one nominal shower, or a pair of loose showers
-  const bool accept(sumShowers >= m_minShowers);
+  l1t::MuonShower outShower;
+  if (hasOneNominalInTime)
+    outShower.setBitsInTime(l1t::MuonShower::kOneNominal);
+  if (hasTwoLooseInTime)
+    outShower.setBitsInTime(l1t::MuonShower::kTwoLoose);
+  if (hasOneNominalOutTime)
+    outShower.setBitsOutTime(l1t::MuonShower::kOneNominal);
+  if (hasTwoLooseOutTime)
+    outShower.setBitsOutTime(l1t::MuonShower::kTwoLoose);
+  outShowers->push_back(0, outShower);
 
-  if (accept) {
-    std::cout << "L1TMuonShowerProducer :: new MuonShower --> bits " << sumShowers << std::endl;
-    MuonShower outShower(sumShowers);
-    outShowers->push_back(0, outShower);
-  }
   iEvent.put(std::move(outShowers));
 }
 

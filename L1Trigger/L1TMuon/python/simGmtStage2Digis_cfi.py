@@ -23,9 +23,6 @@ simGmtStage2Digis = cms.EDProducer('L1TMuonProducer',
 # Muon shower trigger
 simGmtShowerDigis = cms.EDProducer('L1TMuonShowerProducer',
     showerInput = cms.InputTag("simEmtfShowers","EMTF"),
-    bxMin = cms.int32(0),
-    bxMax = cms.int32(0),
-    minShowers = cms.uint32(1)
 )
 
 from CondCore.CondDB.CondDB_cfi import CondDB

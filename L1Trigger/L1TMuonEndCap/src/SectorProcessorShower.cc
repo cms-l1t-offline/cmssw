@@ -51,16 +51,22 @@ void SectorProcessorShower::process(const CSCShowerDigiCollection& in_showers,
   }
 
   // Shower recognition logic: at least one nominal shower (see DN-20-033, section 5.2)
-  const unsigned nLoose(std::count_if(
+  const unsigned nLooseInTime(std::count_if(
       selected_showers.begin(), selected_showers.end(), [](CSCShowerDigi p) { return p.isLooseInTime(); }));
-  const unsigned nNominal(std::count_if(
+  const unsigned nNominalInTime(std::count_if(
       selected_showers.begin(), selected_showers.end(), [](CSCShowerDigi p) { return p.isNominalInTime(); }));
+  const unsigned nLooseOutTime(std::count_if(
+      selected_showers.begin(), selected_showers.end(), [](CSCShowerDigi p) { return p.isLooseOutTime(); }));
+  const unsigned nNominalOutTime(std::count_if(
+      selected_showers.begin(), selected_showers.end(), [](CSCShowerDigi p) { return p.isNominalOutTime(); }));
 
-  const bool hasTwoLoose(nLoose >= 2);
-  const bool hasNominal(nNominal >= 1);
+  const bool hasTwoLooseInTime(nLooseInTime >= 2);
+  const bool hasOneNominalInTime(nNominalInTime >= 1);
+  const bool hasTwoLooseOutTime(nLooseOutTime >= 2);
+  const bool hasOneNominalOutTime(nNominalOutTime >= 1);
 
-  const bool acceptLoose(enableTwoLoose_ and hasTwoLoose);
-  const bool acceptNominal(enableOneNominal_ and hasNominal);
+  const bool acceptLoose(enableTwoLoose_ and (hasTwoLooseInTime or hasTwoLooseOutTime));
+  const bool acceptNominal(enableOneNominal_ and (hasOneNominalInTime or hasOneNominalOutTime));
   // trigger condition
   const bool accept(acceptLoose or acceptNominal);
 
@@ -69,16 +75,14 @@ void SectorProcessorShower::process(const CSCShowerDigiCollection& in_showers,
     l1t::RegionalMuonShower out_shower;
     out_shower.setEndcap(endcap_);
     out_shower.setSector(sector_);
-    std::cout << "SectorProcessorShower :: new RegionalMuonShower: endcap " << endcap_ << " sector " << sector_
-              << std::endl;
-    if (acceptLoose) {
+    if (hasOneNominalInTime)
       out_shower.setBitsInTime(l1t::RegionalMuonShower::kOneNominal);
-      std::cout << "SectorProcessorShower :: two loose showers" << std::endl;
-    }
-    if (acceptNominal) {
+    if (hasTwoLooseInTime)
       out_shower.setBitsInTime(l1t::RegionalMuonShower::kTwoLoose);
-      std::cout << "SectorProcessorShower :: one nominal shower" << std::endl;
-    }
+    if (hasOneNominalOutTime)
+      out_shower.setBitsOutTime(l1t::RegionalMuonShower::kOneNominal);
+    if (hasTwoLooseOutTime)
+      out_shower.setBitsOutTime(l1t::RegionalMuonShower::kTwoLoose);
     out_showers.push_back(0, out_shower);
   }
 }

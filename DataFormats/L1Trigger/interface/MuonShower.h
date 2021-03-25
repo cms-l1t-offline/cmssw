@@ -34,7 +34,7 @@ namespace l1t {
     uint16_t getDataWord(const uint16_t word, const unsigned shift, const unsigned mask) const;
 
     // set values
-    void setBits(unsigned bits) { bits_ = bits; };
+    void setBits(const unsigned bits) { bits_ = bits; };
     void setBitsInTime(const uint16_t bits);
     void setBitsOutTime(const uint16_t bits);
 
