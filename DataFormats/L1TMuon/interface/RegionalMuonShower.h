@@ -17,8 +17,9 @@ namespace l1t {
   public:
     // Run-3 definitions as provided in DN-20-033
     // One nominal shower considered higher quality than two loose showers
-    enum TypeMasks { kTwoLooseMask = 0x1, kOneNominalMask = 0x1 };
-    enum TypeShifts { kTwoLooseShift = 0, kOneNominalShift = 1 };
+    enum Run3Shower { kInvalid = 0, kTwoLoose = 1, kOneNominal = 2};
+    enum BitMask { kInTimeMask = 0x2, kOutTimeMask = 0x2 };
+    enum BitShift { kInTimeShift = 0, kOutTimeShift = 2 };
 
     RegionalMuonShower();
 
@@ -26,8 +27,6 @@ namespace l1t {
 
     inline void setDebug(bool debug) { debug_ = debug; };
     inline bool debug() const { return debug_; };
-    /// Get link on which the MicroGMT receives the candidate
-    const int link() const { return m_link; };
 
     bool operator==(const l1t::RegionalMuonShower& rhs) const;
     inline bool operator!=(const l1t::RegionalMuonShower& rhs) const { return !(operator==(rhs)); };
@@ -35,26 +34,35 @@ namespace l1t {
     void setDataWord(const uint16_t newWord, uint16_t& word, const unsigned shift, const unsigned mask);
     uint16_t getDataWord(const uint16_t word, const unsigned shift, const unsigned mask) const;
 
-    unsigned int bits() const { return bits_; }
+    uint16_t bits() const { return bits_; }
+    uint16_t bitsInTime() const;
+    uint16_t bitsOutTime() const;
+
     bool isValid() const { return bits_ > 0; }
-    bool isTwoLoose() const;
-    bool isOneNominal() const;
+    bool isTwoLooseInTime() const;
+    bool isOneNominalInTime() const;
+    bool isTwoLooseOutTime() const;
+    bool isOneNominalOutTime() const;
+
     int endcap() const { return endcap_; }
     int sector() const { return sector_; }
+    /// Get link on which the MicroGMT receives the candidate
+    int link() const { return link_; }
 
-    void set_bits(const unsigned bits) { bits_ = bits; }
-    void set_endcap(const int endcap) { endcap_ = endcap; }
-    void set_sector(const unsigned sector) { sector_ = sector; }
-    void set_oneNominal(const bool bit);
-    void set_twoLoose(const bool bit);
-    void setLink(int link) { m_link = link; };
+    void setBits(const uint16_t bits) { bits_ = bits; }
+    void setBitsInTime(const uint16_t bits);
+    void setBitsOutTime(const uint16_t bits);
+
+    void setEndcap(const int endcap) { endcap_ = endcap; }
+    void setSector(const unsigned sector) { sector_ = sector; }
+    void setLink(const int link) { link_ = link; };
 
   private:
     bool debug_;
     uint16_t bits_;
     int endcap_;       //    +/-1.  For ME+ and ME-.
     unsigned sector_;  //  1 -  6.
-    int m_link;
+    int link_;
   };
 
 }  // namespace l1t

@@ -1,5 +1,5 @@
-#ifndef CSCDigi_CSCShowerDigi_h
-#define CSCDigi_CSCShowerDigi_h
+#ifndef DataFormats_CSCDigi_CSCShowerDigi_h
+#define DataFormats_CSCDigi_CSCShowerDigi_h
 
 #include <cstdint>
 #include <iosfwd>

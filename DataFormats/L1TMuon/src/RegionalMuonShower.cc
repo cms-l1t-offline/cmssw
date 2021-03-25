@@ -9,15 +9,28 @@ bool l1t::RegionalMuonShower::operator==(const l1t::RegionalMuonShower& rhs) con
   ;
 }
 
-bool l1t::RegionalMuonShower::isTwoLoose() const { return getDataWord(bits_, kTwoLooseShift, kTwoLooseMask); }
+uint16_t l1t::RegionalMuonShower::bitsInTime() const { return getDataWord(bits_, kInTimeShift, kInTimeMask); }
 
-bool l1t::RegionalMuonShower::isOneNominal() const { return getDataWord(bits_, kOneNominalShift, kOneNominalMask); }
+uint16_t l1t::RegionalMuonShower::bitsOutTime() const { return getDataWord(bits_, kOutTimeShift, kOutTimeMask); }
 
-void l1t::RegionalMuonShower::set_oneNominal(const bool bit) {
-  setDataWord(bit, bits_, kOneNominalShift, kOneNominalMask);
+bool l1t::RegionalMuonShower::isTwoLooseInTime() const { return bitsInTime() == kTwoLoose; }
+
+bool l1t::RegionalMuonShower::isOneNominalInTime() const { return bitsInTime() == kOneNominal; }
+
+bool l1t::RegionalMuonShower::isTwoLooseOutTime() const { return bitsOutTime() == kTwoLoose; }
+
+bool l1t::RegionalMuonShower::isOneNominalOutTime() const { return bitsOutTime() == kOneNominal; }
+
+void l1t::RegionalMuonShower::setBitsInTime(const uint16_t bits)
+{
+  setDataWord(bits, bits_, kInTimeShift, kInTimeMask);
+
 }
 
-void l1t::RegionalMuonShower::set_twoLoose(const bool bit) { setDataWord(bit, bits_, kTwoLooseShift, kTwoLooseMask); }
+void l1t::RegionalMuonShower::setBitsOutTime(const uint16_t bits)
+{
+  setDataWord(bits, bits_, kOutTimeShift, kOutTimeMask);
+}
 
 void l1t::RegionalMuonShower::setDataWord(const uint16_t newWord,
                                           uint16_t& word,

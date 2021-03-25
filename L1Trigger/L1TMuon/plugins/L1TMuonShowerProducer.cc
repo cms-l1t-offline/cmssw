@@ -64,7 +64,7 @@ void L1TMuonShowerProducer::produce(edm::Event& iEvent, const edm::EventSetup& i
   for (size_t i = 0; i < emtfShowers->size(0); ++i) {
     auto shower = emtfShowers->at(0, i);
     std::cout << "L1TMuonShowerProducer :: Found RegionalMuonShower from endcap " << shower.endcap() << " sector "
-              << shower.sector() << " isTwoLoose " << shower.isTwoLoose() << " isOneNominal " << shower.isOneNominal()
+              << shower.sector() << " isTwoLoose " << shower.isTwoLooseInTime() << " isOneNominal " << shower.isOneNominalInTime()
               << std::endl;
     if (shower.isValid()) {
       sumShowers++;

@@ -67,16 +67,16 @@ void SectorProcessorShower::process(const CSCShowerDigiCollection& in_showers,
   if (accept) {
     // shower output
     l1t::RegionalMuonShower out_shower;
-    out_shower.set_endcap(endcap_);
-    out_shower.set_sector(sector_);
+    out_shower.setEndcap(endcap_);
+    out_shower.setSector(sector_);
     std::cout << "SectorProcessorShower :: new RegionalMuonShower: endcap " << endcap_ << " sector " << sector_
               << std::endl;
     if (acceptLoose) {
-      out_shower.set_twoLoose(true);
+      out_shower.setBitsInTime(l1t::RegionalMuonShower::kOneNominal);
       std::cout << "SectorProcessorShower :: two loose showers" << std::endl;
     }
     if (acceptNominal) {
-      out_shower.set_oneNominal(true);
+      out_shower.setBitsInTime(l1t::RegionalMuonShower::kTwoLoose);
       std::cout << "SectorProcessorShower :: one nominal shower" << std::endl;
     }
     out_showers.push_back(0, out_shower);
