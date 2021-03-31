@@ -9,7 +9,7 @@
 namespace dpf2fw {
 
   // convert inputs from discrete to firmware
-  void convert(const l1tpf_impl::PropagatedTrack &in, TkObj &out) {
+  inline void convert(const l1tpf_impl::PropagatedTrack &in, TkObj &out) {
     out.hwPt = in.hwPt;
     out.hwPtErr = in.hwCaloPtErr;
     out.hwEta = in.hwEta;  // @calo
@@ -18,30 +18,77 @@ namespace dpf2fw {
     out.hwTightQuality = (in.hwStubs >= 6 && in.hwChi2 < 500);
   }
 
-  TkObj transformConvert(const l1tpf_impl::PropagatedTrack &in) {
+  inline TkObj transformConvert(const l1tpf_impl::PropagatedTrack &in) {
     TkObj out;
     convert(in, out);
     return out;
   }
 
-  void convert(const l1tpf_impl::CaloCluster &in, HadCaloObj &out) {
+  inline void convert(const l1tpf_impl::CaloCluster &in, HadCaloObj &out) {
     out.hwPt = in.hwPt;
     out.hwEmPt = in.hwEmPt;
     out.hwEta = in.hwEta;
     out.hwPhi = in.hwPhi;
     out.hwIsEM = in.isEM;
   }
-  void convert(const l1tpf_impl::CaloCluster &in, EmCaloObj &out) {
+  inline void convert(const l1tpf_impl::CaloCluster &in, EmCaloObj &out) {
     out.hwPt = in.hwPt;
     out.hwPtErr = in.hwPtErr;
     out.hwEta = in.hwEta;
     out.hwPhi = in.hwPhi;
   }
-  void convert(const l1tpf_impl::Muon &in, MuObj &out) {
+  inline void convert(const l1tpf_impl::Muon &in, MuObj &out) {
     out.hwPt = in.hwPt;
     out.hwPtErr = 0;       // does not exist in input
     out.hwEta = in.hwEta;  // @calo
     out.hwPhi = in.hwPhi;  // @calo
+  }
+
+  inline void convert(const l1tpf_impl::PFParticle &src, PFChargedObj &pf) {
+    pf.hwPt = src.hwPt;
+    pf.hwEta = src.hwEta;
+    pf.hwPhi = src.hwPhi;
+    switch (src.hwId) {
+      case 0:
+        pf.hwId = PID_Charged;
+        break;
+      case 1:
+        pf.hwId = PID_Electron;
+        break;
+      case 2:
+        pf.hwId = PID_Neutral;
+        break;
+      case 3:
+        pf.hwId = PID_Photon;
+        break;
+      case 4:
+        pf.hwId = PID_Muon;
+        break;
+    }
+    pf.hwZ0 = src.track.hwZ0;
+  }
+  inline void convert(const l1tpf_impl::PFParticle &src, PFNeutralObj &pf, bool isPuppi = false) {
+    pf.hwPt = src.hwPt;
+    pf.hwEta = src.hwEta;
+    pf.hwPhi = src.hwPhi;
+    switch (src.hwId) {
+      case 0:
+        pf.hwId = PID_Charged;
+        break;
+      case 1:
+        pf.hwId = PID_Electron;
+        break;
+      case 2:
+        pf.hwId = PID_Neutral;
+        break;
+      case 3:
+        pf.hwId = PID_Photon;
+        break;
+      case 4:
+        pf.hwId = PID_Muon;
+        break;
+    }
+    pf.hwPtPuppi = isPuppi ? pt_t(src.hwPt) : pt_t(0);
   }
 
   template <unsigned int NMAX, typename In, typename Out>

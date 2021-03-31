@@ -20,8 +20,8 @@ namespace l1tpf_impl {
     virtual void runChargedPV(Region &r, float z0) const;
 
     virtual const std::vector<std::string> &puGlobalNames() const;
-    virtual void doPUGlobals(const std::vector<Region> &rs, float npu, std::vector<float> &globals) const = 0;
-    virtual void runNeutralsPU(Region &r, float npu, const std::vector<float> &globals) const = 0;
+    virtual void doPUGlobals(const std::vector<Region> &rs, float z0, float npu, std::vector<float> &globals) const = 0;
+    virtual void runNeutralsPU(Region &r, float z0, float npu, const std::vector<float> &globals) const = 0;
 
   protected:
     int debug_;

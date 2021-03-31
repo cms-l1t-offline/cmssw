@@ -8,6 +8,7 @@
 <class name="L1Analysis::L1AnalysisRCTDataFormat"/>
 <class name="L1Analysis::L1AnalysisCaloTPDataFormat"/>
 <class name="L1Analysis::L1AnalysisGeneratorDataFormat"/>
+<class name="L1Analysis::L1AnalysisCustomGeneratorDataFormat"/>
 <class name="L1Analysis::L1AnalysisSimulationDataFormat"/>
 <class name="L1Analysis::L1AnalysisL1ExtraDataFormat"/>
 <class name="L1Analysis::L1AnalysisRecoMuonDataFormat"/>
@@ -29,4 +30,10 @@
 <class name="L1Analysis::L1AnalysisRecoTauDataFormat"/>
 <class name="L1Analysis::L1AnalysisRecoMuon2DataFormat"/>
 <class name="L1Analysis::L1AnalysisRecoElectronDataFormat"/>
+
+<class name="L1Analysis::L1AnalysisPhaseIIDataFormat"/>
+<class name="L1Analysis::L1AnalysisPhaseIIStep1DataFormat"/>
+
+//<class name="L1Analysis::L1AnalysisPhaseIPFJetDataFormat"/>
+
 </lcgdict>

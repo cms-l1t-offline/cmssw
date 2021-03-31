@@ -31,12 +31,21 @@ namespace L1Analysis {
       partPhi.resize(0);
       partE.resize(0);
       partCh.resize(0);
+      partP.resize(0);
+      partDxy.resize(0);
+      partLxy.resize(0);
+      partVx.resize(0);
+      partVy.resize(0);
+      partVz.resize(0);
 
       nJet = 0;
       jetPt.resize(0);
       jetEta.resize(0);
       jetPhi.resize(0);
       jetM.resize(0);
+
+      genMetTrue = 0;
+      genMetCalo = 0;
     }
 
     // ---- L1AnalysisGeneratorDataFormat information.
@@ -55,12 +64,21 @@ namespace L1Analysis {
     std::vector<float> partPhi;
     std::vector<float> partE;
     std::vector<int> partCh;
+    std::vector<float> partP;
+    std::vector<float> partDxy;
+    std::vector<float> partLxy;
+    std::vector<float> partVx;
+    std::vector<float> partVy;
+    std::vector<float> partVz;
 
     int nJet;
     std::vector<float> jetPt;
     std::vector<float> jetEta;
     std::vector<float> jetPhi;
     std::vector<float> jetM;
+
+    float genMetTrue;
+    float genMetCalo;
   };
 }  // namespace L1Analysis
 #endif

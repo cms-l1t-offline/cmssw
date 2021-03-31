@@ -407,16 +407,35 @@ void TTTrack<T>::setTrackWordBits() {
     return;
   }
 
-  unsigned int sparebits = 0;
+  unsigned int valid = true;
+  unsigned int mvaQuality = 0;
+  unsigned int mvaOther = 0;
 
   // missing conversion of global phi to difference from sector center phi
 
   if (theChi2_Z_ < 0) {
-    setTrackWord(theMomentum_, thePOCA_, theRInv_, theChi2_, 0, theStubPtConsistency_, theHitPattern_, sparebits);
+    setTrackWord(valid,
+                 theMomentum_,
+                 thePOCA_,
+                 theRInv_,
+                 theChi2_,
+                 0,
+                 theStubPtConsistency_,
+                 theHitPattern_,
+                 mvaQuality,
+                 mvaOther);
 
   } else {
-    setTrackWord(
-        theMomentum_, thePOCA_, theRInv_, theChi2_XY_, theChi2_Z_, theStubPtConsistency_, theHitPattern_, sparebits);
+    setTrackWord(valid,
+                 theMomentum_,
+                 thePOCA_,
+                 theRInv_,
+                 theChi2_XY_,
+                 theChi2_Z_,
+                 theStubPtConsistency_,
+                 theHitPattern_,
+                 mvaQuality,
+                 mvaOther);
   }
   return;
 }
@@ -435,7 +454,7 @@ void TTTrack<T>::testTrackWordBits() {
   //std::cout << " eta " << rEta << " " << get_ieta() << std::endl;
   //std::cout << " Z0 " << rZ0 << " " << get_iz0() << std::endl;
   //std::cout << " D0 " << rD0 << " " << get_id0() << std::endl;
-  //std::cout << " Rinv " << theRInv_ << " " << get_iRinv() << std::endl;
+  //std::cout << " Rinv " << tehRInv_ << " " << get_iRinv() << std::endl;
   //std::cout << " chi2 " << theChi2_ << " " << get_ichi2() << std::endl;
 
   return;

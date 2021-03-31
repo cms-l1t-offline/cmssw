@@ -53,6 +53,9 @@ pL1TkPhotonsHGC = cms.Path( L1TkPhotonsHGC )
 from L1Trigger.L1TTrackMatch.L1TkPrimaryVertexProducer_cfi import L1TkPrimaryVertex
 pL1TkPrimaryVertex = cms.Path( L1TkPrimaryVertex )
 
+from L1Trigger.VertexFinder.VertexProducer_cff import VertexProducer
+pVertexProducer = cms.Path( VertexProducer )
+
 # from L1Trigger.L1TTrackMatch.L1TrackerEtMissProducer_cfi import L1TrackerEtMiss
 # pL1TrkMET = cms.Path( L1TrackerEtMiss )
 
@@ -66,13 +69,13 @@ pL1TkMuon = cms.Path( L1TkMuons * L1TkMuonsTP )
 # from L1Trigger.L1TTrackMatch.L1TkGlbMuonProducer_cfi import L1TkGlbMuons
 # pL1TkGlbMuon = cms.Path( L1TkGlbMuons )
 
-# from L1Trigger.L1TTrackMatch.L1TkTauFromCaloProducer_cfi import L1TkTauFromCalo
-# pL1TkTauFromCalo = cms.Path( L1TkTauFromCalo )
+# from L1Trigger.L1TTrackMatch.L1TrkTauFromCaloProducer_cfi import L1TrkTauFromCalo
+# pL1TrkTauFromCalo = cms.Path( L1TrkTauFromCalo )
 
-# from L1Trigger.Phase2L1Taus.L1TrkTauParticleProducer_cfi import L1TrkTaus
+# from L1Trigger.Phase2L1Taus.TkTauProducer_cfi import L1TrkTaus
 # L1TrackerTaus = L1TrkTaus.clone()
 
-# from L1Trigger.Phase2L1Taus.L1TkEGTauParticleProducer_cfi import L1TkEGTaus
+# from L1Trigger.Phase2L1Taus.TkEGTauProducer_cfi import L1TkEGTaus
 
-# from L1Trigger.Phase2L1Taus.L1CaloTkTauParticleProducer_cfi import L1CaloTkTaus
+# from L1Trigger.Phase2L1Taus.L1CaloTkTauProducer_cfi import L1CaloTkTaus
 # L1TkCaloTaus = L1CaloTkTaus.clone()
