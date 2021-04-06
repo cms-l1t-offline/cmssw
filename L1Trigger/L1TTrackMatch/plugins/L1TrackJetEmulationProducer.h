@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <string>
 #include <cstdlib>
-#include "DataFormats/L1TrackTrigger/interface/TkJetsDataTypes.h"
+#include "DataFormats/L1Trigger/interface/TkJetsDataTypes.h"
 
 using namespace std;
 

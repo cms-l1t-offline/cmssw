@@ -18,8 +18,8 @@
 #include "DataFormats/L1TrackTrigger/interface/TTTypes.h"
 #include "DataFormats/L1TrackTrigger/interface/TTTrack.h"
 #include "DataFormats/L1TrackTrigger/interface/TTTrack_TrackWord.h"
-#include "DataFormats/L1TrackTrigger/interface/TkJetWord.h"
-#include "DataFormats/L1TrackTrigger/interface/TkJetsDataTypes.h"
+#include "DataFormats/L1Trigger/interface/TkJetWord.h"
+#include "DataFormats/L1Trigger/interface/TkJetsDataTypes.h"
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/stream/EDProducer.h"
@@ -52,7 +52,7 @@ using namespace edm;
 class L1TrackJetEmulationProducer : public stream::EDProducer<> {
 public:
   explicit L1TrackJetEmulationProducer(const ParameterSet &);
-  ~L1TrackJetEmulationProducer();
+  ~L1TrackJetEmulationProducer() override;
   typedef TTTrack<Ref_Phase2TrackerDigi_> L1TTTrackType;
   typedef vector<L1TTTrackType> L1TTTrackCollectionType;
 
@@ -62,9 +62,9 @@ public:
   virtual EtaPhiBin *L1_cluster(EtaPhiBin *phislice);
 
 private:
-  virtual void beginStream(StreamID) override;
-  virtual void produce(Event &, const EventSetup &) override;
-  virtual void endStream() override;
+  void beginStream(StreamID) override;
+  void produce(Event &, const EventSetup &) override;
+  void endStream() override;
 
   // ----------member data ---------------------------
 

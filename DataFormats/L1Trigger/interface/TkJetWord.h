@@ -21,8 +21,8 @@ namespace l1t { //l1t
     }
 
     int intPt() const { return Scales::intPt(hwPt); }
-    int intEta() const { return hwEta.to_int(); }
-    int intPhi() const { return hwPhi.to_int(); }
+    int intNTracks() const { return Scales::intNt(hwNt); }
+    int intNXTracks() const { return Scales::intXt(hwXt); }
     float floatPt() const { return Scales::floatPt(hwPt); }
     float floatEta() const { return Scales::floatEta(hwEta); }
     float floatPhi() const { return Scales::floatPhi(hwPhi); }
