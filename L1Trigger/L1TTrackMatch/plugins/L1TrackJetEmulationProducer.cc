@@ -239,12 +239,18 @@ void L1TrackJetEmulationProducer::produce(Event &iEvent, const EventSetup &iSetu
         L1L1TrackJetProducer->push_back(trkJet);
       }
     }
+    else if (mzb.clusters == nullptr) {
+      edm::LogWarning("L1TrackJetEmulationProducer") << "mzb.clusters Not Assigned!\n";
+    }
     //free(mzb.clusters);
     if (displaced_)
       iEvent.put(std::move(L1L1TrackJetProducer), "L1TrackJetsExtended");
     else
       iEvent.put(std::move(L1L1TrackJetProducer), "L1TrackJets");
     delete[] mzb.clusters;
+  }
+  else if (L1TrkPtrs_.empty()) {
+      edm::LogWarning("L1TrackJetEmulationProducer") << "L1TrkPtrs Not Assigned!\n";
   }
 }
 
@@ -293,27 +299,29 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
     }  //for each phibin
 
     for (unsigned int k = 0; k < L1TrkPtrs_.size(); ++k) {
-      ap_ufixed<14, 9, AP_RND_CONV, AP_SAT> inputTrkPt = L1TrkPtrs_[k]->getTrackWord()(
+      ap_ufixed<14, 9, AP_RND_CONV, AP_SAT> inputTrkPt = 0;
+      inputTrkPt.V = L1TrkPtrs_[k]->getTrackWord()(
           TTTrack_TrackWord::TrackBitLocations::kRinvMSB - 1, TTTrack_TrackWord::TrackBitLocations::kRinvLSB);
-      int pt_conv = 32;
+      int pt_conv = 1;
       l1t::pt_t trkpt = pt_conv * inputTrkPt;
 
-      ap_fixed<16, 8, AP_RND_CONV, AP_SAT> trketainput = L1TrkPtrs_[k]->getTrackWord()(
+      ap_fixed<16, 3, AP_RND_CONV, AP_SAT> trketainput = 0;
+      trketainput.V = L1TrkPtrs_[k]->getTrackWord()(
           TTTrack_TrackWord::TrackBitLocations::kTanlMSB, TTTrack_TrackWord::TrackBitLocations::kTanlLSB);
-      ap_ufixed<64, 6> eta_conv = 59.5739051347;
+      ap_ufixed<32, 8> eta_conv = 720.0/M_PI;
       l1t::glbeta_t trketa = eta_conv * trketainput;
 
       int Sector = L1TrkPtrs_[k]->phiSector();
-      l1t::glbphi_t trkphiSector = l1t::Scales::makeGlbPhi(-M_PI) + Sector * l1t::Scales::makeGlbPhi(M_PI / 27.0);
-      TTTrack_TrackWord::phi_t trkphiinput = L1TrkPtrs_[k]->getTrackWord()(
+      l1t::glbphi_t trkphiSector = l1t::Scales::makeGlbPhi(-M_PI+M_PI/27.0) + Sector * l1t::Scales::makeGlbPhi(2.0*M_PI / 27.0);
+      ap_uint<12> trkphiinput = L1TrkPtrs_[k]->getTrackWord()(
           TTTrack_TrackWord::TrackBitLocations::kPhiMSB, TTTrack_TrackWord::TrackBitLocations::kPhiLSB);
-      ap_ufixed<64, 11> phi_conv = 1760.12634664;
+      ap_ufixed<32, 1> phi_conv = TTTrack_TrackWord::stepPhi0 / (M_PI/720.0);
       l1t::glbphi_t trkphilocal = phi_conv * trkphiinput;
       l1t::glbphi_t trkphi = trkphiSector + trkphilocal;
 
-      TTTrack_TrackWord::z0_t inputTrkZ0 = L1TrkPtrs_[k]->getTrackWord()(TTTrack_TrackWord::TrackBitLocations::kZ0MSB,
+      ap_uint<12> inputTrkZ0 = L1TrkPtrs_[k]->getTrackWord()(TTTrack_TrackWord::TrackBitLocations::kZ0MSB,
                                                                          TTTrack_TrackWord::TrackBitLocations::kZ0LSB);
-      ap_ufixed<32, 1> z0_conv = 1.27932032;
+      ap_ufixed<32, 1> z0_conv = TTTrack_TrackWord::stepZ0 / .05;
       l1t::z0_t trkZ = z0_conv * inputTrkZ0;
 
       for (int i = 0; i < phiBins_; ++i) {
@@ -324,6 +332,7 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
                epbins[i][j].phi - phiStep_ / 2 <= trkphi && epbins[i][j].phi + phiStep_ / 2 >= trkphi &&
                (zBinCount_[k] != 2))) {
             zBinCount_.at(k) = zBinCount_.at(k) + 1;
+	    edm::LogWarning("L1TrackJetEmulationProducer") << "tracks passed\n";
             if (trkpt < l1t::Scales::makePtFromFloat(trkPtMax_))
               epbins[i][j].pTtot += trkpt;
             else
@@ -534,7 +543,7 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
 EtaPhiBin *L1TrackJetEmulationProducer::L1_cluster(EtaPhiBin *phislice) {
   EtaPhiBin *clusters = new EtaPhiBin[etaBins_ / 2];
   if (clusters == nullptr)
-    edm::LogWarning("L1TrackJetProducer") << "Clusters memory not assigned!\n";
+    edm::LogWarning("L1TrackJetEmulationProducer") << "Clusters memory not assigned!\n";
 
   // Find eta-phibin with maxpT, make center of cluster, add neighbors if not already used
   l1t::pt_t my_pt, left_pt, right_pt, right2pt;

@@ -3,6 +3,7 @@
 
 #include "TkJetsDataTypes.h"
 #include "TkJetsBit_Encoding.h"
+#include <vector>
 
 namespace l1t { //l1t
 
@@ -30,7 +31,7 @@ namespace l1t { //l1t
   };
  
   
-  typedef vector<l1t::TkJetWord> TkJetEmulationCollection;
+  typedef std::vector<l1t::TkJetWord> TkJetEmulationCollection;
   
 }  // namespace l1ct
 

@@ -2509,6 +2509,7 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
       }
       else if (TrackJetsEmulationHandle.isValid() && (Displaced=="Prompt" || Displaced=="Both")) {
         for (jetemIter = TrackJetsEmulationHandle->begin(); jetemIter != TrackJetsEmulationHandle->end(); ++jetemIter) {
+	  edm::LogWarning("DataFound")<< "Warning: TrackJetsEmulationHandle found in the event"<< std::endl;
           m_trkjetem_ntracks->push_back(jetemIter->intNTracks());
           m_trkjetem_phi->push_back(jetemIter->floatPhi());
           m_trkjetem_eta->push_back(jetemIter->floatEta());
@@ -2521,6 +2522,7 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
       }
       else if (TrackJetsExtendedEmulationHandle.isValid() && (Displaced=="Displaced" || Displaced=="Both")) {
         for (jetemIter = TrackJetsExtendedEmulationHandle->begin(); jetemIter != TrackJetsExtendedEmulationHandle->end(); ++jetemIter) {
+          edm::LogWarning("DataFound")<< "Warning: TrackJetsEmulationHandle found in the event"<< std::endl;
           m_trkjetemExt_ntracks->push_back(jetemIter->intNTracks());
           m_trkjetemExt_phi->push_back(jetemIter->floatPhi());
           m_trkjetemExt_eta->push_back(jetemIter->floatEta());
