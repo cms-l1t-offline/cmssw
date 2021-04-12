@@ -255,6 +255,14 @@ void L1TrackJetEmulationProducer::produce(Event &iEvent, const EventSetup &iSetu
 }
 
 void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtrs_, MaxZBin &mzb) {
+
+  enum TrackBitWidths {
+    kEtaSize = 16,             // Width of z-position (40cm / 0.1)
+    kEtaMagSize = 3,           // Width of z-position magnitude (signed)
+    kPtSize = 14,             // Width of pt
+    kPtMagSize = 9,           // Width of pt magnitude (unsigned)
+  };
+
   const int nz = zBins_;
   MaxZBin all_zBins[nz];
   MaxZBin mzbtemp;
@@ -299,29 +307,28 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
     }  //for each phibin
 
     for (unsigned int k = 0; k < L1TrkPtrs_.size(); ++k) {
-      ap_ufixed<14, 9, AP_RND_CONV, AP_SAT> inputTrkPt = 0;
+      ap_ufixed<TrackBitWidths::kPtSize, TrackBitWidths::kPtMagSize, AP_RND_CONV, AP_SAT> inputTrkPt = 0;
       inputTrkPt.V = L1TrkPtrs_[k]->getTrackWord()(
           TTTrack_TrackWord::TrackBitLocations::kRinvMSB - 1, TTTrack_TrackWord::TrackBitLocations::kRinvLSB);
-      int pt_conv = 1;
-      l1t::pt_t trkpt = pt_conv * inputTrkPt;
+      l1t::pt_t trkpt = inputTrkPt;
 
-      ap_fixed<16, 3, AP_RND_CONV, AP_SAT> trketainput = 0;
+      ap_fixed<TrackBitWidths::kEtaSize, TrackBitWidths::kEtaMagSize, AP_RND_CONV, AP_SAT> trketainput = 0;
       trketainput.V = L1TrkPtrs_[k]->getTrackWord()(
           TTTrack_TrackWord::TrackBitLocations::kTanlMSB, TTTrack_TrackWord::TrackBitLocations::kTanlLSB);
-      ap_ufixed<32, 8> eta_conv = 720.0/M_PI;
+      ap_ufixed<32, 8> eta_conv = 1.0 / l1t::Scales::ETAPHI_LSB; //conversion factor from input eta format to output format
       l1t::glbeta_t trketa = eta_conv * trketainput;
 
       int Sector = L1TrkPtrs_[k]->phiSector();
       l1t::glbphi_t trkphiSector = l1t::Scales::makeGlbPhi(-M_PI+M_PI/27.0) + Sector * l1t::Scales::makeGlbPhi(2.0*M_PI / 27.0);
-      ap_uint<12> trkphiinput = L1TrkPtrs_[k]->getTrackWord()(
+      ap_uint<TTTrack_TrackWord::TrackBitWidths::kPhiSize> trkphiinput = L1TrkPtrs_[k]->getTrackWord()(
           TTTrack_TrackWord::TrackBitLocations::kPhiMSB, TTTrack_TrackWord::TrackBitLocations::kPhiLSB);
-      ap_ufixed<32, 1> phi_conv = TTTrack_TrackWord::stepPhi0 / (M_PI/720.0);
+      ap_ufixed<32, 1> phi_conv = TTTrack_TrackWord::stepPhi0 / l1t::Scales::ETAPHI_LSB; //conversion factor from input phi format to output format
       l1t::glbphi_t trkphilocal = phi_conv * trkphiinput;
-      l1t::glbphi_t trkphi = trkphiSector + trkphilocal;
+      l1t::glbphi_t trkphi = trkphiSector + trkphilocal; //global phi of track in output format
 
-      ap_uint<12> inputTrkZ0 = L1TrkPtrs_[k]->getTrackWord()(TTTrack_TrackWord::TrackBitLocations::kZ0MSB,
+      ap_uint<TTTrack_TrackWord::TrackBitWidths::kZ0Size> inputTrkZ0 = L1TrkPtrs_[k]->getTrackWord()(TTTrack_TrackWord::TrackBitLocations::kZ0MSB,
                                                                          TTTrack_TrackWord::TrackBitLocations::kZ0LSB);
-      ap_ufixed<32, 1> z0_conv = TTTrack_TrackWord::stepZ0 / .05;
+      ap_ufixed<32, 1> z0_conv = TTTrack_TrackWord::stepZ0 / l1t::Scales::Z0_LSB; //conversion factor from input z format to output format
       l1t::z0_t trkZ = z0_conv * inputTrkZ0;
 
       for (int i = 0; i < phiBins_; ++i) {
@@ -332,7 +339,6 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
                epbins[i][j].phi - phiStep_ / 2 <= trkphi && epbins[i][j].phi + phiStep_ / 2 >= trkphi &&
                (zBinCount_[k] != 2))) {
             zBinCount_.at(k) = zBinCount_.at(k) + 1;
-	    edm::LogWarning("L1TrackJetEmulationProducer") << "tracks passed\n";
             if (trkpt < l1t::Scales::makePtFromFloat(trkPtMax_))
               epbins[i][j].pTtot += trkpt;
             else
