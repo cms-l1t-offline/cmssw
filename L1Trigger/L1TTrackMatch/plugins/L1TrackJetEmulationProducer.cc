@@ -289,6 +289,7 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
     phi = phi + phiStep_;
   }  // for each phibin (finished creating epbins)
   mzb = all_zBins[0];
+  mzb.ht = 0;
   int ntracks = L1TrkPtrs_.size();
   // uninitalized arrays
   EtaPhiBin *L1clusters[phiBins_];
@@ -318,7 +319,7 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
       l1t::glbeta_t trketa = eta_conv * trketainput;
 
       int Sector = L1TrkPtrs_[k]->phiSector();
-      l1t::glbphi_t trkphiSector = l1t::Scales::makeGlbPhi(-M_PI+M_PI/27.0) + Sector * l1t::Scales::makeGlbPhi(2.0*M_PI / 27.0);
+      l1t::glbphi_t trkphiSector = l1t::Scales::makeGlbPhi(-M_PI+M_PI/9.0) + Sector * l1t::Scales::makeGlbPhi(2.0*M_PI / 9.0);
       ap_uint<TTTrack_TrackWord::TrackBitWidths::kPhiSize> trkphiinput = L1TrkPtrs_[k]->getTrackWord()(
           TTTrack_TrackWord::TrackBitLocations::kPhiMSB, TTTrack_TrackWord::TrackBitLocations::kPhiLSB);
       ap_ufixed<32, 1> phi_conv = TTTrack_TrackWord::stepPhi0 / l1t::Scales::ETAPHI_LSB; //conversion factor from input phi format to output format
@@ -505,7 +506,9 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
         }         // end if clusters neighbor in eta
       }
     }  // end for (m) loop
-
+    cout << "nclust: ";
+    cout << nclust;
+    cout << endl;
     // sum up all pTs in this zbin to find ht
     l1t::pt_t ht = 0;
     for (int k = 0; k < nclust; ++k) {
@@ -516,7 +519,9 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
       if (L2cluster[k].pTtot > l1t::Scales::makePtFromFloat(minTrkJetpT_))
         ht += L2cluster[k].pTtot;
     }
-
+    cout << "ht: ";
+    cout << l1t::Scales::intPt(ht);
+    cout << endl;
     // if ht is larger than previous max, this is the new vertex zbin
     all_zBins[zbin].znum = zbin;
     all_zBins[zbin].clusters = new EtaPhiBin[nclust];
@@ -530,6 +535,9 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
       all_zBins[zbin].clusters[k].nxtracks = L2cluster[k].nxtracks;
     }
     all_zBins[zbin].ht = ht;
+    cout << "mzb.ht: ";
+    cout << (l1t::Scales::intPt(mzb.ht));
+    cout << endl;
     if (ht >= mzb.ht) {
       mzb = all_zBins[zbin];
       mzb.zbincenter = (zmin + zmax) / 2;
@@ -537,12 +545,28 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
     // Prepare for next zbin!
     zmin = zmin + zStep_;
     zmax = zmax + zStep_;
+    cout << "max z bin center: ";
+    cout << l1t::Scales::floatZ0(mzb.zbincenter);
+    cout << endl;
+    cout << "max z has no clusters: ";
+    cout << (mzb.clusters == nullptr);
+    cout << endl;
   }  // for each zbin
+  cout << "max z bin center: ";
+  cout << l1t::Scales::floatZ0(mzb.zbincenter);
+  cout << endl;
   for (int zbin = 0; zbin < zBins_ - 1; ++zbin) {
-    if (zbin == mzb.znum)
+    if (zbin == mzb.znum) {
       continue;
+    }
     delete[] all_zBins[zbin].clusters;
   }
+  cout << "max z bin center after delete: ";
+  cout << mzb.zbincenter;
+  cout << endl;
+  cout << "max z has no clusters: ";
+  cout << (mzb.clusters == nullptr);
+  cout << endl;
 }
 
 EtaPhiBin *L1TrackJetEmulationProducer::L1_cluster(EtaPhiBin *phislice) {
