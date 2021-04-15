@@ -506,9 +506,6 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
         }         // end if clusters neighbor in eta
       }
     }  // end for (m) loop
-    cout << "nclust: ";
-    cout << nclust;
-    cout << endl;
     // sum up all pTs in this zbin to find ht
     l1t::pt_t ht = 0;
     for (int k = 0; k < nclust; ++k) {
@@ -519,9 +516,6 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
       if (L2cluster[k].pTtot > l1t::Scales::makePtFromFloat(minTrkJetpT_))
         ht += L2cluster[k].pTtot;
     }
-    cout << "ht: ";
-    cout << l1t::Scales::intPt(ht);
-    cout << endl;
     // if ht is larger than previous max, this is the new vertex zbin
     all_zBins[zbin].znum = zbin;
     all_zBins[zbin].clusters = new EtaPhiBin[nclust];
@@ -535,9 +529,6 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
       all_zBins[zbin].clusters[k].nxtracks = L2cluster[k].nxtracks;
     }
     all_zBins[zbin].ht = ht;
-    cout << "mzb.ht: ";
-    cout << (l1t::Scales::intPt(mzb.ht));
-    cout << endl;
     if (ht >= mzb.ht) {
       mzb = all_zBins[zbin];
       mzb.zbincenter = (zmin + zmax) / 2;
@@ -545,28 +536,15 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
     // Prepare for next zbin!
     zmin = zmin + zStep_;
     zmax = zmax + zStep_;
-    cout << "max z bin center: ";
-    cout << l1t::Scales::floatZ0(mzb.zbincenter);
-    cout << endl;
-    cout << "max z has no clusters: ";
-    cout << (mzb.clusters == nullptr);
-    cout << endl;
   }  // for each zbin
-  cout << "max z bin center: ";
-  cout << l1t::Scales::floatZ0(mzb.zbincenter);
-  cout << endl;
+
   for (int zbin = 0; zbin < zBins_ - 1; ++zbin) {
     if (zbin == mzb.znum) {
       continue;
     }
     delete[] all_zBins[zbin].clusters;
   }
-  cout << "max z bin center after delete: ";
-  cout << mzb.zbincenter;
-  cout << endl;
-  cout << "max z has no clusters: ";
-  cout << (mzb.clusters == nullptr);
-  cout << endl;
+
 }
 
 EtaPhiBin *L1TrackJetEmulationProducer::L1_cluster(EtaPhiBin *phislice) {
