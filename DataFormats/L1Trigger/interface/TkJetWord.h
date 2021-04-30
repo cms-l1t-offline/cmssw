@@ -24,18 +24,18 @@ namespace l1t {
     constexpr float ETAPHI_LSB = M_PI / INTPHI_PI;
     constexpr float Z0_LSB = 0.05;
     inline float floatPt(pt_t pt) { return pt.to_float(); }
-    inline int intPt(pt_t pt) { return (ap_ufixed<16, 14>(pt) << 2).to_int(); }
-    inline int intNt(nt_t nt) { return (ap_ufixed<7, 5>(nt) << 2).to_int(); }
-    inline int intXt(nx_t xt) { return (ap_ufixed<6, 4>(xt) << 2).to_int(); }
+    inline int intPt(pt_t pt) { return (ap_ufixed<16, 14>(pt)).to_int(); }
+    inline int intNt(nt_t nt) { return (ap_ufixed<7, 5>(nt)).to_int(); }
+    inline int intXt(nx_t xt) { return (ap_ufixed<6, 4>(xt)).to_int(); }
     inline float floatEta(eta_t eta) { return eta.to_float() * ETAPHI_LSB; }
     inline float floatPhi(phi_t phi) { return phi.to_float() * ETAPHI_LSB; }
     inline float floatEta(glbeta_t eta) { return eta.to_float() * ETAPHI_LSB; }
     inline float floatPhi(glbphi_t phi) { return phi.to_float() * ETAPHI_LSB; }
     inline float floatZ0(z0_t z0) { return z0.to_float() * Z0_LSB; }
 
-    inline pt_t makePt(int pt) { return ap_ufixed<16, 14>(pt) >> 2; }
-    inline nt_t makeNt(int nt) { return ap_ufixed<7, 5>(nt) >> 2; }
-    inline nx_t makeXt(int xt) { return ap_ufixed<6, 4>(xt) >> 2; }
+    inline pt_t makePt(int pt) { return ap_ufixed<16, 14>(pt); }
+    inline nt_t makeNt(int nt) { return ap_ufixed<7, 5>(nt); }
+    inline nx_t makeXt(int xt) { return ap_ufixed<6, 4>(xt); }
     inline pt_t makePtFromFloat(float pt) { return pt_t(0.25 * round(pt * 4)); }
     inline z0_t makeZ0(float z0) { return z0_t(round(z0 / Z0_LSB)); }
 

@@ -220,7 +220,7 @@ void L1TrackJetEmulationProducer::produce(Event &iEvent, const EventSetup &iSetu
     if (mzb.clusters != nullptr) {
       for (int j = 0; j < mzb.nclust; ++j) {
         //FILL Two Layer Jets for Jet Collection
-        if (mzb.clusters[j].pTtot <= l1t::Scales::makePtFromFloat(trkPtMin_))
+        if (mzb.clusters[j].pTtot < l1t::Scales::makePtFromFloat(trkPtMin_))
           continue;  //protects against reading bad memory
         if (mzb.clusters[j].ntracks < 1)
           continue;
@@ -260,6 +260,8 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
     kEtaMagSize = 3,           // Width of z-position magnitude (signed)
     kPtSize = 14,             // Width of pt
     kPtMagSize = 9,           // Width of pt magnitude (unsigned)
+    kPhiSize = 12,
+    kPhiMagSize = 1,
   };
 
   const int nz = zBins_;
@@ -283,11 +285,15 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
       etamin = eta;
       eta = eta + etaStep_;
       etamax = eta;
-      epbins[i][j].phi = (phimin + phimax) / 2;  //should 2 be represented in binary?
+      epbins[i][j].phi = (phimin + phimax) / 2;
       epbins[i][j].eta = (etamin + etamax) / 2;
+      epbins[i][j].pTtot = 0;
+      epbins[i][j].ntracks = 0;
+      epbins[i][j].nxtracks = 0;
     }  // for each etabin
     phi = phi + phiStep_;
   }  // for each phibin (finished creating epbins)
+
   mzb = all_zBins[0];
   mzb.ht = 0;
   int ntracks = L1TrkPtrs_.size();
@@ -318,19 +324,15 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
       ap_ufixed<32, 8> eta_conv = 1.0 / l1t::Scales::ETAPHI_LSB; //conversion factor from input eta format to output format
       l1t::glbeta_t trketa = eta_conv * trketainput;
 
-      int Sector = L1TrkPtrs_[k]->phiSector();
-      l1t::glbphi_t trkphiSector = l1t::Scales::makeGlbPhi(-M_PI+M_PI/9.0) + Sector * l1t::Scales::makeGlbPhi(2.0*M_PI / 9.0);
-      ap_uint<TTTrack_TrackWord::TrackBitWidths::kPhiSize> trkphiinput = L1TrkPtrs_[k]->getTrackWord()(
-          TTTrack_TrackWord::TrackBitLocations::kPhiMSB, TTTrack_TrackWord::TrackBitLocations::kPhiLSB);
-      ap_ufixed<32, 1> phi_conv = TTTrack_TrackWord::stepPhi0 / l1t::Scales::ETAPHI_LSB; //conversion factor from input phi format to output format
-      l1t::glbphi_t trkphilocal = phi_conv * trkphiinput;
-      l1t::glbphi_t trkphi = trkphiSector + trkphilocal; //global phi of track in output format
+      l1t::glbphi_t trkphi = l1t::Scales::makeGlbPhi(L1TrkPtrs_[k]->momentum().phi()); //global phi of track in output format
 
-      ap_uint<TTTrack_TrackWord::TrackBitWidths::kZ0Size> inputTrkZ0 = L1TrkPtrs_[k]->getTrackWord()(TTTrack_TrackWord::TrackBitLocations::kZ0MSB,
+      ap_int<TTTrack_TrackWord::TrackBitWidths::kZ0Size> inputTrkZ0 = L1TrkPtrs_[k]->getTrackWord()(TTTrack_TrackWord::TrackBitLocations::kZ0MSB,
                                                                          TTTrack_TrackWord::TrackBitLocations::kZ0LSB);
       ap_ufixed<32, 1> z0_conv = TTTrack_TrackWord::stepZ0 / l1t::Scales::Z0_LSB; //conversion factor from input z format to output format
       l1t::z0_t trkZ = z0_conv * inputTrkZ0;
-
+      
+      ap_ufixed<32, 1> phi_conv = TTTrack_TrackWord::stepPhi0 / l1t::Scales::ETAPHI_LSB;
+      
       for (int i = 0; i < phiBins_; ++i) {
         for (int j = 0; j < etaBins_; ++j) {
           L2cluster[k] = epbins[i][j];
@@ -356,7 +358,7 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
         L1clusters[phislice][ind].used = false;
       }
     }
-
+    
     //Create clusters array to hold output cluster data for Layer2; can't have more clusters than tracks.
     //Find eta-phibin with maxpT, make center of cluster, add neighbors if not already used.
     l1t::pt_t hipT = 0;
@@ -391,6 +393,7 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
         nxtrk1 = 0;
         nxtrk2 = 0;
         L2cluster[nclust] = L1clusters[phibin][imax];
+
         L1clusters[phibin][imax].used = true;
         // Add pT of upper neighbor
         // E1 is pT of the middle phibin (should be highest pT)
@@ -401,7 +404,7 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
             if (L1clusters[phibin + 1][index1].used)
               continue;
             if (L1clusters[phibin + 1][index1].eta - L1clusters[phibin][imax].eta <= 3 * etaStep_ / 2 &&
-                L1clusters[phibin][index1].eta - L1clusters[phibin + 1][imax].eta <= 3 * etaStep_ / 2) {
+                L1clusters[phibin][imax].eta - L1clusters[phibin + 1][index1].eta <= 3 * etaStep_ / 2) {
               E1 += L1clusters[phibin + 1][index1].pTtot;
               ntrk1 += L1clusters[phibin + 1][index1].ntracks;
               nxtrk1 += L1clusters[phibin + 1][index1].nxtracks;
@@ -430,8 +433,8 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
             for (index1 = 0; L1clusters[phibin + 2][index1].pTtot != 0; ++index1) {
               if (L1clusters[phibin + 2][index1].used)
                 continue;
-              if (L1clusters[phibin + 1][index1].eta - L1clusters[phibin][imax].eta <= 3 * etaStep_ / 2 &&
-                  L1clusters[phibin][index1].eta - L1clusters[phibin + 1][imax].eta <= 3 * etaStep_ / 2) {
+              if (L1clusters[phibin + 2][index1].eta - L1clusters[phibin][imax].eta <= 3 * etaStep_ / 2 &&
+                  L1clusters[phibin][imax].eta - L1clusters[phibin + 2][index1].eta <= 3 * etaStep_ / 2) {
                 E2 += L1clusters[phibin + 2][index1].pTtot;
                 ntrk2 += L1clusters[phibin + 2][index1].ntracks;
                 nxtrk2 += L1clusters[phibin + 2][index1].nxtracks;
@@ -487,26 +490,27 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
     for (int m = 0; m < nclust - 1; ++m) {
       for (int n = m + 1; n < nclust; ++n) {
         if (L2cluster[n].eta == L2cluster[m].eta &&
-            ((L2cluster[n].phi - L2cluster[m].phi <= 3 * phiStep_ / 2 &&
-              L2cluster[m].phi - L2cluster[n].phi <= 3 * phiStep_ / 2) ||
-             (L2cluster[n].phi - L2cluster[m].phi >= 2 * l1t::Scales::makeGlbPhi(M_PI) - phiStep_ ||
-              L2cluster[m].phi - L2cluster[n].phi >= 2 * l1t::Scales::makeGlbPhi(M_PI) - phiStep_))) {
+            ((L2cluster[n].phi - L2cluster[m].phi < 3 * phiStep_ / 2 &&
+              L2cluster[m].phi - L2cluster[n].phi < 3 * phiStep_ / 2) ||
+             (L2cluster[n].phi - L2cluster[m].phi > 2 * l1t::Scales::makeGlbPhi(M_PI) - phiStep_ ||
+              L2cluster[m].phi - L2cluster[n].phi > 2 * l1t::Scales::makeGlbPhi(M_PI) - phiStep_))) {
           if (L2cluster[n].pTtot > L2cluster[m].pTtot) {
             L2cluster[m].phi = L2cluster[n].phi;
+          }
             L2cluster[m].pTtot += L2cluster[n].pTtot;
             L2cluster[m].ntracks += L2cluster[n].ntracks;
             L2cluster[m].nxtracks += L2cluster[n].nxtracks;
-          }
           for (int m1 = n; m1 < nclust - 1; ++m1) {
             L2cluster[m1] = L2cluster[m1 + 1];
-            nclust--;
-            m = -1;
           }
+          nclust--;
+          m = -1;
           break;  //?????
         }         // end if clusters neighbor in eta
       }
     }  // end for (m) loop
     // sum up all pTs in this zbin to find ht
+
     l1t::pt_t ht = 0;
     for (int k = 0; k < nclust; ++k) {
       if (L2cluster[k].pTtot > 50 && L2cluster[k].ntracks < lowpTJetMinTrackMultiplicity_)
@@ -549,6 +553,15 @@ void L1TrackJetEmulationProducer::L2_cluster(vector<Ptr<L1TTTrackType>> L1TrkPtr
 
 EtaPhiBin *L1TrackJetEmulationProducer::L1_cluster(EtaPhiBin *phislice) {
   EtaPhiBin *clusters = new EtaPhiBin[etaBins_ / 2];
+  for (int etabin = 0; etabin < etaBins_/2; ++etabin) {
+    clusters[etabin].pTtot = 0;
+    clusters[etabin].ntracks = 0;
+    clusters[etabin].nxtracks = 0;
+    clusters[etabin].phi = 0;
+    clusters[etabin].eta = 0;
+    clusters[etabin].used = 0;
+  }
+  
   if (clusters == nullptr)
     edm::LogWarning("L1TrackJetEmulationProducer") << "Clusters memory not assigned!\n";
 
@@ -606,8 +619,8 @@ EtaPhiBin *L1TrackJetEmulationProducer::L1_cluster(EtaPhiBin *phislice) {
 
   // Now merge clusters, if necessary
   for (int m = 0; m < nclust - 1; ++m) {
-    if (clusters[m + 1].eta - clusters[m].eta <= 3 * etaStep_ / 2 &&
-        clusters[m].eta - clusters[m + 1].eta <= 3 * etaStep_ / 2) {
+    if (clusters[m + 1].eta - clusters[m].eta < 3 * etaStep_ / 2 &&
+        clusters[m].eta - clusters[m + 1].eta < 3 * etaStep_ / 2) {
       if (clusters[m + 1].pTtot > clusters[m].pTtot) {
         clusters[m].eta = clusters[m + 1].eta;
       }
