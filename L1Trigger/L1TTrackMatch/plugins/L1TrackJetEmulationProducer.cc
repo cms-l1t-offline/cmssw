@@ -135,15 +135,15 @@ L1TrackJetEmulationProducer::L1TrackJetEmulationProducer(const ParameterSet &iCo
   phiStep_ = l1t::Scales::makePhi(2.0 * M_PI / phiBins_);           ////phiStep is the width of a phibin
 
   if (displaced_)
-    produces<l1t::TkJetEmulationCollection>("L1TrackJetsExtended");
+    produces<l1t::TkJetWordCollection>("L1TrackJetsExtended");
   else
-    produces<l1t::TkJetEmulationCollection>("L1TrackJets");
+    produces<l1t::TkJetWordCollection>("L1TrackJets");
 }
 
 L1TrackJetEmulationProducer::~L1TrackJetEmulationProducer() {}
 
 void L1TrackJetEmulationProducer::produce(Event &iEvent, const EventSetup &iSetup) {
-  unique_ptr<l1t::TkJetEmulationCollection> L1L1TrackJetProducer(new l1t::TkJetEmulationCollection);
+  unique_ptr<l1t::TkJetWordCollection> L1L1TrackJetProducer(new l1t::TkJetWordCollection);
 
   // For TTStubs
   ESHandle<TrackerTopology> tTopoHandle;

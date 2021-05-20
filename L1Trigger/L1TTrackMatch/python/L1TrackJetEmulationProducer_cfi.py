@@ -29,7 +29,7 @@ L1TrackJetsEmulation = cms.EDProducer('L1TrackJetEmulationProducer',
 )
 
 L1TrackJetsExtendedEmulation = cms.EDProducer('L1TrackJetEmulationProducer',
-	L1TrackInputTag= cms.InputTag("L1GTTInputProducerExtended", "Level1TTTracksConverted"),
+	L1TrackInputTag= cms.InputTag("L1GTTInputProducerExtended", "Level1TTTracksExtendedConverted"),
 	trk_zMax = cms.double (15.) ,    # maximum track z
 	trk_ptMax = cms.double(200.),    # maximumum track pT before saturation [GeV]
 	trk_ptMin = cms.double(3.0),     # minimum track pt [GeV]

@@ -86,11 +86,12 @@ namespace l1t {
     float floatPt() const { return Scales::floatPt(hwPt); }
     float floatEta() const { return Scales::floatEta(hwEta); }
     float floatPhi() const { return Scales::floatPhi(hwPhi); }
+    float floatZ0() const { return Scales::floatZ0(hwZ0); }
 
   };
  
 
-  typedef std::vector<l1t::TkJetWord> TkJetEmulationCollection;
+  typedef std::vector<l1t::TkJetWord> TkJetWordCollection;
   
 }  // namespace l1ct
 

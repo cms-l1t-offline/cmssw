@@ -40,7 +40,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 
 readFiles = cms.untracked.vstring(
-    'file:/tmp/TT_TuneCP5_14TeV-powheg-pythia8_Phase2HLTTDRSummer20ReRECOMiniAOD-PU200_111X_mcRun4_realistic_T15_v1-v2_FEVT_015FB6F1-59B4-304C-B540-2392A983A97D.root'
+    '/store/relval/CMSSW_11_1_0_pre2/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_110X_mcRun4_realistic_v2_2026D49PU200-v1/20000/F7BF4AED-51F1-9D47-B86D-6C3DDA134AB9.root'
 )
 secFiles = cms.untracked.vstring()
 

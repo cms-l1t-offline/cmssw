@@ -187,8 +187,8 @@ private:
   edm::EDGetTokenT<l1t::TkHTMissCollection > TrackMHTExtendedToken_;
   edm::EDGetTokenT<l1t::TkJetCollection> TrackJetsToken_;
   edm::EDGetTokenT<l1t::TkJetCollection> TrackJetsExtendedToken_;
-  edm::EDGetTokenT<l1t::TkJetEmulationCollection> TrackJetsEmulationToken_;	
-  edm::EDGetTokenT<l1t::TkJetEmulationCollection> TrackJetsExtendedEmulationToken_;
+  edm::EDGetTokenT<l1t::TkJetWordCollection> TrackJetsEmulationToken_;	
+  edm::EDGetTokenT<l1t::TkJetWordCollection> TrackJetsExtendedEmulationToken_;
 
   //-----------------------------------------------------------------------------------------------
   // tree & branches for mini-ntuple
@@ -468,7 +468,7 @@ L1TrackObjectNtupleMaker::L1TrackObjectNtupleMaker(edm::ParameterSet const& iCon
     ttTrackMCTruthToken_ = consumes<TTTrackAssociationMap<Ref_Phase2TrackerDigi_> >(MCTruthTrackInputTag);
     TrackFastJetsToken_ = consumes<std::vector<l1t::TkJet> >(TrackFastJetsInputTag);
     TrackJetsToken_ = consumes<l1t::TkJetCollection>(TrackJetsInputTag);
-    TrackJetsEmulationToken_ = consumes<l1t::TkJetEmulationCollection>(TrackJetsEmulationInputTag);
+    TrackJetsEmulationToken_ = consumes<l1t::TkJetWordCollection>(TrackJetsEmulationInputTag);
     TrackMETToken_ = consumes<std::vector<l1t::TkEtMiss>  >(TrackMETInputTag);
     TrackMHTToken_ = consumes<l1t::TkHTMissCollection>(TrackMHTInputTag);
   }
@@ -486,7 +486,7 @@ L1TrackObjectNtupleMaker::L1TrackObjectNtupleMaker(edm::ParameterSet const& iCon
     ttTrackMCTruthExtendedToken_ = consumes<TTTrackAssociationMap<Ref_Phase2TrackerDigi_> >(MCTruthTrackExtendedInputTag);
     TrackFastJetsExtendedToken_ = consumes<std::vector<l1t::TkJet> >(TrackFastJetsExtendedInputTag);
     TrackJetsExtendedToken_ = consumes<l1t::TkJetCollection>(TrackJetsExtendedInputTag);
-    TrackJetsExtendedEmulationToken_ = consumes<l1t::TkJetEmulationCollection>(TrackJetsExtendedEmulationInputTag);
+    TrackJetsExtendedEmulationToken_ = consumes<l1t::TkJetWordCollection>(TrackJetsExtendedEmulationInputTag);
     TrackMETExtendedToken_ = consumes<std::vector<l1t::TkEtMiss>  >(TrackMETExtendedInputTag);
     TrackMHTExtendedToken_ = consumes<l1t::TkHTMissCollection>(TrackMHTExtendedInputTag);
   }
@@ -951,7 +951,8 @@ void L1TrackObjectNtupleMaker::beginJob() {
     if (Displaced=="Prompt" || Displaced=="Both") {	
       eventTree->Branch("trkjetem_eta", &m_trkjetem_eta);	
       eventTree->Branch("trkjetem_pt", &m_trkjetem_pt);	
-      eventTree->Branch("trkjetem_phi", &m_trkjetem_phi);	
+      eventTree->Branch("trkjetem_phi", &m_trkjetem_phi);
+      eventTree->Branch("trkjetem_z", &m_trkjetem_z);
       eventTree->Branch("trkjetem_ntracks", &m_trkjetem_ntracks);	
       eventTree->Branch("trkjetem_nxtracks", &m_trkjetem_nxtracks);		
     }	
@@ -959,6 +960,7 @@ void L1TrackObjectNtupleMaker::beginJob() {
       eventTree->Branch("trkjetemExt_eta", &m_trkjetemExt_eta);	
       eventTree->Branch("trkjetemExt_pt", &m_trkjetemExt_pt);	
       eventTree->Branch("trkjetemExt_phi", &m_trkjetemExt_phi);	
+      eventTree->Branch("trkjetemExt_z", &m_trkjetemExt_z);
       eventTree->Branch("trkjetemExt_ntracks", &m_trkjetemExt_ntracks);	
       eventTree->Branch("trkjetemExt_nxtracks", &m_trkjetemExt_nxtracks);		
     }	
@@ -1195,7 +1197,8 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
       if (Displaced=="Prompt" || Displaced=="Both") {	
         m_trkjetem_eta->clear();	
         m_trkjetem_pt->clear();	
-        m_trkjetem_phi->clear();	
+        m_trkjetem_phi->clear();
+        m_trkjetem_z->clear();		
         m_trkjetem_ntracks->clear();	
         m_trkjetem_nxtracks->clear();		
       }	
@@ -1203,6 +1206,7 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
         m_trkjetemExt_eta->clear();	
         m_trkjetemExt_pt->clear();	
         m_trkjetemExt_phi->clear();	
+        m_trkjetemExt_z->clear();
         m_trkjetemExt_ntracks->clear();	
         m_trkjetemExt_nxtracks->clear();		
       }	
@@ -1257,8 +1261,8 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
     edm::Handle< std::vector<l1t::TkJet> > TrackFastJetsExtendedHandle;
     edm::Handle<l1t::TkJetCollection> TrackJetsHandle;
     edm::Handle<l1t::TkJetCollection> TrackJetsExtendedHandle;
-    edm::Handle<l1t::TkJetEmulationCollection> TrackJetsEmulationHandle;	
-    edm::Handle<l1t::TkJetEmulationCollection> TrackJetsExtendedEmulationHandle;
+    edm::Handle<l1t::TkJetWordCollection> TrackJetsEmulationHandle;	
+    edm::Handle<l1t::TkJetWordCollection> TrackJetsExtendedEmulationHandle;
     std::vector< l1t::TkJet >::const_iterator jetIter;
     std::vector< l1t::TkJetWord >::const_iterator jetemIter;
 
@@ -2399,7 +2403,8 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
           m_trkjetem_ntracks->push_back(jetemIter->intNTracks());	
           m_trkjetem_phi->push_back(jetemIter->floatPhi());	
           m_trkjetem_eta->push_back(jetemIter->floatEta());	
-          m_trkjetem_pt->push_back(jetemIter->floatPt());	
+          m_trkjetem_pt->push_back(jetemIter->floatPt());
+          m_trkjetem_z->push_back(jetemIter->floatZ0());
           m_trkjetem_nxtracks->push_back(jetemIter->intNXTracks());	
         }	
       }	
@@ -2411,7 +2416,8 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
           m_trkjetemExt_ntracks->push_back(jetemIter->intNTracks());	
           m_trkjetemExt_phi->push_back(jetemIter->floatPhi());	
           m_trkjetemExt_eta->push_back(jetemIter->floatEta());	
-          m_trkjetemExt_pt->push_back(jetemIter->floatPt());	
+          m_trkjetemExt_pt->push_back(jetemIter->floatPt());
+          m_trkjetemExt_z->push_back(jetemIter->floatZ0());	
           m_trkjetemExt_nxtracks->push_back(jetemIter->intNXTracks());	
         }	
       }	
