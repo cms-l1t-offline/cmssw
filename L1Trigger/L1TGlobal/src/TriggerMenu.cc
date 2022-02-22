@@ -41,6 +41,7 @@ TriggerMenu::TriggerMenu(
     const std::string& triggerMenuNameVal,
     const unsigned int numberConditionChips,
     const std::vector<std::vector<MuonTemplate> >& vecMuonTemplateVal,
+    const std::vector<std::vector<MuonShowerTemplate> >& vecMuonShowerTemplateVal,
     const std::vector<std::vector<CaloTemplate> >& vecCaloTemplateVal,
     const std::vector<std::vector<EnergySumTemplate> >& vecEnergySumTemplateVal,
     const std::vector<std::vector<ExternalTemplate> >& vecExternalTemplateVal,
@@ -57,6 +58,7 @@ TriggerMenu::TriggerMenu(
       m_triggerMenuImplementation(0x0),
       m_scaleDbKey("NULL"),
       m_vecMuonTemplate(vecMuonTemplateVal),
+      m_vecMuonShowerTemplate(vecMuonShowerTemplateVal),
       m_vecCaloTemplate(vecCaloTemplateVal),
       m_vecEnergySumTemplate(vecEnergySumTemplateVal),
       m_vecExternalTemplate(vecExternalTemplateVal),
@@ -81,6 +83,7 @@ TriggerMenu::TriggerMenu(const TriggerMenu& rhs) {
 
   // copy physics conditions
   m_vecMuonTemplate = rhs.m_vecMuonTemplate;
+  m_vecMuonShowerTemplate = rhs.m_vecMuonShowerTemplate;
   m_vecCaloTemplate = rhs.m_vecCaloTemplate;
   m_vecEnergySumTemplate = rhs.m_vecEnergySumTemplate;
   m_vecExternalTemplate = rhs.m_vecExternalTemplate;
@@ -128,6 +131,7 @@ TriggerMenu& TriggerMenu::operator=(const TriggerMenu& rhs) {
     m_triggerMenuUUID = rhs.m_triggerMenuUUID;
 
     m_vecMuonTemplate = rhs.m_vecMuonTemplate;
+    m_vecMuonShowerTemplate = rhs.m_vecMuonShowerTemplate;
     m_vecCaloTemplate = rhs.m_vecCaloTemplate;
     m_vecEnergySumTemplate = rhs.m_vecEnergySumTemplate;
     m_vecExternalTemplate = rhs.m_vecExternalTemplate;
@@ -185,6 +189,26 @@ void TriggerMenu::buildGtConditionMap() {
     chipNr++;
 
     for (std::vector<MuonTemplate>::iterator itCond = itCondOnChip->begin(); itCond != itCondOnChip->end(); itCond++) {
+      (m_conditionMap.at(chipNr))[itCond->condName()] = &(*itCond);
+    }
+  }
+
+  //
+  size_t vecMuonShowerSize = m_vecMuonShowerTemplate.size();
+  if (condMapSize < vecMuonShowerSize) {
+    m_conditionMap.resize(vecMuonShowerSize);
+    condMapSize = m_conditionMap.size();
+  }
+
+  chipNr = -1;
+
+  for (std::vector<std::vector<MuonShowerTemplate> >::iterator itCondOnChip = m_vecMuonShowerTemplate.begin();
+       itCondOnChip != m_vecMuonShowerTemplate.end();
+       itCondOnChip++) {
+    chipNr++;
+
+    for (std::vector<MuonShowerTemplate>::iterator itCond = itCondOnChip->begin(); itCond != itCondOnChip->end();
+         itCond++) {
       (m_conditionMap.at(chipNr))[itCond->condName()] = &(*itCond);
     }
   }
@@ -402,14 +426,11 @@ void TriggerMenu::print(std::ostream& myCout, int& printVerbosity) const {
   /*
     // idem for technical trigger map - only name and bit number are relevant for them
     std::map<int, const GlobalAlgorithm*> ttBitToTt;
-
     for (l1t::CItAlgo itAlgo = m_technicalTriggerMap.begin(); itAlgo
             != m_technicalTriggerMap.end(); itAlgo++) {
-
         int bitNumber = (itAlgo->second).algoBitNumber();
         ttBitToTt[bitNumber] = &(itAlgo->second);
     }
-
     size_t nrDefinedTechTrig = ttBitToTt.size();
 */
   //
@@ -443,13 +464,10 @@ void TriggerMenu::print(std::ostream& myCout, int& printVerbosity) const {
             if (nrDefinedTechTrig) {
                 myCout << "Bit Number " << " Technical trigger name " << std::endl;
             }
-
             for (CItBit itBit = ttBitToTt.begin(); itBit != ttBitToTt.end(); itBit++) {
-
                 int bitNumber = itBit->first;
                 std::string aName = (itBit->second)->algoName();
                 std::string aAlias = (itBit->second)->algoAlias();
-
                 myCout << std::setw(6) << bitNumber << "       "
                 << std::right << std::setw(35) << aName << "  "
                 << std::right << std::setw(35) << aAlias
@@ -490,12 +508,9 @@ void TriggerMenu::print(std::ostream& myCout, int& printVerbosity) const {
             if (nrDefinedTechTrig) {
                 myCout << "Bit Number " << " Technical trigger name " << std::endl;
             }
-
             for (CItBit itBit = ttBitToTt.begin(); itBit != ttBitToTt.end(); itBit++) {
-
                 int bitNumber = itBit->first;
                 std::string aName = (itBit->second)->algoName();
-
                 myCout << std::setw(6) << bitNumber << "       " << aName << std::endl;
             }
 */
@@ -546,12 +561,9 @@ void TriggerMenu::print(std::ostream& myCout, int& printVerbosity) const {
             if (nrDefinedTechTrig) {
                 myCout << "Bit Number " << " Technical trigger name " << std::endl;
             }
-
             for (CItBit itBit = ttBitToTt.begin(); itBit != ttBitToTt.end(); itBit++) {
-
                 int bitNumber = itBit->first;
                 std::string aName = (itBit->second)->algoName();
-
                 myCout << std::setw(6) << bitNumber << "       " << aName << std::endl;
             }
 */

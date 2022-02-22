@@ -14,9 +14,11 @@
  *                - correlations with overlap object removal
  *                - displaced muons by R.Cavanaugh
  *
- * \new features: Elisa Fontanesi                                                      
- *                - extended for three-body correlation conditions                                         
- *                                                                
+ * \new features: Elisa Fontanesi
+ *                - extended for three-body correlation conditions
+ * \new features: Dragana Pilipovic
+ *                - updated for invariant mass over delta R condition
+ *
  * $Date$
  * $Revision$
  *
@@ -111,6 +113,11 @@ void l1t::TriggerMenuParser::setVecMuonTemplate(const std::vector<std::vector<Mu
   m_vecMuonTemplate = vecMuonTempl;
 }
 
+void l1t::TriggerMenuParser::setVecMuonShowerTemplate(
+    const std::vector<std::vector<MuonShowerTemplate> >& vecMuonShowerTempl) {
+  m_vecMuonShowerTemplate = vecMuonShowerTempl;
+}
+
 void l1t::TriggerMenuParser::setVecCaloTemplate(const std::vector<std::vector<CaloTemplate> >& vecCaloTempl) {
   m_vecCaloTemplate = vecCaloTempl;
 }
@@ -202,6 +209,7 @@ void l1t::TriggerMenuParser::parseCondFormats(const L1TUtmTriggerMenu* utmMenu) 
   m_conditionMap.resize(m_numberConditionChips);
 
   m_vecMuonTemplate.resize(m_numberConditionChips);
+  m_vecMuonShowerTemplate.resize(m_numberConditionChips);
   m_vecCaloTemplate.resize(m_numberConditionChips);
   m_vecEnergySumTemplate.resize(m_numberConditionChips);
   m_vecExternalTemplate.resize(m_numberConditionChips);
@@ -300,6 +308,12 @@ void l1t::TriggerMenuParser::parseCondFormats(const L1TUtmTriggerMenu* utmMenu) 
                    condition.getType() == esConditionType::QuadMuon) {
           parseMuon(condition, chipNr, false);
 
+        } else if (condition.getType() == esConditionType::MuonShower0 ||
+                   condition.getType() == esConditionType::MuonShower1 ||
+                   condition.getType() == esConditionType::MuonShowerOutOfTime0 ||
+                   condition.getType() == esConditionType::MuonShowerOutOfTime1) {
+          parseMuonShower(condition, chipNr, false);
+
           //parse Correlation Conditions
         } else if (condition.getType() == esConditionType::MuonMuonCorrelation ||
                    condition.getType() == esConditionType::MuonEsumCorrelation ||
@@ -307,6 +321,7 @@ void l1t::TriggerMenuParser::parseCondFormats(const L1TUtmTriggerMenu* utmMenu) 
                    condition.getType() == esConditionType::CaloCaloCorrelation ||
                    condition.getType() == esConditionType::CaloEsumCorrelation ||
                    condition.getType() == esConditionType::InvariantMass ||
+                   condition.getType() == esConditionType::InvariantMassDeltaR ||
                    condition.getType() == esConditionType::TransverseMass ||
                    condition.getType() == esConditionType::InvariantMassUpt) {  // Added for displaced muons
           parseCorrelation(condition, chipNr);
@@ -319,42 +334,39 @@ void l1t::TriggerMenuParser::parseCondFormats(const L1TUtmTriggerMenu* utmMenu) 
         } else if (condition.getType() == esConditionType::Externals) {
           parseExternal(condition, chipNr);
 
+          //parse CorrelationWithOverlapRemoval
+        } else if (condition.getType() == esConditionType::CaloCaloCorrelationOvRm ||
+                   condition.getType() == esConditionType::InvariantMassOvRm ||
+                   condition.getType() == esConditionType::TransverseMassOvRm ||
+                   condition.getType() == esConditionType::DoubleJetOvRm ||
+                   condition.getType() == esConditionType::DoubleTauOvRm) {
+          parseCorrelationWithOverlapRemoval(condition, chipNr);
+
         } else if (condition.getType() == esConditionType::SingleEgammaOvRm ||
                    condition.getType() == esConditionType::DoubleEgammaOvRm ||
                    condition.getType() == esConditionType::TripleEgammaOvRm ||
                    condition.getType() == esConditionType::QuadEgammaOvRm ||
                    condition.getType() == esConditionType::SingleTauOvRm ||
-                   condition.getType() == esConditionType::DoubleTauOvRm ||
                    condition.getType() == esConditionType::TripleTauOvRm ||
                    condition.getType() == esConditionType::QuadTauOvRm ||
                    condition.getType() == esConditionType::SingleJetOvRm ||
-                   condition.getType() == esConditionType::DoubleJetOvRm ||
                    condition.getType() == esConditionType::TripleJetOvRm ||
                    condition.getType() == esConditionType::QuadJetOvRm) {
-          edm::LogError("TriggerMenuParser")
-              << std::endl
-              << "SingleEgammaOvRm" << std::endl
-              << "DoubleEgammaOvRm" << std::endl
-              << "TripleEgammaOvRm" << std::endl
-              << "QuadEgammaOvRm" << std::endl
-              << "SingleTauOvRm" << std::endl
-              << "DoubleTauOvRm" << std::endl
-              << "TripleTauOvRm" << std::endl
-              << "QuadTauOvRm" << std::endl
-              << "SingleJetOvRm" << std::endl
-              << "DoubleJetOvRm" << std::endl
-              << "TripleJetOvRm" << std::endl
-              << "QuadJetOvRm" << std::endl
-              << "The above conditions types OvRm are not implemented yet in the parser. Please remove alogrithms that "
-                 "use this type of condtion from L1T Menu!"
-              << std::endl;
-
-        }
-        //parse CorrelationWithOverlapRemoval
-        else if (condition.getType() == esConditionType::CaloCaloCorrelationOvRm ||
-                 condition.getType() == esConditionType::InvariantMassOvRm ||
-                 condition.getType() == esConditionType::TransverseMassOvRm) {
-          parseCorrelationWithOverlapRemoval(condition, chipNr);
+          edm::LogError("TriggerMenuParser") << std::endl
+                                             << "\n SingleEgammaOvRm"
+                                             << "\n DoubleEgammaOvRm"
+                                             << "\n TripleEgammaOvRm"
+                                             << "\n QuadEgammaOvRm"
+                                             << "\n SingleTauOvRm"
+                                             << "\n TripleTauOvRm"
+                                             << "\n QuadTauOvRm"
+                                             << "\n SingleJetOvRm"
+                                             << "\n TripleJetOvRm"
+                                             << "\n QuadJetOvRm"
+                                             << "\n The above conditions types OvRm are not implemented yet in the "
+                                                "parser. Please remove alogrithms that "
+                                                "use this type of condtion from L1T Menu!"
+                                             << std::endl;
         }
 
       }  //if condition is a new one
@@ -1520,6 +1532,84 @@ bool l1t::TriggerMenuParser::parseMuonCorr(const tmeventsetup::esObject* corrMu,
 }
 
 /**
+ * parseMuonShower Parse a muonShower condition and insert an entry to the conditions map
+ *
+ * @param node The corresponding node.
+ * @param name The name of the condition.
+ * @param chipNr The number of the chip this condition is located.
+ *
+ * @return "true" if succeeded, "false" if an error occurred.
+ *
+ */
+
+bool l1t::TriggerMenuParser::parseMuonShower(tmeventsetup::esCondition condMu,
+                                             unsigned int chipNr,
+                                             const bool corrFlag) {
+  using namespace tmeventsetup;
+
+  // get condition, particle name (must be muon) and type name
+  std::string condition = "muonShower";
+  std::string particle = "muonShower";  //l1t2string( condMu.objectType() );
+  std::string type = l1t2string(condMu.getType());
+  std::string name = l1t2string(condMu.getName());
+  // the number of muon shower objects is always 1
+  int nrObj = 1;
+
+  // condition type is always 1 particle, thus Type1s
+  GtConditionType cType = l1t::Type1s;
+
+  // temporary storage of the parameters
+  std::vector<MuonShowerTemplate::ObjectParameter> objParameter(nrObj);
+
+  if (int(condMu.getObjects().size()) != nrObj) {
+    edm::LogError("TriggerMenuParser") << " condMu objects: nrObj = " << nrObj
+                                       << "condMu.getObjects().size() = " << condMu.getObjects().size() << std::endl;
+    return false;
+  }
+
+  // Get the muon shower object
+  esObject object = condMu.getObjects().at(0);
+  int relativeBx = object.getBxOffset();
+
+  if (condMu.getType() == esConditionType::MuonShower0) {
+    objParameter[0].MuonShower0 = true;
+  } else if (condMu.getType() == esConditionType::MuonShower1) {
+    objParameter[0].MuonShower1 = true;
+  } else if (condMu.getType() == esConditionType::MuonShowerOutOfTime0) {
+    objParameter[0].MuonShowerOutOfTime0 = true;
+  } else if (condMu.getType() == esConditionType::MuonShowerOutOfTime1) {
+    objParameter[0].MuonShowerOutOfTime1 = true;
+  }
+
+  // object types - all muons
+  std::vector<GlobalObject> objType(nrObj, gtMuShower);
+
+  // now create a new CondMuonition
+  MuonShowerTemplate muonShowerCond(name);
+  muonShowerCond.setCondType(cType);
+  muonShowerCond.setObjectType(objType);
+  muonShowerCond.setCondChipNr(chipNr);
+  muonShowerCond.setCondRelativeBx(relativeBx);
+
+  muonShowerCond.setConditionParameter(objParameter);
+
+  if (edm::isDebugEnabled()) {
+    std::ostringstream myCoutStream;
+    muonShowerCond.print(myCoutStream);
+  }
+
+  // insert condition into the map and into muon template vector
+  if (!insertConditionIntoMap(muonShowerCond, chipNr)) {
+    edm::LogError("TriggerMenuParser") << "    Error: duplicate condition (" << name << ")" << std::endl;
+    return false;
+  } else {
+    (m_vecMuonShowerTemplate[chipNr]).push_back(muonShowerCond);
+  }
+
+  return true;
+}
+
+/**
  * parseCalo Parse a calo condition and insert an entry to the conditions map
  *
  * @param node The corresponding node.
@@ -2025,11 +2115,9 @@ bool l1t::TriggerMenuParser::parseCaloCorr(const tmeventsetup::esObject* corrCal
   /*
     // insert condition into the map
     if ( !insertConditionIntoMap(caloCond, chipNr)) {
-
         edm::LogError("TriggerMenuParser")
                 << "    Error: duplicate condition (" << name << ")"
                 << std::endl;
-
         return false;
     }
     else {
@@ -2431,17 +2519,13 @@ bool l1t::TriggerMenuParser::parseEnergySumCorr(const tmeventsetup::esObject* co
   /*
     // insert condition into the map
     if ( !insertConditionIntoMap(energySumCond, chipNr)) {
-
         edm::LogError("TriggerMenuParser")
                 << "    Error: duplicate condition (" << name << ")"
                 << std::endl;
-
         return false;
     }
     else {
-
        (m_corEnergySumTemplate[chipNr]).push_back(energySumCond);
-
     }
 */
   (m_corEnergySumTemplate[chipNr]).push_back(energySumCond);
@@ -2639,7 +2723,8 @@ bool l1t::TriggerMenuParser::parseCorrelation(tmeventsetup::esCondition corrCond
                                       << " Max = " << maxV << " precMin = " << cut.getMinimum().index
                                       << " precMax = " << cut.getMaximum().index << std::endl;
         cutType = cutType | 0x20;
-      } else if (cut.getCutType() == esCutType::Mass) {
+      } else if ((cut.getCutType() == esCutType::Mass) ||
+                 (cut.getCutType() == esCutType::MassDeltaR)) {  //Invariant Mass, MassOverDeltaR
         LogDebug("TriggerMenuParser") << "CutType: " << cut.getCutType() << "\tMass Cut minV = " << minV
                                       << " Max = " << maxV << " precMin = " << cut.getMinimum().index
                                       << " precMax = " << cut.getMaximum().index << std::endl;
@@ -2649,6 +2734,8 @@ bool l1t::TriggerMenuParser::parseCorrelation(tmeventsetup::esCondition corrCond
         // cutType = cutType | 0x8;
         if (corrCond.getType() == esConditionType::TransverseMass) {
           cutType = cutType | 0x10;
+        } else if (corrCond.getType() == esConditionType::InvariantMassDeltaR) {
+          cutType = cutType | 0x80;
         } else {
           cutType = cutType | 0x8;
         }
@@ -2692,10 +2779,8 @@ bool l1t::TriggerMenuParser::parseCorrelation(tmeventsetup::esCondition corrCond
 	  // conditions every time, so even if we put the condition in the vector once, we would
 	  // still evaluate it multiple times.  This is a place for optimization.
           {
-
               parseMuonCorr(&object,chipNr);
 	      corrIndexVal[jj] = (m_corMuonTemplate[chipNr]).size() - 1;
-
           } else {
 	     LogDebug("TriggerMenuParser") << "Not Adding Correlation Muon Condition to Map...looking for the condition in Muon Cor Vector" << std::endl;
 	     bool found = false;
@@ -2713,7 +2798,6 @@ bool l1t::TriggerMenuParser::parseCorrelation(tmeventsetup::esCondition corrCond
 	     } else {
 	       edm::LogError("TriggerMenuParser") << "FAILURE: Condition " << object.getName() << " is in map but not in cor. vector " << std::endl;
 	     }
-
 	  }
 */
       parseMuonCorr(&object, chipNr);
@@ -2900,6 +2984,11 @@ bool l1t::TriggerMenuParser::parseCorrelationThreeBody(tmeventsetup::esCondition
       corrThreeBodyParameter.maxMassCutValue = (long long)(maxV * pow(10., cut.getMaximum().index));
       corrThreeBodyParameter.precMassCut = cut.getMinimum().index;
       cutType = cutType | 0x8;
+    } else if (cut.getCutType() == esCutType::MassDeltaR) {
+      corrThreeBodyParameter.minMassCutValue = (long long)(minV * pow(10., cut.getMinimum().index));
+      corrThreeBodyParameter.maxMassCutValue = (long long)(maxV * pow(10., cut.getMaximum().index));
+      corrThreeBodyParameter.precMassCut = cut.getMinimum().index;
+      cutType = cutType | 0x80;
     }
   }
   corrThreeBodyParameter.corrCutType = cutType;
@@ -3074,6 +3163,11 @@ bool l1t::TriggerMenuParser::parseCorrelationWithOverlapRemoval(const tmeventset
         corrParameter.maxMassCutValue = (long long)(maxV * pow(10., cut.getMaximum().index));
         corrParameter.precMassCut = cut.getMinimum().index;
         cutType = cutType | 0x8;
+      } else if (cut.getCutType() == esCutType::MassDeltaR) {
+        corrParameter.minMassCutValue = (long long)(minV * pow(10., cut.getMinimum().index));
+        corrParameter.maxMassCutValue = (long long)(maxV * pow(10., cut.getMaximum().index));
+        corrParameter.precMassCut = cut.getMinimum().index;
+        cutType = cutType | 0x80;
       }
       if (cut.getCutType() == esCutType::OvRmDeltaEta) {
         //std::cout << "OverlapRemovalDeltaEta Cut minV = " << minV << " Max = " << maxV << " precMin = " << cut.getMinimum().index << " precMax = " << cut.getMaximum().index << std::endl;
@@ -3127,10 +3221,8 @@ bool l1t::TriggerMenuParser::parseCorrelationWithOverlapRemoval(const tmeventset
 	  // conditions every time, so even if we put the condition in the vector once, we would
 	  // still evaluate it multiple times.  This is a place for optimization.
           {
-
               parseMuonCorr(&object,chipNr);
 	      corrIndexVal[jj] = (m_corMuonTemplate[chipNr]).size() - 1;
-
           } else {
 	     LogDebug("TriggerMenuParser") << "Not Adding Correlation Muon Condition to Map...looking for the condition in Muon Cor Vector" << std::endl;
 	     bool found = false;
@@ -3148,7 +3240,6 @@ bool l1t::TriggerMenuParser::parseCorrelationWithOverlapRemoval(const tmeventset
 	     } else {
 	       edm::LogError("TriggerMenuParser") << "FAILURE: Condition " << object.getName() << " is in map but not in cor. vector " << std::endl;
 	     }
-
 	  }
 */
       parseMuonCorr(&object, chipNr);
