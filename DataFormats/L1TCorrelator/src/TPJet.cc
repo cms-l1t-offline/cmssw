@@ -1,0 +1,52 @@
+// -*- C++ -*-
+//
+// Package:     L1Trigger
+// Class  :     TPJet
+//
+
+#include "DataFormats/L1TCorrelator/interface/TPJet.h"
+
+using namespace l1t;
+
+TPJet::TPJet() {}
+
+TPJet::TPJet(const LorentzVector& p4,
+             const edm::Ref<JetBxCollection>& jetRef,
+             const std::vector<edm::Ptr<TrackingParticle> >& L1TrackingParticlePtrs,
+             float jetvtx)
+    : L1Candidate(p4), jetRef_(jetRef), L1TrackingParticlePtrs_(L1TrackingParticlePtrs), JetVtx_(jetvtx) {}
+/*TkJet::TkJet(const LorentzVector& p4,
+             const std::vector<edm::Ptr<L1TTTrackType> >& trkPtrs,
+             float jetvtx,
+             unsigned int ntracks,
+             unsigned int tighttracks,
+             unsigned int displacedtracks,
+             unsigned int tightdisplacedtracks)
+    : L1Candidate(p4),
+      trkPtrs_(trkPtrs),
+      JetVtx_(jetvtx),
+      ntracks_(ntracks),
+      tighttracks_(tighttracks),
+      displacedtracks_(displacedtracks),
+      tightdisplacedtracks_(tightdisplacedtracks) {}*/
+TPJet::TPJet(const LorentzVector& p4,
+             const std::vector<edm::Ptr<TrackingParticle> >& L1TrackingParticlePtrs,
+             float jetvtx,
+             unsigned int ntracks,
+             unsigned int tighttracks,
+             unsigned int displacedtracks,
+             unsigned int tightdisplacedtracks,
+             bool displacedTag)
+    : L1Candidate(p4),
+      L1TrackingParticlePtrs_(L1TrackingParticlePtrs),
+      JetVtx_(jetvtx),
+      ntracks_(ntracks),
+      tighttracks_(tighttracks),
+      displacedtracks_(displacedtracks),
+      tightdisplacedtracks_(tightdisplacedtracks),
+      displacedTag_(displacedTag) {}
+
+int TPJet::bx() const {
+  // in the producer TkJetProducer.cc, we keep only jets with bx = 0
+  return 0;
+}
