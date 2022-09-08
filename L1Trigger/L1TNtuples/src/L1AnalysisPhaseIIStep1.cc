@@ -322,6 +322,7 @@ void L1Analysis::L1AnalysisPhaseIIStep1::SetMuonEMTF(const edm::Handle<l1t::EMTF
     }
   }
 }
+
 void L1Analysis::L1AnalysisPhaseIIStep1::SetTkMuon(const edm::Handle<l1t::TkMuonCollection> muon, unsigned maxL1Extra) {
   for (l1t::TkMuonCollection::const_iterator it = muon->begin(); it != muon->end() && l1extra_.nTkMuons < maxL1Extra;
        it++) {
@@ -357,7 +358,9 @@ void L1Analysis::L1AnalysisPhaseIIStep1::SetTkMuon(const edm::Handle<l1t::TkMuon
     l1extra_.nTkMuons++;
   }
 }
+
 //global muons
+
 //sta glb
 void L1Analysis::L1AnalysisPhaseIIStep1::SetMuon(const edm::Handle<l1t::MuonBxCollection> muon, unsigned maxL1Extra) {
   for (int ibx = muon->getFirstBX(); ibx <= muon->getLastBX(); ++ibx) {
@@ -387,6 +390,7 @@ void L1Analysis::L1AnalysisPhaseIIStep1::SetMuon(const edm::Handle<l1t::MuonBxCo
     }
   }
 }
+
 //tkmuon global
 void L1Analysis::L1AnalysisPhaseIIStep1::SetTkGlbMuon(const edm::Handle<l1t::TkGlbMuonCollection> muon,
                                                       unsigned maxL1Extra) {
