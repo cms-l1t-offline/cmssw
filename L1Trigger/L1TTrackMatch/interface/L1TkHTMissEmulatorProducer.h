@@ -30,7 +30,7 @@ namespace l1tmhtemu {
   const unsigned int kMHTSize{15};     // For output Magnitude default 15
   const unsigned int kMHTPhiSize{14};  // For output Phi default 14
   const unsigned int kHTSize{kInternalPtWidth + kEtExtra};
-  const float kMaxMHT{4096};           // 4 TeV
+  const float kMaxMHT{4096};  // 4 TeV
   const float kMaxMHTPhi{2 * M_PI};
 
   typedef ap_uint<5> ntracks_t;
