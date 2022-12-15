@@ -10,12 +10,12 @@ L1Analysis::L1AnalysisPhaseII::~L1AnalysisPhaseII()
 
 }
 
-void L1Analysis::L1AnalysisPhaseII::SetVertices(float z0Puppi, const edm::Handle< std::vector<l1t::TkPrimaryVertex> > TkPrimaryVertex){
+void L1Analysis::L1AnalysisPhaseII::SetVertices(float z0Puppi, const edm::Handle< std::vector<l1t::VertexWord> > TkPrimaryVertex){
       l1extra_.z0Puppi=z0Puppi;
 
       for (unsigned int i=0; i<TkPrimaryVertex->size() ; i++){
-                  l1extra_.z0L1TkPV.push_back(TkPrimaryVertex->at(i).zvertex());
-                  l1extra_.sumL1TkPV.push_back(TkPrimaryVertex->at(i).sum());
+                  //l1extra_.z0L1TkPV.push_back(TkPrimaryVertex->at(i).zvertex());
+                  //l1extra_.sumL1TkPV.push_back(TkPrimaryVertex->at(i).sum());
                   l1extra_.nL1TkPVs++;
       }
 
@@ -133,7 +133,7 @@ void L1Analysis::L1AnalysisPhaseII::SetMuonKF(const edm::Handle<l1t::RegionalMuo
       if (it->hwPt() > 0){
 //      std::cout<<"hwPt vs hwPt2?"<<it->hwPt()*0.5<<" "<<it->hwPt2()<<"   "<<it->hwSign()<<"   "<<muonDetector<<std::endl;
       l1extra_.standaloneMuonPt .push_back(it->hwPt()*0.5);
-      l1extra_.standaloneMuonPt2 .push_back(it->hwPt2());
+      l1extra_.standaloneMuonPt2 .push_back(it->hwPt());
       l1extra_.standaloneMuonDXY .push_back(it->hwDXY());
       l1extra_.standaloneMuonEta.push_back(it->hwEta()*0.010875);
       l1extra_.standaloneMuonPhi.push_back(l1t::MicroGMTConfiguration::calcGlobalPhi( it->hwPhi(), it->trackFinderType(), it->processor() )*2*M_PI/576);
