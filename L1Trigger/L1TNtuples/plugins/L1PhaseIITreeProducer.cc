@@ -41,9 +41,10 @@ Implementation:
 #include "DataFormats/L1TCorrelator/interface/TkMuon.h"
 #include "DataFormats/L1TCorrelator/interface/TkMuonFwd.h"
 
+#include "DataFormats/L1Trigger/interface/VertexWord.h"
+
 #include "DataFormats/L1TCorrelator/interface/TkGlbMuon.h"
 #include "DataFormats/L1TCorrelator/interface/TkGlbMuonFwd.h"
-#include "DataFormats/L1TCorrelator/interface/TkPrimaryVertex.h"
 #include "DataFormats/L1TCorrelator/interface/TkEtMiss.h"
 #include "DataFormats/L1TCorrelator/interface/TkEtMissFwd.h"
 #include "DataFormats/L1TCorrelator/interface/TkEm.h"
@@ -174,7 +175,7 @@ class L1PhaseIITreeProducer : public edm::EDAnalyzer {
                 edm::EDGetTokenT<float> z0PuppiToken_;
                 //edm::EDGetTokenT<l1t::VertexCollection> l1vertextdrToken_;
                 //edm::EDGetTokenT<l1t::VertexCollection> l1verticesToken_;
-                edm::EDGetTokenT<l1t::TkPrimaryVertexCollection> l1TkPrimaryVertexToken_;
+                edm::EDGetTokenT<l1t::VertexWordCollection> l1TkPrimaryVertexToken_;
 
                 //edm::EDGetTokenT<l1t::PFTauCollection> PFTauToken_;
                 edm::EDGetTokenT< std::vector<l1t::PFCandidate> > l1PFCandidates_; 
@@ -248,7 +249,7 @@ L1PhaseIITreeProducer::L1PhaseIITreeProducer(const edm::ParameterSet& iConfig){
         z0PuppiToken_ = consumes< float > (iConfig.getParameter<edm::InputTag>("zoPuppi"));
         //l1vertextdrToken_ = consumes< l1t::VertexCollection> (iConfig.getParameter<edm::InputTag>("l1vertextdr"));
         //l1verticesToken_  = consumes< l1t::VertexCollection> (iConfig.getParameter<edm::InputTag>("l1vertices"));
-        l1TkPrimaryVertexToken_ = consumes< l1t::TkPrimaryVertexCollection> (iConfig.getParameter<edm::InputTag>("l1TkPrimaryVertex"));
+        l1TkPrimaryVertexToken_ = consumes< l1t::VertexWordCollection> (iConfig.getParameter<edm::InputTag>("l1TkPrimaryVertex"));
 
         l1PFCandidates_ =consumes <std::vector<l1t::PFCandidate> > (iConfig.getParameter<edm::InputTag>("l1PFCandidates")); 
         //PFTauToken_ = consumes<l1t::PFTauCollection>(iConfig.getParameter<edm::InputTag>("PFTauToken"));
@@ -389,7 +390,7 @@ L1PhaseIITreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
        // iEvent.getByToken(l1vertextdrToken_,l1vertextdr);
        // iEvent.getByToken(l1verticesToken_,l1vertices);
 
-        edm::Handle<std::vector<l1t::TkPrimaryVertex> > l1TkPrimaryVertex;
+        edm::Handle<std::vector<l1t::VertexWord> > l1TkPrimaryVertex;
         iEvent.getByToken(l1TkPrimaryVertexToken_,l1TkPrimaryVertex);
 
 

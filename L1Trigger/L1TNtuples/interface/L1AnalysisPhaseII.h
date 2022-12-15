@@ -27,13 +27,11 @@
 #include "DataFormats/L1Trigger/interface/L1HFRings.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 
-#include "DataFormats/L1TCorrelator/interface/TkPrimaryVertex.h"
-
+#include "DataFormats/L1Trigger/interface/VertexWord.h"
 #include "DataFormats/L1TCorrelator/interface/TkMuon.h"
 #include "DataFormats/L1TCorrelator/interface/TkMuonFwd.h"
 #include "DataFormats/L1TCorrelator/interface/TkGlbMuon.h"
 #include "DataFormats/L1TCorrelator/interface/TkGlbMuonFwd.h"
-#include "DataFormats/L1TCorrelator/interface/TkPrimaryVertex.h"
 #include "DataFormats/L1TCorrelator/interface/TkEtMiss.h"
 #include "DataFormats/L1TCorrelator/interface/TkEtMissFwd.h"
 #include "DataFormats/L1TCorrelator/interface/TkEm.h"
@@ -84,7 +82,7 @@ namespace L1Analysis
     void Reset() {l1extra_.Reset();}
 
     // Fill DZ of Vertex, different algorithms
-    void SetVertices(float z0Puppi, const edm::Handle<std::vector<l1t::TkPrimaryVertex> > TkPrimaryVertex);
+    void SetVertices(float z0Puppi, const edm::Handle<std::vector<l1t::VertexWord> > TkPrimaryVertex);
 
 
     // Old style objects (Phase I)
