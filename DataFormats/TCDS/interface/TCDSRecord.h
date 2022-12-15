@@ -101,6 +101,7 @@ public:
 
   // Source FED ID
   uint16_t getSourceID() const { return sourceid_; }
+
   // List of active paritions, currently not implemented
   typedef std::bitset<96> ActivePartitions;
   ActivePartitions getActivePartitions() const { return activePartitions_; }
