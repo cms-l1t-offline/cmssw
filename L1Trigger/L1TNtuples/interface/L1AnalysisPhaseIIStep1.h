@@ -107,7 +107,7 @@ namespace L1Analysis {
                  const edm::Handle<l1t::TkEmCollection> tkEMHGC,
                  unsigned maxL1Extra);
 
-/*
+    /*
     void SetMuonKF(const edm::Handle<l1t::RegionalMuonCandBxCollection> muonKF,
                    unsigned maxL1Extra,
                    unsigned int muonDetector);
@@ -182,7 +182,6 @@ namespace L1Analysis {
     const float lsb_d0 = Phase2L1GMT::LSBGTd0;
     const float lsb_SA_z0 = Phase2L1GMT::LSBSAz0;
     const float lsb_SA_d0 = Phase2L1GMT::LSBSAd0;
-
   };
 }  // namespace L1Analysis
 #endif
