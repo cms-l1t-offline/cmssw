@@ -180,17 +180,6 @@ from L1Trigger.L1TTrackMatch.l1tTrackerEmuHTMiss_cfi import *
 _phase2_siml1emulator.add(l1tTrackerEmuHTMiss)
 _phase2_siml1emulator.add(l1tTrackerEmuHTMissExtended)
 
-# Tracker Objects
-# ########################################################################
-# from L1Trigger.L1TTrackMatch.L1TrackJetProducer_cfi import *
-# from L1Trigger.L1TTrackMatch.L1TrackFastJetProducer_cfi import *
-# from L1Trigger.L1TTrackMatch.L1TrackerEtMissProducer_cfi import *
-# from L1Trigger.L1TTrackMatch.L1TkHTMissProducer_cfi import *
-# _phase2_siml1emulator.add(L1TrackJets)
-# _phase2_siml1emulator.add(L1TrackFastJets)
-# _phase2_siml1emulator.add(L1TrackerEtMiss)
-# _phase2_siml1emulator.add(L1TrackerHTMiss)
-
 # PF Candidates
 # ########################################################################
 from L1Trigger.Phase2L1ParticleFlow.l1ctLayer1_cff import *
