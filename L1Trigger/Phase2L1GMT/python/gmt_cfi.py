@@ -41,6 +41,12 @@ l1tGMTStubs = cms.EDProducer("Phase2L1TGMTStubProducer",
 
 
 
+l1tGMTFilteredMuons = cms.EDProducer('Phase2L1TGMTFilter',
+                                     srcMuons = cms.InputTag("l1tTkMuonsGmt",""),
+                                     applyLowPtFilter = cms.bool(False),
+                                     ptBarrelMin = cms.int32(8),
+                                     ptEndcapMin = cms.int32(8)
+                                     )
 
 
 l1tGMTMuons = cms.EDProducer('Phase2L1TGMTProducer',
