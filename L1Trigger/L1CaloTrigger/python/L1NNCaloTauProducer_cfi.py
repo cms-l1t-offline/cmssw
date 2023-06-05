@@ -26,13 +26,13 @@ L1NNCaloTauProducer = cms.EDProducer("L1NNCaloTauProducer",
     EtMinForSeeding = cms.double(2.5),
     EtaRestriction = cms.double(3.0), # the TauMinator algo can go up to 3.0, but 2.4 makes it directly comparable to "Square Calo Tau" algo
     
-    CNNmodel_CB_path = cms.string("L1Trigger/L1CaloTrigger/data/CNNmodel_CB.pb"),
-    DNNident_CB_path = cms.string("L1Trigger/L1CaloTrigger/data/DNNident_CB.pb"),
-    DNNcalib_CB_path = cms.string("L1Trigger/L1CaloTrigger/data/DNNcalib_CB.pb"),
+    CNNmodel_CB_path = cms.string("L1Trigger/L1CaloTrigger/data/Phase2_NNCaloTaus/CNNmodel_CB.pb"),
+    DNNident_CB_path = cms.string("L1Trigger/L1CaloTrigger/data/Phase2_NNCaloTaus/DNNident_CB.pb"),
+    DNNcalib_CB_path = cms.string("L1Trigger/L1CaloTrigger/data/Phase2_NNCaloTaus/DNNcalib_CB.pb"),
 
-    CNNmodel_CE_path = cms.string("L1Trigger/L1CaloTrigger/data/CNNmodel_CE.pb"),
-    DNNident_CE_path = cms.string("L1Trigger/L1CaloTrigger/data/DNNident_CE.pb"),
-    DNNcalib_CE_path = cms.string("L1Trigger/L1CaloTrigger/data/DNNcalib_CE.pb"),
+    CNNmodel_CE_path = cms.string("L1Trigger/L1CaloTrigger/data/Phase2_NNCaloTaus/CNNmodel_CE.pb"),
+    DNNident_CE_path = cms.string("L1Trigger/L1CaloTrigger/data/Phase2_NNCaloTaus/DNNident_CE.pb"),
+    DNNcalib_CE_path = cms.string("L1Trigger/L1CaloTrigger/data/Phase2_NNCaloTaus/DNNcalib_CE.pb"),
 
     DEBUG = cms.bool(False)
 )
