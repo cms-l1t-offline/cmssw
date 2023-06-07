@@ -191,7 +191,7 @@ def _appendPhase2Digis(obj):
         'keep *_l1tTowerCalibration_*_*',
         'keep *_l1tCaloJet_*_*',
         'keep *_l1tCaloJetHTT_*_*',
-        'keep *_l1tNNCaloTau_*_*',
+        'keep *_l1tNNCaloTauProducer_*_*',
         'keep *_l1tPFClustersFromL1EGClusters_*_*',
         'keep *_l1tPFClustersFromCombinedCaloHCal_*_*',
         'keep *_l1tPFClustersFromCombinedCaloHF_*_*',
