@@ -301,8 +301,8 @@ void l1tNNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eS
     l1Hit.towerEm = hit.etEm();
     l1Hit.towerHad = hit.etHad();
     l1Hit.towerEt = l1Hit.towerEm + l1Hit.towerHad;
-    l1Hit.towerIeta = endcap_ieta(l1Hit.towerEta); // computed and filled but not used
-    l1Hit.towerIphi = endcap_iphi(l1Hit.towerPhi); // computed and filled but not used
+    l1Hit.towerIeta = endcap_ieta(l1Hit.towerEta);  // computed and filled but not used
+    l1Hit.towerIphi = endcap_iphi(l1Hit.towerPhi);  // computed and filled but not used
 
     l1CaloTowers.push_back(l1Hit);
   }
@@ -639,14 +639,18 @@ void l1tNNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eS
     TowerClusterPosition_CE.tensor<float, 2>()(clIdx, 0) = clNxM.seedEta;
     TowerClusterPosition_CE.tensor<float, 2>()(clIdx, 1) = clNxM.seedPhi;
 
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 0) = inputScaler( inputQuantizer(HGClu.pt, 0.25, 14), "pt");
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 1) = inputScaler( inputQuantizer(abs(HGClu.eta) - 1.321, 0.004, 9), "eta");
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 2) = inputScaler( HGClu.showerlength, "showerlength");
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 3) = inputScaler( HGClu.coreshowerlength, "coreshowerlength");
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 4) = inputScaler( inputQuantizer(HGClu.spptot, 0.0000153, 16), "spptot");
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 5) = inputScaler( inputQuantizer(HGClu.szz, 0.00153, 16), "szz");
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 6) = inputScaler( inputQuantizer(HGClu.srrtot, 0.0000153, 16), "srrtot");
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 7) = inputScaler( inputQuantizer(10 * (abs(HGClu.meanz) - 321.05), 0.5, 12), "meanz");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 0) = inputScaler(inputQuantizer(HGClu.pt, 0.25, 14), "pt");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 1) =
+        inputScaler(inputQuantizer(abs(HGClu.eta) - 1.321, 0.004, 9), "eta");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 2) = inputScaler(HGClu.showerlength, "showerlength");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 3) = inputScaler(HGClu.coreshowerlength, "coreshowerlength");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 4) =
+        inputScaler(inputQuantizer(HGClu.spptot, 0.0000153, 16), "spptot");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 5) = inputScaler(inputQuantizer(HGClu.szz, 0.00153, 16), "szz");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 6) =
+        inputScaler(inputQuantizer(HGClu.srrtot, 0.0000153, 16), "srrtot");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 7) =
+        inputScaler(inputQuantizer(10 * (abs(HGClu.meanz) - 321.05), 0.5, 12), "meanz");
 
     clIdx++;  // Increase batch index
   }
@@ -797,7 +801,7 @@ float l1tNNCaloTauProducer::inputQuantizer(float inputF, float LSB, int nbits) {
 
 float l1tNNCaloTauProducer::inputScaler(float inputF, std::string feature) {
   float mean = FeatScaler_CE.get_child(feature).get<float>("mean");
-  float std  = FeatScaler_CE.get_child(feature).get<float>("std");
+  float std = FeatScaler_CE.get_child(feature).get<float>("std");
 
   return (inputF - mean) / std;
 }
