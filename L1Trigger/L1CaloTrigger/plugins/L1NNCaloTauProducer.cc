@@ -1,10 +1,10 @@
 /* -*- C++ -*-
 
 Package: L1CaloTrigger
-Class: L1NNCaloTauProducer
+Class: l1tNNCaloTauProducer
 Frinedly name: The TauMinator
 
-\class L1NNCaloTauProducer L1NNCaloTauProducer.cc
+\class l1tNNCaloTauProducer l1tNNCaloTauProducer.cc
 
 Description: 
 Perform reconstruction and identification of tau 
@@ -26,6 +26,9 @@ Created: Tue May 30th 2023
 #include <iostream>
 #include <vector>
 #include <cmath>
+
+#include "boost/property_tree/ptree.hpp"
+#include "boost/property_tree/json_parser.hpp"
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/stream/EDProducer.h"
@@ -53,9 +56,9 @@ Created: Tue May 30th 2023
 
 #include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
 
-class L1NNCaloTauProducer : public edm::stream::EDProducer<> {
+class l1tNNCaloTauProducer : public edm::stream::EDProducer<> {
 public:
-  explicit L1NNCaloTauProducer(const edm::ParameterSet&);
+  explicit l1tNNCaloTauProducer(const edm::ParameterSet&);
 
 private:
   //----edm control---
@@ -67,6 +70,7 @@ private:
   int endcap_iphi(float& phi) const;
   int endcap_ieta(float& eta) const;
   float inputQuantizer(float inputF, float LSB, int nbits);
+  float inputScaler(float inputF, std::string feature);
 
   //----tokens and handles----
   edm::EDGetTokenT<l1tp2::CaloTowerCollection> l1TowersToken;
@@ -96,6 +100,8 @@ private:
   std::string CNNmodel_CE_path;
   std::string DNNident_CE_path;
   std::string DNNcalib_CE_path;
+  std::string FeatScaler_CE_path;
+  boost::property_tree::ptree FeatScaler_CE;
 
   tensorflow::GraphDef* CNNmodel_CB;
   tensorflow::GraphDef* DNNident_CB;
@@ -112,6 +118,14 @@ private:
   tensorflow::Session* CNNmodel_CEsession;
   tensorflow::Session* DNNident_CEsession;
   tensorflow::Session* DNNcalib_CEsession;
+
+  double IdWp90_CB;
+  double IdWp95_CB;
+  double IdWp99_CB;
+
+  double IdWp90_CE;
+  double IdWp95_CE;
+  double IdWp99_CE;
 
   // hardoced dimensions of the tower clusters
   int seedIdx = 22;
@@ -178,7 +192,7 @@ private:
 */
 
 // ----Constructor and Destructor -----
-L1NNCaloTauProducer::L1NNCaloTauProducer(const edm::ParameterSet& iConfig)
+l1tNNCaloTauProducer::l1tNNCaloTauProducer(const edm::ParameterSet& iConfig)
     : l1TowersToken(consumes<l1tp2::CaloTowerCollection>(iConfig.getParameter<edm::InputTag>("l1CaloTowers"))),
       hgcalTowersToken(consumes<l1t::HGCalTowerBxCollection>(iConfig.getParameter<edm::InputTag>("hgcalTowers"))),
 
@@ -198,7 +212,16 @@ L1NNCaloTauProducer::L1NNCaloTauProducer(const edm::ParameterSet& iConfig)
       DNNcalib_CB_path(iConfig.getParameter<std::string>("DNNcalib_CB_path")),
       CNNmodel_CE_path(iConfig.getParameter<std::string>("CNNmodel_CE_path")),
       DNNident_CE_path(iConfig.getParameter<std::string>("DNNident_CE_path")),
-      DNNcalib_CE_path(iConfig.getParameter<std::string>("DNNcalib_CE_path")) {
+      DNNcalib_CE_path(iConfig.getParameter<std::string>("DNNcalib_CE_path")),
+      FeatScaler_CE_path(iConfig.getParameter<std::string>("FeatScaler_CE_path")),
+
+      IdWp90_CB(iConfig.getParameter<double>("IdWp90_CB")),
+      IdWp95_CB(iConfig.getParameter<double>("IdWp95_CB")),
+      IdWp99_CB(iConfig.getParameter<double>("IdWp99_CB")),
+
+      IdWp90_CE(iConfig.getParameter<double>("IdWp90_CE")),
+      IdWp95_CE(iConfig.getParameter<double>("IdWp95_CE")),
+      IdWp99_CE(iConfig.getParameter<double>("IdWp99_CE")) {
   // Create sessions for Tensorflow inferece
   CNNmodel_CB = tensorflow::loadGraphDef(edm::FileInPath(CNNmodel_CB_path).fullPath());
   CNNmodel_CBsession = tensorflow::createSession(CNNmodel_CB);
@@ -218,6 +241,9 @@ L1NNCaloTauProducer::L1NNCaloTauProducer(const edm::ParameterSet& iConfig)
   DNNcalib_CE = tensorflow::loadGraphDef(edm::FileInPath(DNNcalib_CE_path).fullPath());
   DNNcalib_CEsession = tensorflow::createSession(DNNcalib_CE);
 
+  // Read features scaler
+  boost::property_tree::read_json(edm::FileInPath(FeatScaler_CE_path).fullPath(), FeatScaler_CE);
+
   // Initialize HGCAL BDTs
   if (!VsPuId.method().empty()) {
     VsPuId.prepareTMVA();
@@ -232,7 +258,7 @@ L1NNCaloTauProducer::L1NNCaloTauProducer(const edm::ParameterSet& iConfig)
             << std::endl;
 }
 
-void L1NNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eSetup) {
+void l1tNNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eSetup) {
   // Output collection
   std::unique_ptr<BXVector<l1t::Tau>> L1NNCaloTauCollectionBXV(new l1t::TauBxCollection);
 
@@ -275,8 +301,8 @@ void L1NNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eSe
     l1Hit.towerEm = hit.etEm();
     l1Hit.towerHad = hit.etHad();
     l1Hit.towerEt = l1Hit.towerEm + l1Hit.towerHad;
-    l1Hit.towerIeta = endcap_ieta(l1Hit.towerEta);
-    l1Hit.towerIphi = endcap_iphi(l1Hit.towerPhi);
+    l1Hit.towerIeta = endcap_ieta(l1Hit.towerEta); // computed and filled but not used
+    l1Hit.towerIphi = endcap_iphi(l1Hit.towerPhi); // computed and filled but not used
 
     l1CaloTowers.push_back(l1Hit);
   }
@@ -613,18 +639,14 @@ void L1NNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eSe
     TowerClusterPosition_CE.tensor<float, 2>()(clIdx, 0) = clNxM.seedEta;
     TowerClusterPosition_CE.tensor<float, 2>()(clIdx, 1) = clNxM.seedPhi;
 
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 0) = (inputQuantizer(HGClu.pt, 0.25, 14) - 6.07127) / 8.09958;
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 1) =
-        (inputQuantizer(abs(HGClu.eta) - 1.321, 0.004, 9) - 1.43884) / 0.31367;
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 2) = (HGClu.showerlength - 31.2058) / 7.66842;
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 3) = (HGClu.coreshowerlength - 10.0995) / 2.73062;
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 4) =
-        (inputQuantizer(HGClu.spptot, 0.0000153, 16) - 0.02386) / 0.01520;
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 5) = (inputQuantizer(HGClu.szz, 0.00153, 16) - 19.5851) / 12.7077;
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 6) =
-        (inputQuantizer(HGClu.srrtot, 0.0000153, 16) - 0.00606) / 0.00129;
-    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 7) =
-        (inputQuantizer(10 * (abs(HGClu.meanz) - 321.05), 0.5, 12) - 215.552) / 104.794;
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 0) = inputScaler( inputQuantizer(HGClu.pt, 0.25, 14), "pt");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 1) = inputScaler( inputQuantizer(abs(HGClu.eta) - 1.321, 0.004, 9), "eta");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 2) = inputScaler( HGClu.showerlength, "showerlength");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 3) = inputScaler( HGClu.coreshowerlength, "coreshowerlength");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 4) = inputScaler( inputQuantizer(HGClu.spptot, 0.0000153, 16), "spptot");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 5) = inputScaler( inputQuantizer(HGClu.szz, 0.00153, 16), "szz");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 6) = inputScaler( inputQuantizer(HGClu.srrtot, 0.0000153, 16), "srrtot");
+    Cl3dShapeFeatures_CE.tensor<float, 2>()(clIdx, 7) = inputScaler( inputQuantizer(10 * (abs(HGClu.meanz) - 321.05), 0.5, 12), "meanz");
 
     clIdx++;  // Increase batch index
   }
@@ -664,15 +686,18 @@ void L1NNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eSe
 
     // Assign increasing quality to higher scoring candidates
     int quality = 0;
-    if (clNxM.IDscore > 0.0410) {
+    // 99% WP
+    if (clNxM.IDscore > IdWp99_CB) {
       quality = 1;
-    }  // 99% WP
-    if (clNxM.IDscore > 0.3573) {
+    }
+    // 95% WP
+    if (clNxM.IDscore > IdWp95_CB) {
       quality = 2;
-    }  // 95% WP
-    if (clNxM.IDscore > 0.7310) {
+    }
+    // 90% WP
+    if (clNxM.IDscore > IdWp90_CB) {
       quality = 3;
-    }  // 90% WP
+    }
 
     reco::Candidate::PolarLorentzVector tauP4 =
         reco::Candidate::PolarLorentzVector(clNxM.calibPt, clNxM.seedEta, clNxM.seedPhi, 0);
@@ -696,15 +721,18 @@ void L1NNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eSe
 
     // Assign increasing quality to higher scoring candidates
     int quality = 0;
-    if (clNxM.IDscore > 0.0413) {
+    // 99% WP
+    if (clNxM.IDscore > IdWp99_CE) {
       quality = 1;
-    }  // 99% WP
-    if (clNxM.IDscore > 0.2994) {
+    }
+    // 95% WP
+    if (clNxM.IDscore > IdWp95_CE) {
       quality = 2;
-    }  // 95% WP
-    if (clNxM.IDscore > 0.6243) {
+    }
+    // 90% WP
+    if (clNxM.IDscore > IdWp90_CE) {
       quality = 3;
-    }  // 90% WP
+    }
 
     reco::Candidate::PolarLorentzVector tauP4 =
         reco::Candidate::PolarLorentzVector(clNxM.calibPt, clNxM.seedEta, clNxM.seedPhi, 0);
@@ -725,7 +753,7 @@ void L1NNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eSe
 
 }  // End of produce function
 
-int L1NNCaloTauProducer::tower_dIPhi(int& iPhi_1, int& iPhi_2) const {
+int l1tNNCaloTauProducer::tower_dIPhi(int& iPhi_1, int& iPhi_2) const {
   int PI = 36;
   int result = iPhi_1 - iPhi_2;
   if (result > PI) {
@@ -737,7 +765,7 @@ int L1NNCaloTauProducer::tower_dIPhi(int& iPhi_1, int& iPhi_2) const {
   return result;
 }
 
-int L1NNCaloTauProducer::tower_dIEta(int& iEta_1, int& iEta_2) const {
+int l1tNNCaloTauProducer::tower_dIEta(int& iEta_1, int& iEta_2) const {
   if (iEta_1 * iEta_2 > 0) {
     return iEta_1 - iEta_2;
   } else {
@@ -749,7 +777,7 @@ int L1NNCaloTauProducer::tower_dIEta(int& iEta_1, int& iEta_2) const {
   }
 }
 
-int L1NNCaloTauProducer::endcap_iphi(float& phi) const {
+int l1tNNCaloTauProducer::endcap_iphi(float& phi) const {
   float phi_step = 0.0872664;
   if (phi > 0) {
     return floor(phi / phi_step) + 1;
@@ -758,13 +786,20 @@ int L1NNCaloTauProducer::endcap_iphi(float& phi) const {
   }
 }
 
-int L1NNCaloTauProducer::endcap_ieta(float& eta) const {
+int l1tNNCaloTauProducer::endcap_ieta(float& eta) const {
   float eta_step = 0.0845;
   return floor(abs(eta) / eta_step) * std::copysign(1, eta);
 }
 
-float L1NNCaloTauProducer::inputQuantizer(float inputF, float LSB, int nbits) {
+float l1tNNCaloTauProducer::inputQuantizer(float inputF, float LSB, int nbits) {
   return min(floor(inputF / LSB), float(pow(2, nbits) - 1)) * LSB;
 }
 
-DEFINE_FWK_MODULE(L1NNCaloTauProducer);
+float l1tNNCaloTauProducer::inputScaler(float inputF, std::string feature) {
+  float mean = FeatScaler_CE.get_child(feature).get<float>("mean");
+  float std  = FeatScaler_CE.get_child(feature).get<float>("std");
+
+  return (inputF - mean) / std;
+}
+
+DEFINE_FWK_MODULE(l1tNNCaloTauProducer);
