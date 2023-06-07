@@ -92,7 +92,7 @@ _phase2_siml1emulator.add(L1THGCalTriggerPrimitivesTask)
 from L1Trigger.L1CaloTrigger.l1tEGammaCrystalsEmulatorProducer_cfi import *
 _phase2_siml1emulator.add(l1tEGammaClusterEmuProducer)
 
-# Barrel and EndCap CaloJet/HT
+# Barrel and EndCap CaloJet/HT/NNCaloTau
 # ########################################################################
 # ----    Produce the calibrated tower collection combining Barrel, HGCal, HF
 from L1Trigger.L1CaloTrigger.l1tTowerCalibrationProducer_cfi import *
@@ -111,6 +111,9 @@ from L1Trigger.L1CaloTrigger.l1tCaloJetHTTProducer_cfi import *
 l1tCaloJetHTT = l1tCaloJetHTTProducer.clone(
     BXVCaloJetsInputTag = ("L1CaloJet", "CaloJets") 
 )
+# ----    Produce the NNCaloTau
+from L1Trigger.L1CaloTrigger.l1tNNCaloTauProducer_cfi import *
+_phase2_siml1emulator.add(l1tNNCaloTauProducer)
 
 
 _phase2_siml1emulator.add(l1tTowerCalibration)
