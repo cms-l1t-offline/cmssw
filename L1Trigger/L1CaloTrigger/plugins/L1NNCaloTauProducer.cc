@@ -128,13 +128,14 @@ private:
   double IdWp99_CE;
 
   // hardoced dimensions of the tower clusters
-  int seedIdx = 22;
-  int IEta_dim = 5;
-  int IPhi_dim = 9;
-  float Eta_dim = 0.2;
-  float Phi_dim = 0.4;
-  float Eta_dim_seed = 0.35;
-  float Phi_dim_seed = 0.7;
+  const int seedIdx = 22;
+  const int IEta_dim = 5;
+  const int IPhi_dim = 9;
+  const float Eta_dim = 0.2;
+  const float Phi_dim = 0.4;
+  const float Eta_dim_seed = 0.35;
+  const float Phi_dim_seed = 0.7;
+  const float Eta_limit = 2.83;
 
   // classes of objects used only in this producer
   class SimpleTowerHit {
@@ -388,7 +389,7 @@ void l1tNNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eS
     for (auto& l1CaloTower : l1CaloTowers) {
       // Skip seeding in towers that would make the cluster extend in HF
       // Skip l1CaloTowers which are already used by this clusters' mask
-      if (abs(l1CaloTower.towerEta) > 2.83 || l1CaloTower.stale4seed) {
+      if (abs(l1CaloTower.towerEta) > Eta_limit || l1CaloTower.stale4seed) {
         continue;
       }
 
