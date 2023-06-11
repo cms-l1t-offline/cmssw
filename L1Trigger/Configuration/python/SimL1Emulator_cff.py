@@ -115,6 +115,9 @@ l1tCaloJetHTT = l1tCaloJetHTTProducer.clone(
 from L1Trigger.L1CaloTrigger.l1tNNCaloTauProducer_cfi import *
 _phase2_siml1emulator.add(l1tNNCaloTauProducer)
 
+from L1Trigger.L1CaloTrigger.l1tNNCaloTauEmulator_cfi import *
+_phase2_siml1emulator.add(l1tNNCaloTauEmulator)
+
 
 _phase2_siml1emulator.add(l1tTowerCalibration)
 _phase2_siml1emulator.add(l1tCaloJet)
