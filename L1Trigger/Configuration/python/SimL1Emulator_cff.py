@@ -88,11 +88,14 @@ _phase2_siml1emulator.add(L1THGCalTriggerPrimitivesTask)
 
 # Barrel and EndCap EGamma
 # ########################################################################
-
 from L1Trigger.L1CaloTrigger.l1tEGammaCrystalsEmulatorProducer_cfi import *
 _phase2_siml1emulator.add(l1tEGammaClusterEmuProducer)
 
 # Barrel and EndCap CaloJet/HT/NNCaloTau
+from L1Trigger.L1CaloTrigger.l1tPhase2L1CaloEGammaEmulator_cfi import *
+_phase2_siml1emulator.add(l1tPhase2L1CaloEGammaEmulator)
+
+# Barrel and EndCap CaloJet/HT
 # ########################################################################
 # ----    Produce the calibrated tower collection combining Barrel, HGCal, HF
 from L1Trigger.L1CaloTrigger.l1tTowerCalibrationProducer_cfi import *
@@ -149,6 +152,12 @@ l1tSAMuonsGmt = l1tStandaloneMuons.clone()
 _phase2_siml1emulator.add( l1tTkStubsGmt )
 _phase2_siml1emulator.add( l1tTkMuonsGmt )
 _phase2_siml1emulator.add( l1tSAMuonsGmt )
+
+## fix for low-pt muons, this collection is a copy of the l1tTkMuonsGmt collection 
+## in which we only keep those low pt muons with an SA muon associated to it. Threshold 
+## for this cutoff is configurable. 
+l1tTkMuonsGmtLowPtFix = l1tGMTFilteredMuons.clone()
+_phase2_siml1emulator.add( l1tTkMuonsGmtLowPtFix )
 
 # Tracker Objects
 # ########################################################################
