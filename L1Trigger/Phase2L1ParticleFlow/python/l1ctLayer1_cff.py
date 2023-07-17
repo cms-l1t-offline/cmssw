@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 import math
 
-from L1Trigger.Phase2L1ParticleFlow.l1tPFTracksFromL1Tracks_cfi import l1tPFTracksFromL1Tracks
+from L1Trigger.Phase2L1ParticleFlow.l1tPFTracksFromL1Tracks_cfi import l1tPFTracksFromL1Tracks, l1tPFTracksFromL1TracksExtended
 from L1Trigger.Phase2L1ParticleFlow.l1tPFClustersFromL1EGClusters_cfi import l1tPFClustersFromL1EGClusters
 from L1Trigger.Phase2L1ParticleFlow.pfClustersFromCombinedCalo_cff import l1tPFClustersFromCombinedCaloHCal, l1tPFClustersFromCombinedCaloHF
 from L1Trigger.Phase2L1ParticleFlow.l1tPFClustersFromHGC3DClusters_cfi import l1tPFClustersFromHGC3DClusters
@@ -17,7 +17,7 @@ muonInputConversionParameters = cms.PSet(
 l1tLayer1Barrel = cms.EDProducer("L1TCorrelatorLayer1Producer",
     tracks = cms.InputTag('l1tPFTracksFromL1Tracks'),
     muons = cms.InputTag('l1tSAMuonsGmt','promptSAMuons'),
-    emClusters = cms.VInputTag(cms.InputTag('l1tPFClustersFromL1EGClusters')),
+    emClusters = cms.VInputTag(cms.InputTag('l1tPFClustersFromL1EGClusters:selected')),
     hadClusters = cms.VInputTag(cms.InputTag('l1tPFClustersFromCombinedCaloHCal:calibrated')),
     vtxCollection = cms.InputTag("l1tVertexFinderEmulator","l1verticesEmulation"),
     vtxCollectionEmulation = cms.bool(True),
@@ -29,6 +29,7 @@ l1tLayer1Barrel = cms.EDProducer("L1TCorrelatorLayer1Producer",
         region = cms.string("barrel"),
         trackWordEncoding = cms.string("biased"),
         bitwiseAccurate = cms.bool(True),
+        slimDataFormat = cms.bool(True),
         ptLUTBits = cms.uint32(11),
         etaLUTBits = cms.uint32(10),
         etaPreOffs = cms.int32(0),
@@ -48,6 +49,7 @@ l1tLayer1Barrel = cms.EDProducer("L1TCorrelatorLayer1Producer",
         ),
     muonInputConversionAlgo = cms.string("Emulator"),
     muonInputConversionParameters = muonInputConversionParameters.clone(),
+    hgcalInputConversionAlgo = cms.string("Ideal"),
     regionizerAlgo = cms.string("Ideal"),
     pfAlgo = cms.string("PFAlgo3"),
     puAlgo = cms.string("LinearizedPuppi"),
@@ -106,6 +108,7 @@ l1tLayer1Barrel = cms.EDProducer("L1TCorrelatorLayer1Producer",
         nEMCALO_EGIN = 10,
         nEM_EGOUT = 10,
     ),
+    tkEgSorterAlgo = cms.string("Barrel"),
     tkEgSorterParameters=tkEgSorterParameters.clone(
         nObjToSort = 10
     ),
@@ -137,6 +140,8 @@ l1tLayer1Barrel = cms.EDProducer("L1TCorrelatorLayer1Producer",
     )
 )
 
+l1tLayer1BarrelExtended = l1tLayer1Barrel.clone(tracks = cms.InputTag('l1tPFTracksFromL1TracksExtended'))
+
 _hgcalSectors = cms.VPSet(
     cms.PSet( 
         etaBoundaries = cms.vdouble(-3.0, -1.5),
@@ -167,6 +172,7 @@ l1tLayer1HGCal = cms.EDProducer("L1TCorrelatorLayer1Producer",
         region = cms.string("endcap"),
         trackWordEncoding = cms.string("biased"),
         bitwiseAccurate = cms.bool(True),
+        slimDataFormat = cms.bool(False),
         ptLUTBits = cms.uint32(11),
         etaLUTBits = cms.uint32(11),
         etaPreOffs = cms.int32(0),
@@ -191,11 +197,17 @@ l1tLayer1HGCal = cms.EDProducer("L1TCorrelatorLayer1Producer",
         ),
     muonInputConversionAlgo = cms.string("Emulator"),
     muonInputConversionParameters = muonInputConversionParameters.clone(),
+    hgcalInputConversionAlgo = cms.string("Emulator"),
+    hgcalInputConversionParameters = cms.PSet(
+        slim = cms.bool(False)
+    ),
     regionizerAlgo = cms.string("Multififo"),
     regionizerAlgoParameters = cms.PSet(
         useAlsoVtxCoords = cms.bool(True),
         nEndcaps = cms.uint32(2),
         nClocks = cms.uint32(54),
+        nTkLinks = cms.uint32(2),
+        nCaloLinks = cms.uint32(3),
         nTrack = cms.uint32(30),
         nCalo = cms.uint32(20),
         nEmCalo = cms.uint32(10),
@@ -257,7 +269,10 @@ l1tLayer1HGCal = cms.EDProducer("L1TCorrelatorLayer1Producer",
         doBremRecovery=True,
         doEndcapHwQual=True,
         writeBeforeBremRecovery=False,
-        writeEGSta=True),
+        writeEGSta=True,
+        doCompositeTkEle=True,
+        trkQualityPtMin=0.), # This should be 10 GeV when doCompositeTkEle=False
+    tkEgSorterAlgo = cms.string("Endcap"),
     tkEgSorterParameters=tkEgSorterParameters.clone(
         nObjToSort = 5
     ),
@@ -286,6 +301,13 @@ l1tLayer1HGCal = cms.EDProducer("L1TCorrelatorLayer1Producer",
     writeRawHgcalCluster = cms.untracked.bool(True)
 )
 
+l1tLayer1HGCalElliptic = l1tLayer1HGCal.clone(
+    tkEgAlgoParameters = l1tLayer1HGCal.tkEgAlgoParameters.clone(
+        doCompositeTkEle = False,
+        trkQualityPtMin = 10.)
+)
+
+l1tLayer1HGCalExtended = l1tLayer1HGCal.clone(tracks = cms.InputTag('l1tPFTracksFromL1TracksExtended'))
 
 l1tLayer1HGCalNoTK = cms.EDProducer("L1TCorrelatorLayer1Producer",
     tracks = cms.InputTag(''),
@@ -300,6 +322,10 @@ l1tLayer1HGCalNoTK = cms.EDProducer("L1TCorrelatorLayer1Producer",
     trkPtCut    = cms.double(2.0),
     muonInputConversionAlgo = cms.string("Emulator"),
     muonInputConversionParameters = muonInputConversionParameters.clone(),
+    hgcalInputConversionAlgo = cms.string("Emulator"),
+    hgcalInputConversionParameters = cms.PSet(
+        slim = cms.bool(True)
+    ),
     regionizerAlgo = cms.string("Ideal"),
     pfAlgo = cms.string("PFAlgoDummy"),
     puAlgo = cms.string("LinearizedPuppi"),
@@ -344,6 +370,7 @@ l1tLayer1HGCalNoTK = cms.EDProducer("L1TCorrelatorLayer1Producer",
         doEndcapHwQual=True,
         writeBeforeBremRecovery=False,
         writeEGSta=True),
+    tkEgSorterAlgo = cms.string("Endcap"),
     tkEgSorterParameters=tkEgSorterParameters.clone(
         nObjToSort=5
     ),
@@ -385,6 +412,7 @@ l1tLayer1HF = cms.EDProducer("L1TCorrelatorLayer1Producer",
     trkPtCut    = cms.double(2.0),
     muonInputConversionAlgo = cms.string("Ideal"),
     muonInputConversionParameters = muonInputConversionParameters.clone(),
+    hgcalInputConversionAlgo = cms.string("Ideal"),
     regionizerAlgo = cms.string("Ideal"),
     pfAlgo = cms.string("PFAlgoDummy"),
     puAlgo = cms.string("LinearizedPuppi"),
@@ -427,6 +455,7 @@ l1tLayer1HF = cms.EDProducer("L1TCorrelatorLayer1Producer",
         nEM_EGOUT = 5,        # to be defined
         doBremRecovery=True,
         writeEGSta=True),
+    tkEgSorterAlgo = cms.string("Endcap"),
     tkEgSorterParameters=tkEgSorterParameters.clone(),
     caloSectors = cms.VPSet(
         cms.PSet( 
@@ -467,6 +496,16 @@ l1tLayer1 = cms.EDProducer("L1TPFCandMultiMerger",
     ),
     labelsToMerge = cms.vstring("PF", "Puppi", "Calo", "TK"),
     regionalLabelsToMerge = cms.vstring("Puppi"),
+)
+
+
+l1tLayer1Extended = l1tLayer1.clone(
+    pfProducers = cms.VInputTag(
+        cms.InputTag("l1tLayer1BarrelExtended"),
+        cms.InputTag("l1tLayer1HGCalExtended"),
+        cms.InputTag("l1tLayer1HGCalNoTK"),
+        cms.InputTag("l1tLayer1HF")
+    )
 )
 
 l1tLayer1EG = cms.EDProducer(
@@ -511,19 +550,69 @@ l1tLayer1EG = cms.EDProducer(
     )
 )
 
+l1tLayer1EGElliptic = cms.EDProducer(
+    "L1TEGMultiMerger",
+    tkElectrons=cms.VPSet(
+        cms.PSet(
+            instance=cms.string("L1TkEleEE"),
+            pfProducers=cms.VInputTag(
+                cms.InputTag("l1tLayer1HGCalElliptic", 'L1TkEle')
+            )
+        ),
+        cms.PSet(
+            instance=cms.string("L1TkEleEB"),
+            pfProducers=cms.VInputTag(
+                cms.InputTag("l1tLayer1Barrel", 'L1TkEle')
+            )
+        )
+    ),
+    tkEms=cms.VPSet(
+        cms.PSet(
+            instance=cms.string("L1TkEmEE"),
+            pfProducers=cms.VInputTag(
+                cms.InputTag("l1tLayer1HGCalElliptic", 'L1TkEm'),
+                cms.InputTag("l1tLayer1HGCalNoTK", 'L1TkEm')
+            )
+        ),
+        cms.PSet(
+            instance=cms.string("L1TkEmEB"),
+            pfProducers=cms.VInputTag(
+                cms.InputTag("l1tLayer1Barrel", 'L1TkEm')
+            )
+        )
+    ),
+    tkEgs=cms.VPSet(
+        cms.PSet(
+            instance=cms.string("L1EgEE"),
+            pfProducers=cms.VInputTag(
+                cms.InputTag("l1tLayer1HGCalElliptic", 'L1Eg'),
+                cms.InputTag("l1tLayer1HGCalNoTK", 'L1Eg')
+            )
+        )    
+    )
+)
+
+
+
 L1TLayer1TaskInputsTask = cms.Task(
     l1tPFClustersFromL1EGClusters,
     l1tPFClustersFromCombinedCaloHCal,
     l1tPFClustersFromCombinedCaloHF,
     l1tPFClustersFromHGC3DClusters,
-    l1tPFTracksFromL1Tracks
+    l1tPFTracksFromL1Tracks,
+    l1tPFTracksFromL1TracksExtended
 )
 
 L1TLayer1Task = cms.Task(
      l1tLayer1Barrel,
+     l1tLayer1BarrelExtended,
      l1tLayer1HGCal,
+     l1tLayer1HGCalExtended,
      l1tLayer1HGCalNoTK,
      l1tLayer1HF,
      l1tLayer1,
-     l1tLayer1EG
+     l1tLayer1Extended,
+     l1tLayer1HGCalElliptic,
+     l1tLayer1EG,
+     l1tLayer1EGElliptic
 )

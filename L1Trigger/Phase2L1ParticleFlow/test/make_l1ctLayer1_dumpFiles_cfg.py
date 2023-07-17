@@ -38,6 +38,28 @@ process.l1tVertexFinderEmulator.l1TracksInputTag = cms.InputTag("l1tGTTInputProd
 from L1Trigger.Phase2L1GMT.gmt_cfi import l1tStandaloneMuons
 process.l1tSAMuonsGmt = l1tStandaloneMuons.clone()
 
+process.l1tLayer1BarrelSerenity = process.l1tLayer1Barrel.clone()
+process.l1tLayer1BarrelSerenity.regionizerAlgo = "MultififoBarrel"
+process.l1tLayer1BarrelSerenity.regionizerAlgoParameters = cms.PSet(
+        barrelSetup = cms.string("Full54"),
+        useAlsoVtxCoords = cms.bool(True),
+        nClocks = cms.uint32(54),
+        nHCalLinks = cms.uint32(2),
+        nECalLinks = cms.uint32(1),
+        nTrack = cms.uint32(22),
+        nCalo = cms.uint32(15),
+        nEmCalo = cms.uint32(12),
+        nMu = cms.uint32(2))
+process.l1tLayer1BarrelSerenity.pfAlgoParameters.nTrack = 22
+process.l1tLayer1BarrelSerenity.pfAlgoParameters.nSelCalo = 15
+process.l1tLayer1BarrelSerenity.pfAlgoParameters.nCalo = 15
+process.l1tLayer1BarrelSerenity.pfAlgoParameters.nAllNeutral = 27
+process.l1tLayer1BarrelSerenity.puAlgoParameters.nTrack = 22
+process.l1tLayer1BarrelSerenity.puAlgoParameters.nIn = 27
+process.l1tLayer1BarrelSerenity.puAlgoParameters.nOut = 27
+process.l1tLayer1BarrelSerenity.puAlgoParameters.finalSortAlgo = "FoldedHybrid"
+
+
 process.l1tLayer1Barrel9 = process.l1tLayer1Barrel.clone()
 process.l1tLayer1Barrel9.puAlgo.nFinalSort = 32
 process.l1tLayer1Barrel9.regions[0].etaBoundaries = [ -1.5, -0.5, 0.5, 1.5 ] 
@@ -55,17 +77,24 @@ process.runPF = cms.Path(
         process.l1tGTTInputProducer +
         process.l1tVertexFinderEmulator +
         process.l1tLayer1Barrel +
+        process.l1tLayer1BarrelSerenity +
         process.l1tLayer1Barrel9 +
         process.l1tLayer1HGCal +
         process.l1tLayer1HGCalNoTK +
         process.l1tLayer1HF
 )
-process.runPF.associate(process.l1tLayer1TaskInputsTask)
+process.runPF.associate(process.L1TLayer1TaskInputsTask)
 
 
-for det in "Barrel", "Barrel9", "HGCal", "HGCalNoTK", "HF":
+for det in "Barrel", "BarrelSerenity", "Barrel9", "HGCal", "HGCalNoTK", "HF":
     l1pf = getattr(process, 'l1tLayer1'+det)
     l1pf.dumpFileName = cms.untracked.string("TTbar_PU200_"+det+".dump")
 
 process.source.fileNames  = [ '/store/cmst3/group/l1tr/gpetrucc/11_1_0/NewInputs110X/110121.done/TTbar_PU200/inputs110X_%d.root' % i for i in (1,3,7,8,9) ]
-process.l1tPFClustersFromCombinedCaloHCal.phase2barrelCaloTowers = [cms.InputTag("l1tEGammaClusterEmuProducer",)]
+process.l1tPFClustersFromL1EGClusters.src = cms.InputTag("L1EGammaClusterEmuProducer",)
+process.l1tPFClustersFromCombinedCaloHCal.phase2barrelCaloTowers = [cms.InputTag("L1EGammaClusterEmuProducer",)]
+process.l1tPFClustersFromHGC3DClusters.src  = cms.InputTag("hgcalBackEndLayer2Producer","HGCalBackendLayer2Processor3DClustering")
+process.l1tPFClustersFromCombinedCaloHF.hcalCandidates = [ cms.InputTag("hgcalBackEndLayer2Producer","HGCalBackendLayer2Processor3DClustering")]
+process.l1tPFTracksFromL1Tracks.L1TrackTag = cms.InputTag("TTTracksFromTrackletEmulation","Level1TTTracks")
+process.l1tGTTInputProducer.l1TracksInputTag = cms.InputTag("TTTracksFromTrackletEmulation","Level1TTTracks")
+
