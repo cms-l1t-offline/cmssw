@@ -195,6 +195,7 @@ private:
   double HcalEtMinForClustering;
   double EtMinForSeeding;
   double EtaRestriction;
+  double CB_CE_split;
   double PuidThr;
 
   std::string CNNmodel_CB_path;
@@ -233,6 +234,7 @@ private:
 
   PUid_t intPuidThr;
   IEta_t intEtaRestriction;
+  IEta_t intCB_CE_split;
 
   // Class for the towers info as they should be in GCT
   class SimpleTowerHit {
@@ -394,6 +396,7 @@ l1tNNCaloTauEmulator::l1tNNCaloTauEmulator(const edm::ParameterSet& iConfig)
       HcalEtMinForClustering(iConfig.getParameter<double>("HcalEtMinForClustering")),
       EtMinForSeeding(iConfig.getParameter<double>("EtMinForSeeding")),
       EtaRestriction(iConfig.getParameter<double>("EtaRestriction")),
+      CB_CE_split(iConfig.getParameter<double>("CB_CE_split")),
       PuidThr(iConfig.getParameter<double>("PuidThr")),
 
       CNNmodel_CB_path(iConfig.getParameter<std::string>("CNNmodel_CB_path")),
@@ -440,12 +443,14 @@ l1tNNCaloTauEmulator::l1tNNCaloTauEmulator(const edm::ParameterSet& iConfig)
 
   intPuidThr = apintQuantizer(PuidThr, PUID_LSB, PUID_W);
   intEtaRestriction = apintQuantizer(EtaRestriction, IETAPHI_LSB, IETAPHI_W);
+  intCB_CE_split = apintQuantizer(CB_CE_split, IETAPHI_LSB, IETAPHI_W) + 1;
 
   // Create produced outputs
   produces<BXVector<l1t::Tau>>("L1NNCaloTauCollectionBXV");
 
   // Settings output
-  std::cout << "EtaRestriction = " << EtaRestriction << " (" << intEtaRestriction
+  std::cout << "EtaRestriction = " << EtaRestriction << " (" << intEtaRestriction << ")"
+            << " , CB_CE_split = " << CB_CE_split << "(" << intCB_CE_split
             << ") , EtMinForSeeding = " << EtMinForSeeding << " , HcalTpEtMin = " << HcalEtMinForClustering
             << " , EcalTpEtMin = " << EcalEtMinForClustering << " , PuidThr = " << PuidThr << "(" << intPuidThr << ")"
             << std::endl;
@@ -593,7 +598,8 @@ void l1tNNCaloTauEmulator::produce(edm::Event& iEvent, const edm::EventSetup& eS
     for (auto& l1CaloTower : l1CaloTowers) {
       // Skip seeding in towers that would make the cluster extend in HF
       // Skip l1CaloTowers which are already used by this clusters' mask
-      if (ap_abs(l1CaloTower.towerIeta) > Eta_limit || l1CaloTower.stale4seed) {
+      if (ap_abs(l1CaloTower.towerIeta) > Eta_limit || ap_abs(l1CaloTower.towerIeta) > intEtaRestriction ||
+          l1CaloTower.stale4seed) {
         continue;
       }
 
@@ -630,7 +636,7 @@ void l1tNNCaloTauEmulator::produce(edm::Event& iEvent, const edm::EventSetup& eS
 
     // Pushback seeds split in barrel and endcap
     if (seeded) {
-      if (clNxM.barrelSeeded) {
+      if (ap_abs(clNxM_pstn.seedIeta) <= intCB_CE_split) {
         l1TowerClustersNxM_CB.push_back(clNxM);
         l1TowerClustersNxM_CB_pstn.push_back(clNxM_pstn);
         Nclusters_CB++;
@@ -720,7 +726,7 @@ void l1tNNCaloTauEmulator::produce(edm::Event& iEvent, const edm::EventSetup& eS
   // Barrel TauMinator application
   tensorflow::setLogging("2");
   int batchSize_CB = (int)(Nclusters_CB);
-  tensorflow::TensorShape imageShape_CB({batchSize_CB, IEta_dim, IPhi_dim, 3});
+  tensorflow::TensorShape imageShape_CB({batchSize_CB, IEta_dim, IPhi_dim, 2});
   tensorflow::TensorShape positionShape_CB({batchSize_CB, 2});
   tensorflow::Tensor TowerClusterImage_CB(tensorflow::DT_FLOAT, imageShape_CB);
   tensorflow::Tensor TowerClusterPosition_CB(tensorflow::DT_FLOAT, positionShape_CB);
@@ -731,11 +737,10 @@ void l1tNNCaloTauEmulator::produce(edm::Event& iEvent, const edm::EventSetup& eS
       for (int phi = 0; phi < IPhi_dim; ++phi) {
         int towerIdx = eta * IPhi_dim + phi;
         TowerClusterImage_CB.tensor<float, 4>()(clNxMIdx, eta, phi, 0) =
-            l1TowerClustersNxM_CB[clNxMIdx].towerHits[towerIdx].l1egTowerEt.to_float();
+            (l1TowerClustersNxM_CB[clNxMIdx].towerHits[towerIdx].l1egTowerEt.to_float() +
+             l1TowerClustersNxM_CB[clNxMIdx].towerHits[towerIdx].towerEm.to_float());
         TowerClusterImage_CB.tensor<float, 4>()(clNxMIdx, eta, phi, 1) =
-            l1TowerClustersNxM_CB[clNxMIdx].towerHits[towerIdx].towerEm.to_float();
-        TowerClusterImage_CB.tensor<float, 4>()(clNxMIdx, eta, phi, 2) =
-            l1TowerClustersNxM_CB[clNxMIdx].towerHits[towerIdx].towerHad.to_float();
+            (l1TowerClustersNxM_CB[clNxMIdx].towerHits[towerIdx].towerHad.to_float());
       }
     }
 
@@ -762,7 +767,7 @@ void l1tNNCaloTauEmulator::produce(edm::Event& iEvent, const edm::EventSetup& eS
 
   // Endcap TauMinator application
   int batchSize_CE = (int)(Nclusters_CE);
-  tensorflow::TensorShape imageShape_CE({batchSize_CE, IEta_dim, IPhi_dim, 3});
+  tensorflow::TensorShape imageShape_CE({batchSize_CE, IEta_dim, IPhi_dim, 2});
   tensorflow::TensorShape positionShape_CE({batchSize_CE, 2});
   tensorflow::TensorShape cl3dfeatShape_CE({batchSize_CE, 8});
   tensorflow::Tensor TowerClusterImage_CE(tensorflow::DT_FLOAT, imageShape_CE);
@@ -778,11 +783,10 @@ void l1tNNCaloTauEmulator::produce(edm::Event& iEvent, const edm::EventSetup& eS
       for (int phi = 0; phi < IPhi_dim; ++phi) {
         int towerIdx = eta * IPhi_dim + phi;
         TowerClusterImage_CE.tensor<float, 4>()(clNxMIdx, eta, phi, 0) =
-            l1TowerClustersNxM_CE[clNxMIdx].towerHits[towerIdx].l1egTowerEt.to_float();
+            (l1TowerClustersNxM_CE[clNxMIdx].towerHits[towerIdx].l1egTowerEt.to_float() +
+             l1TowerClustersNxM_CE[clNxMIdx].towerHits[towerIdx].towerEm.to_float());
         TowerClusterImage_CE.tensor<float, 4>()(clNxMIdx, eta, phi, 1) =
-            l1TowerClustersNxM_CE[clNxMIdx].towerHits[towerIdx].towerEm.to_float();
-        TowerClusterImage_CE.tensor<float, 4>()(clNxMIdx, eta, phi, 2) =
-            l1TowerClustersNxM_CE[clNxMIdx].towerHits[towerIdx].towerHad.to_float();
+            (l1TowerClustersNxM_CE[clNxMIdx].towerHits[towerIdx].towerHad.to_float());
       }
     }
 
@@ -816,7 +820,7 @@ void l1tNNCaloTauEmulator::produce(edm::Event& iEvent, const edm::EventSetup& eS
 
   // Apply DNN for calibration
   std::vector<tensorflow::Tensor> DNN_CEoutputsCalib;
-  tensorflow::run(DNNcalib_CEsession, DNN_CEinputsList, {"TauMinator_CE_calib/DNNout/MatMul"}, &DNN_CEoutputsCalib);
+  tensorflow::run(DNNcalib_CEsession, DNN_CEinputsList, {"TauMinator_CE_calib/LIN_DNNout/Relu"}, &DNN_CEoutputsCalib);
 
   // ------------------------------------------------------------- */
   // RESTART OF SOFTWARE PRECISION SECTION

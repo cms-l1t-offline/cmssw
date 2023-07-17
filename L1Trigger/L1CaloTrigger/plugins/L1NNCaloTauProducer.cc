@@ -92,6 +92,7 @@ private:
   double HcalEtMinForClustering;
   double EtMinForSeeding;
   double EtaRestriction;
+  double CB_CE_split;
 
   std::string CNNmodel_CB_path;
   std::string DNNident_CB_path;
@@ -207,6 +208,7 @@ l1tNNCaloTauProducer::l1tNNCaloTauProducer(const edm::ParameterSet& iConfig)
       HcalEtMinForClustering(iConfig.getParameter<double>("HcalEtMinForClustering")),
       EtMinForSeeding(iConfig.getParameter<double>("EtMinForSeeding")),
       EtaRestriction(iConfig.getParameter<double>("EtaRestriction")),
+      CB_CE_split(iConfig.getParameter<double>("CB_CE_split")),
 
       CNNmodel_CB_path(iConfig.getParameter<std::string>("CNNmodel_CB_path")),
       DNNident_CB_path(iConfig.getParameter<std::string>("DNNident_CB_path")),
@@ -254,9 +256,9 @@ l1tNNCaloTauProducer::l1tNNCaloTauProducer(const edm::ParameterSet& iConfig)
   produces<BXVector<l1t::Tau>>("L1NNCaloTauCollectionBXV");
 
   // Settings output
-  std::cout << "EtaRestriction = " << EtaRestriction << " , EtMinForSeeding = " << EtMinForSeeding
-            << " , HcalTpEtMin = " << HcalEtMinForClustering << " , EcalTpEtMin = " << EcalEtMinForClustering
-            << std::endl;
+  std::cout << "EtaRestriction = " << EtaRestriction << " , CB_CE_split = " << CB_CE_split
+            << " , EtMinForSeeding = " << EtMinForSeeding << " , HcalTpEtMin = " << HcalEtMinForClustering
+            << " , EcalTpEtMin = " << EcalEtMinForClustering << std::endl;
 }
 
 void l1tNNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eSetup) {
@@ -389,7 +391,8 @@ void l1tNNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eS
     for (auto& l1CaloTower : l1CaloTowers) {
       // Skip seeding in towers that would make the cluster extend in HF
       // Skip l1CaloTowers which are already used by this clusters' mask
-      if (abs(l1CaloTower.towerEta) > Eta_limit || l1CaloTower.stale4seed) {
+      if (abs(l1CaloTower.towerEta) > Eta_limit || abs(l1CaloTower.towerEta) > EtaRestriction ||
+          l1CaloTower.stale4seed) {
         continue;
       }
 
@@ -441,7 +444,7 @@ void l1tNNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eS
 
     // Pushback seeds split in barrel and endcap
     if (seeded) {
-      if (clNxM.barrelSeeded) {
+      if (abs(clNxM.seedEta) < CB_CE_split) {
         l1TowerClustersNxM_CB.push_back(clNxM);
       } else {
         AllL1TowerClustersNxM_CE.push_back(clNxM);
@@ -559,7 +562,7 @@ void l1tNNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eS
   // Barrel TauMinator application
   tensorflow::setLogging("2");
   int batchSize_CB = (int)(l1TowerClustersNxM_CB.size());
-  tensorflow::TensorShape imageShape_CB({batchSize_CB, IEta_dim, IPhi_dim, 3});
+  tensorflow::TensorShape imageShape_CB({batchSize_CB, IEta_dim, IPhi_dim, 2});
   tensorflow::TensorShape positionShape_CB({batchSize_CB, 2});
   tensorflow::Tensor TowerClusterImage_CB(tensorflow::DT_FLOAT, imageShape_CB);
   tensorflow::Tensor TowerClusterPosition_CB(tensorflow::DT_FLOAT, positionShape_CB);
@@ -571,10 +574,8 @@ void l1tNNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eS
       for (int phi = 0; phi < IPhi_dim; ++phi) {
         int towerIdx = eta * IPhi_dim + phi;
         TowerClusterImage_CB.tensor<float, 4>()(clIdx, eta, phi, 0) =
-            inputQuantizer(clNxM.towerHits[towerIdx].l1egTowerEt, 0.25, 10);
+            inputQuantizer(clNxM.towerHits[towerIdx].l1egTowerEt + clNxM.towerHits[towerIdx].towerEm, 0.25, 10);
         TowerClusterImage_CB.tensor<float, 4>()(clIdx, eta, phi, 1) =
-            inputQuantizer(clNxM.towerHits[towerIdx].towerEm, 0.25, 10);
-        TowerClusterImage_CB.tensor<float, 4>()(clIdx, eta, phi, 2) =
             inputQuantizer(clNxM.towerHits[towerIdx].towerHad, 0.25, 10);
       }
     }
@@ -600,7 +601,7 @@ void l1tNNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eS
 
   // Apply DNN for calibration
   std::vector<tensorflow::Tensor> DNN_CBoutputsCalib;
-  tensorflow::run(DNNcalib_CBsession, DNN_CBinputsList, {"TauMinator_CB_calib/DNNout/MatMul"}, &DNN_CBoutputsCalib);
+  tensorflow::run(DNNcalib_CBsession, DNN_CBinputsList, {"TauMinator_CB_calib/LIN_DNNout/Relu"}, &DNN_CBoutputsCalib);
 
   // Fill TauMinator output variables of TowerClusters
   clIdx = 0;
@@ -612,7 +613,7 @@ void l1tNNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eS
 
   // Endcap TauMinator application
   int batchSize_CE = (int)(l1TowerClustersNxM_CE.size());
-  tensorflow::TensorShape imageShape_CE({batchSize_CE, IEta_dim, IPhi_dim, 3});
+  tensorflow::TensorShape imageShape_CE({batchSize_CE, IEta_dim, IPhi_dim, 2});
   tensorflow::TensorShape positionShape_CE({batchSize_CE, 2});
   tensorflow::TensorShape cl3dfeatShape_CE({batchSize_CE, 8});
   tensorflow::Tensor TowerClusterImage_CE(tensorflow::DT_FLOAT, imageShape_CE);
@@ -629,10 +630,8 @@ void l1tNNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eS
       for (int phi = 0; phi < IPhi_dim; ++phi) {
         int towerIdx = eta * IPhi_dim + phi;
         TowerClusterImage_CE.tensor<float, 4>()(clIdx, eta, phi, 0) =
-            inputQuantizer(clNxM.towerHits[towerIdx].l1egTowerEt, 0.25, 10);
+            inputQuantizer(clNxM.towerHits[towerIdx].l1egTowerEt + clNxM.towerHits[towerIdx].towerEm, 0.25, 10);
         TowerClusterImage_CE.tensor<float, 4>()(clIdx, eta, phi, 1) =
-            inputQuantizer(clNxM.towerHits[towerIdx].towerEm, 0.25, 10);
-        TowerClusterImage_CE.tensor<float, 4>()(clIdx, eta, phi, 2) =
             inputQuantizer(clNxM.towerHits[towerIdx].towerHad, 0.25, 10);
       }
     }
@@ -672,7 +671,7 @@ void l1tNNCaloTauProducer::produce(edm::Event& iEvent, const edm::EventSetup& eS
 
   // Apply DNN for calibration
   std::vector<tensorflow::Tensor> DNN_CEoutputsCalib;
-  tensorflow::run(DNNcalib_CEsession, DNN_CEinputsList, {"TauMinator_CE_calib/DNNout/MatMul"}, &DNN_CEoutputsCalib);
+  tensorflow::run(DNNcalib_CEsession, DNN_CEinputsList, {"TauMinator_CE_calib/LIN_DNNout/Relu"}, &DNN_CEoutputsCalib);
 
   // Fill TauMinator output variables of TowerClusters
   clIdx = 0;
